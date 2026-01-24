@@ -50,8 +50,8 @@ Build stack
 - Zod for schema validation of frontmatter.
 
 Obsidian vault
-- Treat the repo root as the vault.
-- Create new notes under `notes/`.
+- Vault root is `notes/`.
+- Create new notes directly inside `notes/`.
 - Supported formats include Markdown and other Obsidian file types.
 
 Notes: IPFS ecosystem vs ontology systems
