@@ -178,10 +178,17 @@
   },
   "active": "a6e4ca9acdbb26ea",
   "lastOpenFiles": [
-    "Publish Limitations.md",
-    "Publishing.md",
-    "Cognitive JQ.md",
-    "Cognitive Folding.md",
-    "00-Home.md"
+    "publishing.md",
+    "publish-limitations.md",
+    "cognitive-jq.md",
+    "cognitive-folding.md",
+    "00-home.md",
+    "_includes/layout.njk",
+    "_includes",
+    "publish-limitations.md",
+    "publishing.md",
+    "cognitive-jq.md",
+    "cognitive-folding.md",
+    "00-home.md"
   ]
 }

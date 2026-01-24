@@ -1,14 +1,15 @@
 ---
-title: Fold-engine Vault
+title: fold-engine-vault
 tags:
   - fold-engine
   - vault
   - schema
 schema: fold-v1
 fold: bounded-tree
+layout: layout.njk
 ---
 
-# Fold-engine Vault
+# fold-engine-vault
 
 This vault is the structured writing surface for cognitive folding.
 
@@ -19,7 +20,7 @@ This vault is the structured writing surface for cognitive folding.
 - JSON as the shared lens
 
 ## Start here
-- [[Cognitive Folding]]
-- [[Cognitive JQ]]
-- [[Publishing]]
-- [[Publish Limitations]]
+- [[cognitive-folding]]
+- [[cognitive-jq]]
+- [[publishing]]
+- [[publish-limitations]]
