@@ -11,10 +11,14 @@
             "id": "a6e4ca9acdbb26ea",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "cognitive-folding.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "cognitive-folding"
             }
           }
         ]
@@ -90,6 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "cognitive-folding.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -99,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks"
+              "title": "Backlinks for cognitive-folding"
             }
           },
           {
@@ -108,11 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "cognitive-folding.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links"
+              "title": "Outgoing links from cognitive-folding"
             }
           },
           {
@@ -150,12 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "cognitive-folding.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline"
+              "title": "Outline of cognitive-folding"
             }
           }
         ]
@@ -178,17 +185,21 @@
   },
   "active": "a6e4ca9acdbb26ea",
   "lastOpenFiles": [
-    "publishing.md",
-    "publish-limitations.md",
-    "cognitive-jq.md",
-    "cognitive-folding.md",
     "00-home.md",
+    "home.md",
+    "_includes/layout.tmpl.ts",
+    "index.md",
+    "project-notes.md",
+    "cognitive-folding.md",
+    "cognitive-jq.md",
+    "publish-limitations.md",
+    "publishing.md",
     "_includes/layout.njk",
     "_includes",
-    "publish-limitations.md",
-    "publishing.md",
-    "cognitive-jq.md",
-    "cognitive-folding.md",
-    "00-home.md"
+    "Publish Limitations.md",
+    "Publishing.md",
+    "Cognitive JQ.md",
+    "Cognitive Folding.md",
+    "00-Home.md"
   ]
 }

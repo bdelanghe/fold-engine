@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "validate": "deno run -A scripts/validate_frontmatter.ts",
+    "validate": "deno test -A tests/notes_validation_test.ts",
     "build": "deno task validate && deno run -A https://deno.land/x/lume/cli.ts",
     "dev": "deno run -A https://deno.land/x/lume/cli.ts -s"
   }

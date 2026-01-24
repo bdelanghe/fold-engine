@@ -1,16 +1,24 @@
 {
   "name": "fold-engine",
-  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
-  "features": {
-    "ghcr.io/devcontainers/features/deno:1": {
-      "version": "latest"
+  "image": "denoland/deno:latest",
+  "postCreateCommand": "deno --version",
+  "forwardPorts": [3000, 3001],
+  "portsAttributes": {
+    "3000": {
+      "label": "Lume dev server",
+      "onAutoForward": "openBrowser"
+    },
+    "3001": {
+      "label": "Lume dev server (alt)",
+      "onAutoForward": "openBrowser"
     }
   },
   "customizations": {
     "vscode": {
-      "extensions": [
-        "denoland.vscode-deno"
-      ]
+      "extensions": ["denoland.vscode-deno"],
+      "settings": {
+        "deno.enable": true
+      }
     }
   }
 }
