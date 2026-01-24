@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "validate": "deno test -A tests/",
+    "validate": "deno test -A src/tests/",
     "cache": "deno cache --vendor lume.config.ts",
     "build:site": "deno task cache && deno run -A --vendor https://deno.land/x/lume/cli.ts",
     "build": "deno task cache && deno task validate && deno task build:site",

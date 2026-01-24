@@ -1,15 +1,14 @@
 import Ajv from "npm:ajv";
-import {
-  assert,
-  assertEquals,
-} from "https://deno.land/std/assert/mod.ts";
-import { generateSiteManifest } from "../src/site/manifest.ts";
+import addFormats from "npm:ajv-formats";
+import { assert, assertEquals } from "https://deno.land/std/assert/mod.ts";
+import { generateSiteManifest } from "../site/manifest.ts";
 import expectations from "./contracts/site.manifest.expectations.json" assert {
   type: "json",
 };
 import schema from "./contracts/site.manifest.schema.json" assert {
   type: "json",
 };
+import site from "../../lume.config.ts";
 
 type Expectations = {
   siteUrl?: string;
@@ -112,9 +111,6 @@ Deno.test("site manifest contract", async () => {
     assert(page.hasJsonLd, `Missing JSON-LD on ${path}`);
   }
 });
-import Ajv from "npm:ajv";
-import addFormats from "npm:ajv-formats";
-import site from "../lume.config.ts";
 
 const readJson = async (path: string) =>
   JSON.parse(await Deno.readTextFile(path));
@@ -123,7 +119,7 @@ Deno.test("site manifest matches schema and invariants", async () => {
   await site.build();
 
   const schema = await readJson(
-    new URL("../site.manifest.schema.json", import.meta.url).pathname,
+    new URL("../../site.manifest.schema.json", import.meta.url).pathname,
   );
   const manifestPath = site.dest("site.manifest.json");
   const manifest = await readJson(manifestPath);
