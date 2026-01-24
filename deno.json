@@ -1,7 +1,16 @@
 {
   "tasks": {
-    "validate": "deno test -A tests/notes_validation_test.ts",
-    "build": "deno task validate && deno run -A https://deno.land/x/lume/cli.ts",
-    "dev": "deno run -A https://deno.land/x/lume/cli.ts -s"
+    "validate": "deno test -A tests/",
+    "cache": "deno cache --vendor lume.config.ts",
+    "build:site": "deno task cache && deno run -A --vendor https://deno.land/x/lume/cli.ts",
+    "build": "deno task cache && deno task validate && deno task build:site",
+    "dev": "deno task cache && deno run -A --vendor https://deno.land/x/lume/cli.ts -s"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1.0.17",
+    "ajv": "npm:ajv@^8.17.1",
+    "lume/": "https://deno.land/x/lume@v3.1.4/",
+    "lume/plugins/": "https://deno.land/x/lume@v3.1.4/plugins/",
+    "lume/plugins/vento.ts": "https://deno.land/x/lume@v3.1.4/plugins/vento.ts"
   }
 }

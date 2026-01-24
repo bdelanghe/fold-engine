@@ -53,8 +53,8 @@ linked by CIDs so that each part can evolve independently.
 
 ### Structural atoms
 
-Anything that can be reused, referenced elsewhere, or indexed globally should
-be a candidate for its own CID-backed object.
+Anything that can be reused, referenced elsewhere, or indexed globally should be
+a candidate for its own CID-backed object.
 
 ### Front-matter fields as links
 

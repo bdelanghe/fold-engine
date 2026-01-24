@@ -1,0 +1,21 @@
+_site/
+node_modules/
+vendor/
+
+# Local environment
+.env
+.env.*
+
+# Editor/OS files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Obsidian local workspace/cache
+**/.obsidian/workspace.json
+**/.obsidian/workspace.json.bak
+**/.obsidian/workspace
+**/.obsidian/cache/
+**/.obsidian/graph.json
