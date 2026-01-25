@@ -4,6 +4,13 @@ Unfold is organized around validation-first JSON-LD. The core pipeline focuses
 on type-safe schemas, SHACL-style graph constraints, and deterministic
 validation before any rendering or exports.
 
+## Validation Modes
+
+Validation mode is controlled by `UNFOLD_VALIDATE_MODE`:
+
+- `dev` (default): authoring-friendly validation
+- `strict`: CI gate validation
+
 ## Structure
 
 - `cli/` — entrypoints and argument parsing.

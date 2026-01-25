@@ -6,6 +6,7 @@ import metas from "lume/plugins/metas.ts";
 import robots from "lume/plugins/robots.ts";
 import sitemap from "lume/plugins/sitemap.ts";
 import vento from "lume/plugins/vento.ts";
+import jsonLdLoader from "../renderers/lume/jsonld_loader.ts";
 import {
   buildExternalLinksHtml,
   buildExternalLinksXml,
@@ -139,10 +140,7 @@ export const createSite = (): ReturnType<typeof lume> => {
   site.remoteFile("_includes/layout.tmpl.ts", layoutPath);
 
   // Register JSON-LD loader
-  const jsonLdLoaderPath = fromFileUrl(
-    new URL("../renderers/lume/jsonld_loader.ts", import.meta.url),
-  );
-  site.loadData([".jsonld"], jsonLdLoaderPath);
+  site.loadData([".jsonld"], jsonLdLoader());
 
   site.data("site", { url: siteUrl, basePath });
   site.data("layout", "layout.tmpl.ts");

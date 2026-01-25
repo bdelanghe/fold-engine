@@ -24,7 +24,9 @@ const SCHEMA_MAP: Record<string, string> = {
 /**
  * Load a JSON Schema from the schemas directory
  */
-async function loadSchema(schemaFile: string): Promise<Record<string, unknown>> {
+async function loadSchema(
+  schemaFile: string,
+): Promise<Record<string, unknown>> {
   const schemaPath = join(
     Deno.cwd(),
     "src",
@@ -108,28 +110,37 @@ export async function validateNode(node: VaultNode): Promise<void> {
 /**
  * Validate all nodes
  */
-export async function validateNodes(nodes: VaultNode[]): Promise<ValidationError[]> {
-  const errors: ValidationError[] = [];
-
-  for (const node of nodes) {
-    try {
+export async function validateNodes(
+  nodes: VaultNode[],
+): Promise<ValidationError[]> {
+  const results = await Promise.allSettled(
+    nodes.map(async (node) => {
       await validateNode(node);
-    } catch (error) {
-      if (error instanceof ValidationError) {
-        errors.push(error);
-      } else {
-        errors.push(
-          new ValidationError(
-            `Validation error: ${error instanceof Error ? error.message : String(error)}`,
-            node._source?.file || "unknown",
-            error,
-          ),
-        );
-      }
-    }
-  }
+      return node;
+    }),
+  );
 
-  return errors;
+  return results.flatMap((result, index) => {
+    if (result.status === "fulfilled") {
+      return [];
+    }
+
+    const error = result.reason;
+    const node = nodes[index];
+    if (error instanceof ValidationError) {
+      return [error];
+    }
+
+    return [
+      new ValidationError(
+        `Validation error: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+        node?._source?.file || "unknown",
+        error,
+      ),
+    ];
+  });
 }
 
 /**
@@ -181,7 +192,8 @@ export function extractSemanticAnnotations(
           "@container": prop["x-jsonld-container"],
         };
       } else if (typeof existing === "object" && existing !== null) {
-        (existing as Record<string, unknown>)["@container"] = prop["x-jsonld-container"];
+        (existing as Record<string, unknown>)["@container"] =
+          prop["x-jsonld-container"];
       } else {
         context[propName] = {
           "@id": prop["x-jsonld-term"] || propName,

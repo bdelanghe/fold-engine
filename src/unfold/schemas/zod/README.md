@@ -28,7 +28,7 @@ JSON Schema (for external tools)
 ### Page
 
 ```typescript
-import { PageSchema, type Page } from "./page.ts";
+import { type Page, PageSchema } from "./page.ts";
 
 const page: Page = {
   "@type": "basis:Page",
@@ -42,7 +42,7 @@ PageSchema.parse(page); // validates at runtime
 ### Reference
 
 ```typescript
-import { ReferenceSchema, type Reference } from "./reference.ts";
+import { type Reference, ReferenceSchema } from "./reference.ts";
 
 const ref: Reference = {
   "@type": "basis:Reference",
@@ -55,7 +55,7 @@ const ref: Reference = {
 ### Concept
 
 ```typescript
-import { ConceptSchema, type Concept } from "./concept.ts";
+import { type Concept, ConceptSchema } from "./concept.ts";
 
 const concept: Concept = {
   "@id": "https://example.org/vocab/basis#Test",
@@ -78,6 +78,7 @@ const result = schema?.parse(node);
 ## Generating JSON Schema
 
 Future: Use `zod-to-json-schema` or similar to generate JSON Schema for:
+
 - External documentation
 - API contracts
 - Non-TypeScript tools

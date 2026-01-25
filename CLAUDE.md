@@ -1,14 +1,19 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with
+code in this repository.
 
 ## Project Overview
 
-Unfold is a compiler that treats Obsidian Markdown notes as typed records, validates the vault, and emits deterministic static artifacts (HTML, JSON, manifests, and machine-readable projections). The Obsidian vault is the single source of truth.
+Unfold is a compiler that treats Obsidian Markdown notes as typed records,
+validates the vault, and emits deterministic static artifacts (HTML, JSON,
+manifests, and machine-readable projections). The Obsidian vault is the single
+source of truth.
 
 ## Development Commands
 
 ### Core Workflow
+
 ```bash
 # Development server (port 3000)
 deno task dev
@@ -34,6 +39,7 @@ deno task clean
 ```
 
 ### Internal Commands
+
 ```bash
 # Cache Lume dependencies
 deno task cache
@@ -46,6 +52,7 @@ deno task docs
 ```
 
 ### Beads (Issue Tracking)
+
 ```bash
 # View available work
 bd ready
@@ -70,10 +77,13 @@ bd close <issue-id>
 bd sync
 ```
 
-**Important:** This project uses beads for AI-native issue tracking. Issues are stored in `.beads/` and synced with git.
-**Worktrees:** Run `bd` from a worktree checkout (not the bare repo store). Use `./scripts/bd` to auto-hop out of a bare repo and pin the local `.beads/beads.db` when present.
+**Important:** This project uses beads for AI-native issue tracking. Issues are
+stored in `.beads/` and synced with git. **Worktrees:** Run `bd` from a worktree
+checkout (not the bare repo store). Use `./scripts/bd` to auto-hop out of a bare
+repo and pin the local `.beads/beads.db` when present.
 
 ### Docker Workflow
+
 ```bash
 # Build images with Bake (not docker-compose)
 docker buildx bake
@@ -85,13 +95,16 @@ docker compose up unfold
 docker compose run --rm unfold-test
 ```
 
-**Important:** Compose consumes pre-built images from Bake. Never add `build:` directives to `docker-compose.yml`.
+**Important:** Compose consumes pre-built images from Bake. Never add `build:`
+directives to `docker-compose.yml`.
 
 ## Architecture
 
-Unfold is organized as a multi-pass compiler. Each directory represents a pass or interface:
+Unfold is organized as a multi-pass compiler. Each directory represents a pass
+or interface:
 
 ### Pipeline Flow
+
 ```
 vault/ (Obsidian notes)
   ↓ inputs/ (ingestion, markdown, frontmatter validation)
@@ -157,6 +170,7 @@ Three services run in Compose:
 ### Adding a New Pass
 
 Each pass is independently testable:
+
 1. Create module in appropriate directory (`inputs/`, `exporters/`, etc.)
 2. Export a `run*` function (e.g., `runExport()`)
 3. Add to `pipeline/build.ts` if part of core build
@@ -165,6 +179,7 @@ Each pass is independently testable:
 ### Schema Validation
 
 Frontmatter validation uses schemas in `schemas/`:
+
 - Edit `vault.manifest.schema.json` for note frontmatter
 - Edit `site.manifest.schema.json` for site metadata
 - Validation happens in `pipeline/validate.ts`
@@ -172,6 +187,7 @@ Frontmatter validation uses schemas in `schemas/`:
 ### Working with Vault Content
 
 Vault content is accessed via:
+
 - **Local development:** Direct filesystem reads from `vault/` directory
 - **Docker:** HTTP API at `http://vault-api:7777`
 - Set `VAULT_REQUIRE_BASE_URL=1` to enforce API usage
@@ -179,6 +195,7 @@ Vault content is accessed via:
 ### Linting Rules
 
 Strict linting enabled (see `deno.json`):
+
 - No `console.log` (use structured logging if needed)
 - Explicit return types required
 - No non-null assertions (`!`)
@@ -188,27 +205,32 @@ Strict linting enabled (see `deno.json`):
 ## Common Workflows
 
 ### Full Build from Scratch
+
 ```bash
 deno task clean
 deno task build
 ```
 
 ### Watch Mode Development
+
 ```bash
 deno task dev:watch
 ```
 
 ### Validate After Editing Notes
+
 ```bash
 deno task validate
 ```
 
 ### Check CI Readiness
+
 ```bash
 deno task ci
 ```
 
 ### Generate Documentation
+
 ```bash
 deno task docs
 # Output: dist/unfold/
@@ -226,8 +248,11 @@ deno task docs
 
 ## Key Conventions
 
-- **Task naming:** Public tasks use simple names (`dev`, `build`, `test`). Internal tasks use prefixed names (`unfold:server`, `vault:api`).
-- **Bake for builds:** Use `docker buildx bake` to build images, never `docker compose build`.
+- **Task naming:** Public tasks use simple names (`dev`, `build`, `test`).
+  Internal tasks use prefixed names (`unfold:server`, `vault:api`).
+- **Bake for builds:** Use `docker buildx bake` to build images, never
+  `docker compose build`.
 - **Health checks:** All services expose `GET /healthz` returning `"ok"`.
 - **No `build:` in Compose:** Compose files reference pre-built images only.
-- **Deterministic builds:** All outputs must be reproducible for the same vault input.
+- **Deterministic builds:** All outputs must be reproducible for the same vault
+  input.

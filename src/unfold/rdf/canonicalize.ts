@@ -41,7 +41,7 @@ export interface CanonicalizedDataset {
 export async function canonicalizeJsonLd(
   node: JsonLdNode,
 ): Promise<CanonicalizedDataset> {
-  // TODO: Integrate rdfjs-c14n library
+  // TODO(@bdelanghe): Integrate rdfjs-c14n library
   // For now, use deterministic JSON serialization as placeholder
 
   const canonical = await deterministicSerialize(node);
@@ -95,7 +95,7 @@ async function sha256(text: string): Promise<string> {
 /**
  * Canonicalize multiple nodes
  */
-export async function canonicalizeNodes(
+export function canonicalizeNodes(
   nodes: JsonLdNode[],
 ): Promise<CanonicalizedDataset[]> {
   return Promise.all(nodes.map(canonicalizeJsonLd));

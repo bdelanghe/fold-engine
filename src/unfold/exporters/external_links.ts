@@ -56,7 +56,9 @@ export const collectExternalLinks = (
     if (!pageUrl) {
       continue;
     }
-    const anchors = Array.from(page.document?.querySelectorAll("a[href]") ?? []);
+    const anchors = Array.from(
+      page.document?.querySelectorAll("a[href]") ?? [],
+    );
     for (const anchor of anchors) {
       const href = anchor.getAttribute("href")?.trim() ?? "";
       if (!href || isSkippableHref(href)) {
@@ -117,9 +119,7 @@ export const buildExternalLinksHtml = (
   const siteUrl = options.siteUrl.replace(/\/$/, "");
   const listItems = entries.map((entry) => {
     const sourceItems = entry.sources
-      .map((source) =>
-        `<li><a href="${source}">${source}</a></li>`
-      )
+      .map((source) => `<li><a href="${source}">${source}</a></li>`)
       .join("");
     return `<li>
   <a href="${entry.href}">${entry.href}</a>

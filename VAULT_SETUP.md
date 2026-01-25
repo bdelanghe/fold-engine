@@ -1,6 +1,8 @@
 # Vault Setup
 
-The `vault/` directory contains JSON-LD objects that serve as the source of truth for the knowledge graph. This directory is **not tracked in git** - it's external content that varies per deployment.
+The `vault/` directory contains JSON-LD objects that serve as the source of
+truth for the knowledge graph. This directory is **not tracked in git** - it's
+external content that varies per deployment.
 
 ## Structure
 
@@ -23,7 +25,8 @@ vault/
 
 ### Option 1: Use Example Vault (for testing)
 
-The test files demonstrate the expected structure. To create a minimal vault for local development:
+The test files demonstrate the expected structure. To create a minimal vault for
+local development:
 
 ```bash
 mkdir -p vault/{@context,pages,refs,vocab}
@@ -46,7 +49,8 @@ export VAULT_PATH=/path/to/your/vault
 
 ### Option 3: Use Docker Volume (for containerized setups)
 
-The docker-compose.yml already configures a vault service that clones from `VAULT_REPO`. Set in your `.env`:
+The docker-compose.yml already configures a vault service that clones from
+`VAULT_REPO`. Set in your `.env`:
 
 ```
 VAULT_REPO=https://github.com/yourusername/your-vault
@@ -106,6 +110,7 @@ VAULT_BRANCH=main
 ## Validation
 
 The loader validates:
+
 - JSON structure
 - JSON Schema compliance (using x-jsonld-* annotations)
 - @id presence and uniqueness
@@ -122,10 +127,12 @@ docker compose run --rm unfold deno task validate
 ## Why vault/ is not in git
 
 The vault contains your actual knowledge graph content, which:
+
 - May be large
 - Changes frequently
 - Might be private
 - Could be shared across multiple projects
 - Should be versioned separately from the compiler code
 
-This separation follows the "data vs code" principle - the fold-engine repository contains the compiler, your vault repository contains the data.
+This separation follows the "data vs code" principle - the fold-engine
+repository contains the compiler, your vault repository contains the data.

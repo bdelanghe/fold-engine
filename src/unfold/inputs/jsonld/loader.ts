@@ -5,7 +5,12 @@
 
 import { walk } from "@std/fs/walk";
 import { join } from "@std/path";
-import type { JsonLdDocument, JsonLdNode, LoadResult, VaultNode } from "./types.ts";
+import type {
+  JsonLdDocument,
+  JsonLdNode,
+  LoadResult,
+  VaultNode,
+} from "./types.ts";
 import { ValidationError } from "./types.ts";
 
 /**
@@ -62,7 +67,9 @@ export async function loadJsonLdFile(filePath: string): Promise<VaultNode[]> {
     return extractNodes(parsed, filePath);
   } catch (error) {
     throw new ValidationError(
-      `Failed to load JSON-LD file: ${error instanceof Error ? error.message : String(error)}`,
+      `Failed to load JSON-LD file: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
       filePath,
       error,
     );
@@ -94,7 +101,9 @@ export async function loadVault(vaultPath: string): Promise<LoadResult> {
         } else {
           errors.push(
             new ValidationError(
-              `Unexpected error loading file: ${error instanceof Error ? error.message : String(error)}`,
+              `Unexpected error loading file: ${
+                error instanceof Error ? error.message : String(error)
+              }`,
               entry.path,
               error,
             ),
@@ -105,7 +114,9 @@ export async function loadVault(vaultPath: string): Promise<LoadResult> {
   } catch (error) {
     errors.push(
       new ValidationError(
-        `Failed to walk vault directory: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to walk vault directory: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
         vaultPath,
         error,
       ),

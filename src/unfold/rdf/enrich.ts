@@ -42,8 +42,6 @@ export async function enrichNode(node: VaultNode): Promise<EnrichedNode> {
 /**
  * Enrich multiple nodes
  */
-export async function enrichNodes(
-  nodes: VaultNode[],
-): Promise<EnrichedNode[]> {
+export function enrichNodes(nodes: VaultNode[]): Promise<EnrichedNode[]> {
   return Promise.all(nodes.map(enrichNode));
 }

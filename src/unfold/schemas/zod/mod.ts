@@ -27,7 +27,9 @@ export const SCHEMA_REGISTRY = {
 /**
  * Get schema for a node's @type
  */
-export function getSchemaForType(type: string | string[] | undefined) {
+export function getSchemaForType(
+  type: string | string[] | undefined,
+): (typeof SCHEMA_REGISTRY)[keyof typeof SCHEMA_REGISTRY] | null {
   if (!type) return null;
 
   const types = Array.isArray(type) ? type : [type];

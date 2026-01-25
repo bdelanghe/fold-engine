@@ -18,6 +18,9 @@ Commands:
   build        Cache and validate JSON-LD
   dev          Start dev server (legacy)
   docs         Generate Unfold docs
+
+Env:
+  UNFOLD_VALIDATE_MODE=dev|strict   Validation mode (default: dev)
 `;
 
 const runCommand = async (

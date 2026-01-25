@@ -2,7 +2,10 @@
  * JSON-LD node types
  */
 
-export type JsonLdContext = string | Record<string, unknown> | Array<string | Record<string, unknown>>;
+export type JsonLdContext =
+  | string
+  | Record<string, unknown>
+  | Array<string | Record<string, unknown>>;
 
 export interface JsonLdNode {
   "@context"?: JsonLdContext;

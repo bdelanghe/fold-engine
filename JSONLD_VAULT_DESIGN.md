@@ -4,11 +4,14 @@
 
 ## Overview
 
-Instead of using Obsidian markdown as the vault source, the system will use **native JSON-LD objects** as the single source of truth. This "JSON-LD first" approach simplifies the pipeline and enables direct graph operations.
+Instead of using Obsidian markdown as the vault source, the system will use
+**native JSON-LD objects** as the single source of truth. This "JSON-LD first"
+approach simplifies the pipeline and enables direct graph operations.
 
 ## Architectural Change
 
 ### Before (Obsidian-based)
+
 ```
 vault/
   ├── pages/
@@ -25,6 +28,7 @@ vault/
 ```
 
 ### After (JSON-LD native)
+
 ```
 vault/
   ├── pages/
@@ -69,6 +73,7 @@ vault/
 ## Vault Structure
 
 ### Directory Layout
+
 ```
 vault/
 ├── catalog.jsonld              # DCAT catalog (entrypoint)
@@ -91,14 +96,17 @@ vault/
 ### File Naming Convention
 
 **Pages:** `pages/<slug>.jsonld`
+
 - Example: `pages/cognitive-folding.jsonld`
 - @id: `https://site/pages/cognitive-folding`
 
 **Refs:** `refs/<slug>.jsonld`
+
 - Example: `refs/wai-aria.jsonld`
 - @id: `https://site/refs/wai-aria`
 
 **Vocab terms:** `vocab/<vocab-name>.jsonld`
+
 - Example: `vocab/basis.jsonld`
 - Contains multiple terms with hash URIs
 - @id: `https://site/vocab/basis#Fold`, `#Unfold`, etc.
@@ -106,6 +114,7 @@ vault/
 ## JSON-LD Object Schema
 
 ### Minimal Page Object
+
 ```jsonld
 {
   "@context": "https://site/@context/default.jsonld",
@@ -123,6 +132,7 @@ vault/
 ```
 
 ### Section Object (embedded or separate)
+
 ```jsonld
 {
   "@id": "https://site/pages/cognitive-folding#introduction",
@@ -137,6 +147,7 @@ vault/
 ```
 
 ### Reference Object
+
 ```jsonld
 {
   "@context": "https://site/@context/default.jsonld",
@@ -151,6 +162,7 @@ vault/
 ```
 
 ### Vocabulary Term
+
 ```jsonld
 {
   "@context": "https://site/@context/basis.jsonld",
@@ -173,6 +185,7 @@ vault/
 Place common context definitions in `vault/@context/`:
 
 **`@context/default.jsonld`:**
+
 ```jsonld
 {
   "@context": {
@@ -194,6 +207,7 @@ Place common context definitions in `vault/@context/`:
 ### Inline vs Reference
 
 **Small objects:** Inline context
+
 ```jsonld
 {
   "@context": {
@@ -206,6 +220,7 @@ Place common context definitions in `vault/@context/`:
 ```
 
 **Large objects:** Reference shared context
+
 ```jsonld
 {
   "@context": "https://site/@context/default.jsonld",
@@ -217,6 +232,7 @@ Place common context definitions in `vault/@context/`:
 ## Pipeline Changes
 
 ### Current Pipeline (Obsidian)
+
 ```
 src/unfold/
 ├── inputs/
@@ -230,6 +246,7 @@ src/unfold/
 ```
 
 ### New Pipeline (JSON-LD)
+
 ```
 src/unfold/
 ├── inputs/
@@ -251,6 +268,7 @@ src/unfold/
 ### 1. Create `src/unfold/inputs/jsonld/` module
 
 **`loader.ts`** - Load all JSON-LD files
+
 ```typescript
 export async function loadVault(vaultPath: string): Promise<Node[]> {
   const files = await glob(`${vaultPath}/**/*.jsonld`);
@@ -266,12 +284,13 @@ export async function loadVault(vaultPath: string): Promise<Node[]> {
 ```
 
 **`schema.ts`** - JSON Schema validation
+
 ```typescript
 import Ajv from "ajv";
 
 export function validateNode(node: unknown): Node {
   const ajv = new Ajv();
-  const schema = loadSchema(node['@type']);
+  const schema = loadSchema(node["@type"]);
   const valid = ajv.validate(schema, node);
   if (!valid) {
     throw new ValidationError(ajv.errors);
@@ -303,6 +322,7 @@ export async function runValidate(): Promise<void> {
 ### 3. Create `src/unfold/graph/` module
 
 See LINKED_DATA_ARCHITECTURE.md for detailed specs:
+
 - `uris.ts` - Cool URI patterns
 - `resolver.ts` - @id resolution
 - `validator.ts` - Graph invariants
@@ -311,14 +331,15 @@ See LINKED_DATA_ARCHITECTURE.md for detailed specs:
 ### 4. Update `pipeline/render.ts`
 
 Instead of markdown→HTML:
+
 ```typescript
 export async function runRender(): Promise<void> {
   const nodes = await loadVault(getVaultPath());
 
   for (const node of nodes) {
-    if (node['@type'] === 'basis:Page') {
+    if (node["@type"] === "basis:Page") {
       const html = renderPage(node);
-      await writeHTML(`dist/${getSlug(node['@id'])}.html`, html);
+      await writeHTML(`dist/${getSlug(node["@id"])}.html`, html);
     }
   }
 }
@@ -329,6 +350,7 @@ export async function runRender(): Promise<void> {
 Use Lume templates with JSON-LD data:
 
 **`templates/page.tmpl.ts`:**
+
 ```typescript
 export default (data: PageNode) => `
   <!DOCTYPE html>
@@ -358,8 +380,7 @@ export default (data: PageNode) => `
 4. Build and test
 5. Expand from there
 
-**Pros:** Clean start, no legacy code
-**Cons:** No existing content to test with
+**Pros:** Clean start, no legacy code **Cons:** No existing content to test with
 
 ### Option B: Dual Mode (Complex)
 
@@ -367,8 +388,7 @@ export default (data: PageNode) => `
 2. Add converter: Obsidian → JSON-LD
 3. Gradually migrate content
 
-**Pros:** Preserves existing content
-**Cons:** Maintains two pipelines
+**Pros:** Preserves existing content **Cons:** Maintains two pipelines
 
 **Recommendation:** Option A (hard cut) - start clean with JSON-LD.
 
@@ -377,6 +397,7 @@ export default (data: PageNode) => `
 Create `vault/` with minimal example:
 
 ### `vault/catalog.jsonld`
+
 ```jsonld
 {
   "@context": "https://www.w3.org/ns/dcat",
@@ -392,6 +413,7 @@ Create `vault/` with minimal example:
 ```
 
 ### `vault/pages/hello.jsonld`
+
 ```jsonld
 {
   "@context": "https://site/@context/default.jsonld",
@@ -404,6 +426,7 @@ Create `vault/` with minimal example:
 ```
 
 ### `vault/@context/default.jsonld`
+
 ```jsonld
 {
   "@context": {
@@ -419,11 +442,12 @@ Create `vault/` with minimal example:
 ## Testing
 
 ### Unit Tests
+
 ```typescript
 Deno.test("loadVault loads all .jsonld files", async () => {
   const nodes = await loadVault("./fixtures/vault");
   assertEquals(nodes.length, 3);
-  assert(nodes.every(n => n['@id']));
+  assert(nodes.every((n) => n["@id"]));
 });
 
 Deno.test("validateNode rejects invalid JSON-LD", () => {
@@ -434,31 +458,30 @@ Deno.test("validateNode rejects invalid JSON-LD", () => {
 ```
 
 ### Integration Tests
+
 ```typescript
 Deno.test("pipeline validates and renders vault", async () => {
   await runValidate(); // Should not throw
-  await runRender();   // Should generate HTML
+  await runRender(); // Should generate HTML
   assert(await exists("dist/pages/hello.html"));
 });
 ```
 
 ## Success Criteria
 
-✅ JSON-LD vault structure defined
-✅ Loader reads all `.jsonld` files
-✅ JSON Schema validation enforced
-✅ Graph validation works on JSON-LD objects
-✅ Rendering produces HTML from JSON-LD
-✅ Example vault builds successfully
-✅ All tests passing
-✅ Documentation updated
+✅ JSON-LD vault structure defined ✅ Loader reads all `.jsonld` files ✅ JSON
+Schema validation enforced ✅ Graph validation works on JSON-LD objects ✅
+Rendering produces HTML from JSON-LD ✅ Example vault builds successfully ✅ All
+tests passing ✅ Documentation updated
 
 ## Next Steps
 
 After this foundation is complete:
+
 1. bdelanghe-9lu - Cool URIs (native to JSON-LD)
 2. bdelanghe-1kw - Link resolver (just @id lookup)
 3. bdelanghe-xkc - Graph validation (I1-I5)
 4. bdelanghe-zdl - DCAT catalog (already JSON-LD!)
 
-This architectural change makes all subsequent work simpler and more standard-compliant.
+This architectural change makes all subsequent work simpler and more
+standard-compliant.

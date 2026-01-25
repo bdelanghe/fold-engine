@@ -17,7 +17,7 @@
     "fmt:check": "deno fmt --check",
     "test": "deno test -A",
     "check": "deno task fmt:check && deno task lint && deno task test && deno task validate",
-    "ci": "deno task check",
+    "ci": "UNFOLD_VALIDATE_MODE=strict deno task check",
     "check:emit": "deno run -A src/unfold/tools/watch_status.ts",
     "check:watch": "deno run -A --watch src/unfold/tools/watch_status.ts",
     "gh:pages": "gh run list --workflow=\"pages.yml\" -b \"$(git rev-parse --abbrev-ref HEAD)\"",

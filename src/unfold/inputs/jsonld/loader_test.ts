@@ -1,5 +1,5 @@
 import { assertEquals, assertExists } from "@std/assert";
-import { loadJsonLdFile, loadVault, extractNodes } from "./loader.ts";
+import { extractNodes, loadJsonLdFile, loadVault } from "./loader.ts";
 import type { JsonLdDocument } from "./types.ts";
 
 Deno.test("extractNodes - handles single object with @id", () => {
@@ -89,15 +89,39 @@ Deno.test("loadVault - loads all files from vault", async () => {
 
   // Should have loaded all nodes from all files
   assertExists(nodes);
-  assertEquals(errors.length, 0, `Unexpected errors: ${errors.map(e => e.message).join(", ")}`);
+  assertEquals(
+    errors.length,
+    0,
+    `Unexpected errors: ${errors.map((e) => e.message).join(", ")}`,
+  );
 
   // Check we got nodes from different files
-  const ids = nodes.map(n => n["@id"]);
-  assertEquals(ids.includes("https://example.org/catalog"), true, "Missing catalog");
-  assertEquals(ids.includes("https://example.org/pages/hello"), true, "Missing hello page");
-  assertEquals(ids.includes("https://example.org/pages/cognitive-folding"), true, "Missing cognitive-folding");
-  assertEquals(ids.includes("https://example.org/refs/json-ld-spec"), true, "Missing json-ld-spec ref");
-  assertEquals(ids.includes("https://example.org/vocab/basis#Fold"), true, "Missing Fold concept");
+  const ids = nodes.map((n) => n["@id"]);
+  assertEquals(
+    ids.includes("https://example.org/catalog"),
+    true,
+    "Missing catalog",
+  );
+  assertEquals(
+    ids.includes("https://example.org/pages/hello"),
+    true,
+    "Missing hello page",
+  );
+  assertEquals(
+    ids.includes("https://example.org/pages/cognitive-folding"),
+    true,
+    "Missing cognitive-folding",
+  );
+  assertEquals(
+    ids.includes("https://example.org/refs/json-ld-spec"),
+    true,
+    "Missing json-ld-spec ref",
+  );
+  assertEquals(
+    ids.includes("https://example.org/vocab/basis#Fold"),
+    true,
+    "Missing Fold concept",
+  );
 });
 
 Deno.test("loadVault - each node has source metadata", async () => {

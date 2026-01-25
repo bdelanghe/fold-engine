@@ -16,10 +16,12 @@ The vault contains native JSON-LD objects (`.jsonld` files). This module:
 ### Complementary Validation
 
 **Zod** provides:
+
 - Structural validation (required fields, types, formats)
 - TypeScript type inference
 
 **JSON-LD** provides:
+
 - Identity (`@id` must be unique IRI)
 - Typing (`@type` specifies RDF class)
 - Context (`@context` defines term mappings)
@@ -56,6 +58,7 @@ Schemas include `x-jsonld-*` keywords to bridge structure and semantics:
 ```
 
 These annotations:
+
 - Document the semantic layer
 - Can generate `@context` definitions
 - Enable schema-driven tools while preserving JSON-LD meaning
@@ -130,11 +133,13 @@ interface LoadResult {
 ## Error Handling
 
 The loader is designed to be fault-tolerant:
+
 - Parse errors are collected, not thrown
 - Validation errors are collected, not thrown
 - All errors include file path and details
 
 This allows:
+
 - Partial vault loading
 - Reporting all errors at once
 - Graceful degradation
@@ -142,11 +147,13 @@ This allows:
 ## Schema Organization
 
 Schemas are stored in `src/unfold/schemas/`:
+
 - `page.schema.json` - Page/article objects
 - `reference.schema.json` - Citation/reference objects
 - `concept.schema.json` - Vocabulary term definitions
 
 Each schema:
+
 - Validates structure with standard JSON Schema
 - Annotates semantics with `x-jsonld-*` keywords
 - Maps to one or more `@type` values
@@ -154,6 +161,7 @@ Each schema:
 ## Next Steps
 
 This module provides the foundation. Current core:
+
 - JSON-LD loading
 - Zod schema validation
 - SHACL shape validation (see `src/unfold/shacl/`)

@@ -25,7 +25,8 @@ if (!report.ok) {
 ## Supported constraints
 
 - `minCount` / `maxCount`
-- `datatype` (`xsd:string`, `xsd:anyURI`, `xsd:date`, `xsd:dateTime`, `xsd:boolean`, `xsd:integer`, `xsd:decimal`)
+- `datatype` (`xsd:string`, `xsd:anyURI`, `xsd:date`, `xsd:dateTime`,
+  `xsd:boolean`, `xsd:integer`, `xsd:decimal`)
 - `pattern`
 - `in`
 - `class`
@@ -35,4 +36,5 @@ if (!report.ok) {
 
 1. Add/extend the Zod schema in `src/unfold/schemas/zod/`.
 2. Add a matching shape entry in `src/unfold/shacl/shapes.json`.
-3. Add validation tests in `src/unfold/shacl/validator_test.ts` to cover new constraints.
+3. Add validation tests in `src/unfold/shacl/validator_test.ts` to cover new
+   constraints.

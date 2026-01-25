@@ -101,7 +101,10 @@ function extractTitle(node: JsonLdNode): string {
 /**
  * Extract string value from property
  */
-function extractString(node: JsonLdNode, ...props: string[]): string | undefined {
+function extractString(
+  node: JsonLdNode,
+  ...props: string[]
+): string | undefined {
   for (const prop of props) {
     const value = node[prop];
     if (typeof value === "string") {
@@ -205,7 +208,7 @@ export default function (): LoaderFunction {
 
     // Convert nodes to Lume page data
     // For now, take the first node as the page
-    // TODO: Handle multi-node documents (sections, embeds)
+    // TODO(@bdelanghe): Handle multi-node documents (sections, embeds)
     const mainNode = nodes[0];
     if (!mainNode) {
       throw new Error(`No nodes with @id found in ${path}`);
