@@ -22,6 +22,24 @@ const schemaOrgSchema = z
   })
   .strict();
 
+const schemaOrgSchema = z
+  .object({
+    pageType: z.string().min(1).optional(),
+    pageSubtypes: z.array(z.string().min(1)).optional(),
+    about: z
+      .array(
+        z
+          .object({
+            type: z.string().min(1),
+            id: z.string().url().optional(),
+            name: z.string().min(1).optional(),
+          })
+          .strict(),
+      )
+      .optional(),
+  })
+  .strict();
+
 const frontmatterSchema = z
   .object({
     title: z.string().min(1),
