@@ -99,6 +99,12 @@ export const scanVault = async (vaultRoot?: URL): Promise<VaultManifest> => {
   }
 
   try {
+    await Deno.stat(root);
+  } catch {
+    return { root: rootPath, hasConfig: false, files, invalidFiles };
+  }
+
+  try {
     await Deno.stat(new URL(".obsidian", root));
     hasConfig = true;
   } catch {
