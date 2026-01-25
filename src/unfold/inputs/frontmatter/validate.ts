@@ -235,7 +235,6 @@ export const validateNoteContent = (
 };
 
 const mdExtensions = new Set([".md", ".markdown"]);
-const sourceRoot = loadVaultRoot();
 
 async function* walk(dir: URL): AsyncGenerator<URL> {
   for await (const entry of Deno.readDir(dir)) {
@@ -249,6 +248,13 @@ async function* walk(dir: URL): AsyncGenerator<URL> {
 }
 
 export const validateNotes = async (): Promise<void> => {
+  const sourceRoot = loadVaultRoot();
+  try {
+    await Deno.stat(sourceRoot);
+  } catch {
+    console.warn("Skipping note validation (missing vault content).");
+    return;
+  }
   const errors: string[] = [];
 
   for await (const fileUrl of walk(sourceRoot)) {

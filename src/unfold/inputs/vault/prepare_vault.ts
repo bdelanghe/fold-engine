@@ -44,8 +44,14 @@ const fetchIndex = async (baseUrl: string): Promise<VaultIndex> => {
   return await response.json() as VaultIndex;
 };
 
+const toArrayBuffer = (data: Uint8Array): ArrayBuffer => {
+  const copy = new Uint8Array(data.byteLength);
+  copy.set(data);
+  return copy.buffer;
+};
+
 const sha256Hex = async (data: Uint8Array): Promise<string> => {
-  const digest = await crypto.subtle.digest("SHA-256", data);
+  const digest = await crypto.subtle.digest("SHA-256", toArrayBuffer(data));
   return Array.from(new Uint8Array(digest))
     .map((byte) => byte.toString(16).padStart(2, "0"))
     .join("");
