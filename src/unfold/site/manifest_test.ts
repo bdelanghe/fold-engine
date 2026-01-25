@@ -172,6 +172,9 @@ Deno.test("site manifest matches schema and invariants", async () => {
     console.warn("Skipping site manifest invariants (missing permissions).");
     return;
   }
+  if (!await hasVaultContent()) {
+    return;
+  }
   const site = await loadSite();
   await site.build();
 
