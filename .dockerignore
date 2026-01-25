@@ -2,6 +2,12 @@
 .github
 .devcontainer
 .vscode
+ .cursor
 dist
 node_modules
 **/*.log
+ obsidian_vault
+ tools
+ docker-bake.hcl
+ docker-compose.yml
+ readme.md
