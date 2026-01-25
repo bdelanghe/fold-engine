@@ -5,6 +5,7 @@
     "build:site": "deno run -A src/unfold/cli/main.ts build:site",
     "build": "deno run -A src/unfold/cli/main.ts build",
     "dev": "deno run -A src/unfold/cli/main.ts dev",
+    "dev:watch": "deno run -A --watch src/unfold/cli/main.ts dev",
     "docs": "deno run -A src/unfold/cli/main.ts docs"
   },
   "imports": {
