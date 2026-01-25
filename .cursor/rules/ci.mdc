@@ -1,0 +1,11 @@
+---
+description: CI expectations and checks
+alwaysApply: true
+---
+
+# CI Expectations
+
+- `deno task ci` is the canonical local/CI gate.
+- Health checks use `GET /healthz`.
+- Prefer container parity: Bake builds images, CI runs smoke checks via container.
+

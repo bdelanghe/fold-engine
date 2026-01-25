@@ -1,0 +1,11 @@
+---
+description: Docker and Bake conventions
+alwaysApply: true
+---
+
+# Docker Conventions
+
+- Build images with `docker buildx bake` (see `docker-bake.hcl`).
+- Compose consumes baked images; do not add `build:` to `docker-compose.yml`.
+- Runtime service is `unfold` and exposes port 3000.
+

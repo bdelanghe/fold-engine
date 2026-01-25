@@ -1,8 +1,7 @@
-version: "3.9"
-
 services:
   unfold:
     image: local/unfold-dev:latest
+    pull_policy: never
     working_dir: /workspaces/schema-nodes
     command: ["deno", "task", "dev"]
     volumes:
@@ -23,3 +22,12 @@ services:
       timeout: 3s
       retries: 3
       start_period: 10s
+
+  unfold-test:
+    image: local/unfold-dev:latest
+    pull_policy: never
+    working_dir: /workspaces/schema-nodes
+    command: ["deno", "task", "test"]
+    volumes:
+      - .:/workspaces/schema-nodes
+    profiles: ["test"]
