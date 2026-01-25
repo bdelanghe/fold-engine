@@ -90,6 +90,8 @@ const createDefaultDependencies = async (): Promise<CommandDependencies> => {
       const site = createSite();
       await site.build();
       const server = site.getServer();
+      server.options.hostname = "0.0.0.0";
+      server.options.port = 3000;
       await server.start();
     },
     docs: async () => {

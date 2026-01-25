@@ -4,9 +4,15 @@ url: /
 cog_schema: basis.vault.index@v1
 jsonld: vault_index
 entrypoints:
-  - name: home
-    url: /home/
-    role: fold.home
+  - name: cognitive-folding
+    url: /cognitive-folding/
+    role: fold.entry
+  - name: cognitive-jq
+    url: /cognitive-jq/
+    role: fold.entry
+  - name: publishing
+    url: /publishing/
+    role: fold.entry
 ---
 
 # fold-engine-vault
@@ -22,7 +28,6 @@ This vault is the structured writing surface for cognitive folding.
 
 ## Start here
 
-- [home](/home/)
 - [cognitive-folding](/cognitive-folding/)
 - [cognitive-jq](/cognitive-jq/)
 - [publishing](/publishing/)

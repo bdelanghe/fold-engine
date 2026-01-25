@@ -14,18 +14,23 @@ const getSiteUrl = () =>
 const getWorkspaceRoot = () =>
   fromFileUrl(new URL("../../..", import.meta.url));
 
+const getLayoutPath = () =>
+  fromFileUrl(new URL("../renderers/lume/layout.tmpl.ts", import.meta.url));
+
 export const createSite = () => {
   const siteUrl = getSiteUrl();
   const workspaceRoot = getWorkspaceRoot();
+  const layoutPath = getLayoutPath();
 
   const site = lume({
     cwd: workspaceRoot,
     src: "obsidian_vault",
     dest: "dist/site",
-    includes: "_includes",
     location: new URL(siteUrl),
   });
 
+  // Register the layout from external location
+  site.remoteFile("_includes/layout.tmpl.ts", layoutPath);
   site.data("layout", "layout.tmpl.ts");
   site.use(vento());
   site.use(metas());

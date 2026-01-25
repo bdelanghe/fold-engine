@@ -6,13 +6,11 @@
     "/about/",
     "/cognitive-folding/",
     "/cognitive-jq/",
-    "/home/",
     "/project-notes/",
     "/publish-limitations/",
     "/publishing/"
   ],
   "homepageRequiredLinks": [
-    "/home/",
     "/cognitive-folding/",
     "/cognitive-jq/",
     "/publishing/",
@@ -24,7 +22,6 @@
     "/about/",
     "/cognitive-folding/",
     "/cognitive-jq/",
-    "/home/",
     "/project-notes/",
     "/publish-limitations/",
     "/publishing/"
