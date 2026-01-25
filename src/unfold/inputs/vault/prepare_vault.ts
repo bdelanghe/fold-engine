@@ -13,7 +13,10 @@ const shouldRequireBaseUrl = (): boolean => {
   return raw === "1" || raw?.toLowerCase() === "true";
 };
 
-const getCacheRoot = (): string => join(Deno.cwd(), ".unfold", "vault");
+const getWorkspaceRoot = (): string => Deno.realPathSync(Deno.cwd());
+
+const getCacheRoot = (): string =>
+  join(getWorkspaceRoot(), ".unfold", "vault");
 
 const getIndexPath = (cacheRoot: string): string =>
   join(cacheRoot, ".vault-index.json");
@@ -120,5 +123,5 @@ export const prepareVault = async (): Promise<void> => {
   }
 
   await Deno.writeTextFile(indexPath, JSON.stringify(index, null, 2));
-  Deno.env.set("VAULT_PATH", cacheRoot);
+  Deno.env.set("VAULT_PATH", relative(getWorkspaceRoot(), cacheRoot));
 };

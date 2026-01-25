@@ -1,4 +1,4 @@
-import { posix } from "@std/path";
+import { normalize } from "@std/path/posix";
 
 export const sanitizeVaultPath = (input: string): string => {
   if (!input) {
@@ -10,7 +10,7 @@ export const sanitizeVaultPath = (input: string): string => {
   if (input.startsWith("/")) {
     throw new Error("Vault path must be relative");
   }
-  const normalized = posix.normalize(input);
+  const normalized = normalize(input);
   if (
     normalized === "." ||
     normalized === ".." ||
