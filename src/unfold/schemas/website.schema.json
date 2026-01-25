@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.org/schemas/website.schema.json",
+  "title": "WebSite",
+  "description": "Schema.org WebSite profile for Unfold validation",
+  "type": "object",
+  "required": ["@context", "@type", "@id"],
+  "anyOf": [
+    { "required": ["title"] },
+    { "required": ["name"] }
+  ],
+  "properties": {
+    "@context": {
+      "description": "JSON-LD context",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" },
+        { "type": "array" }
+      ]
+    },
+    "@type": {
+      "description": "RDF type of the node",
+      "type": "string",
+      "x-jsonld-type": true,
+      "enum": ["schema:WebSite", "WebSite"]
+    },
+    "@id": {
+      "description": "Unique identifier (IRI) for this site",
+      "type": "string",
+      "format": "uri",
+      "x-jsonld-id": true
+    },
+    "title": {
+      "description": "Site title",
+      "type": "string",
+      "x-jsonld-term": "schema:name",
+      "minLength": 1
+    },
+    "name": {
+      "description": "Site name",
+      "type": "string",
+      "x-jsonld-term": "schema:name",
+      "minLength": 1
+    },
+    "description": {
+      "description": "Site description",
+      "type": "string",
+      "x-jsonld-term": "schema:description"
+    },
+    "url": {
+      "description": "Canonical site URL",
+      "type": "string",
+      "format": "uri",
+      "x-jsonld-term": "schema:url"
+    },
+    "inLanguage": {
+      "description": "Primary language",
+      "type": "string",
+      "x-jsonld-term": "schema:inLanguage"
+    },
+    "sameAs": {
+      "description": "Same-as URLs",
+      "type": "array",
+      "x-jsonld-term": "schema:sameAs",
+      "x-jsonld-container": "@set",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "hasPart": {
+      "description": "Contained pages",
+      "type": "array",
+      "x-jsonld-term": "schema:hasPart",
+      "x-jsonld-container": "@set",
+      "items": {
+        "oneOf": [
+          { "type": "string", "format": "uri" },
+          { "$ref": "#/definitions/nodeRef" }
+        ]
+      }
+    },
+    "publisher": {
+      "description": "Publishing organization or person",
+      "x-jsonld-term": "schema:publisher",
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "$ref": "#/definitions/nodeRef" }
+      ]
+    },
+    "potentialAction": {
+      "description": "Actions supported by the site",
+      "x-jsonld-term": "schema:potentialAction",
+      "x-jsonld-container": "@set",
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "$ref": "#/definitions/nodeRef" },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string", "format": "uri" },
+              { "$ref": "#/definitions/nodeRef" }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "nodeRef": {
+      "type": "object",
+      "required": ["@id"],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "x-jsonld-id": true
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

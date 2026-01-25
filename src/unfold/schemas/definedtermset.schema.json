@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.org/schemas/definedtermset.schema.json",
+  "title": "DefinedTermSet",
+  "description": "Schema.org DefinedTermSet profile for Unfold validation",
+  "type": "object",
+  "required": ["@context", "@type", "@id", "name"],
+  "properties": {
+    "@context": {
+      "description": "JSON-LD context",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" },
+        { "type": "array" }
+      ]
+    },
+    "@type": {
+      "description": "RDF type of the node",
+      "type": "string",
+      "x-jsonld-type": true,
+      "enum": ["schema:DefinedTermSet", "DefinedTermSet"]
+    },
+    "@id": {
+      "description": "Unique identifier (IRI) for this term set",
+      "type": "string",
+      "format": "uri",
+      "x-jsonld-id": true
+    },
+    "name": {
+      "description": "Term set name",
+      "type": "string",
+      "x-jsonld-term": "schema:name",
+      "minLength": 1
+    },
+    "description": {
+      "description": "Term set description",
+      "type": "string",
+      "x-jsonld-term": "schema:description"
+    },
+    "hasDefinedTerm": {
+      "description": "Terms in the set",
+      "x-jsonld-term": "schema:hasDefinedTerm",
+      "x-jsonld-container": "@set",
+      "$ref": "#/definitions/urlOrNodeRefArray"
+    },
+    "inLanguage": {
+      "description": "Language of the terms",
+      "type": "string",
+      "x-jsonld-term": "schema:inLanguage"
+    },
+    "sameAs": {
+      "description": "Same-as URLs",
+      "type": "array",
+      "x-jsonld-term": "schema:sameAs",
+      "x-jsonld-container": "@set",
+      "items": { "type": "string", "format": "uri" }
+    }
+  },
+  "definitions": {
+    "nodeRef": {
+      "type": "object",
+      "required": ["@id"],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "x-jsonld-id": true
+        }
+      }
+    },
+    "urlOrNodeRef": {
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "$ref": "#/definitions/nodeRef" }
+      ]
+    },
+    "urlOrNodeRefArray": {
+      "oneOf": [
+        { "$ref": "#/definitions/urlOrNodeRef" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/definitions/urlOrNodeRef" }
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

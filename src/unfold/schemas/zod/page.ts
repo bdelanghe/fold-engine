@@ -6,22 +6,23 @@
  */
 
 import { z } from "zod";
+import { DateType, TextType, UrlType } from "./datatypes.ts";
 
 /**
  * Page section schema
  */
 export const SectionSchema = z.object({
-  "@id": z.string().url(),
+  "@id": UrlType,
   "@type": z.literal("basis:Section").or(z.literal("Section")),
-  title: z.string().min(1),
-  content: z.string().optional(),
+  title: TextType.min(1),
+  content: TextType.optional(),
 });
 
 /**
  * Reference to another node (just @id)
  */
 export const NodeRefSchema = z.object({
-  "@id": z.string().url(),
+  "@id": UrlType,
 });
 
 /**
@@ -29,22 +30,22 @@ export const NodeRefSchema = z.object({
  */
 export const PageSchema = z.object({
   "@context": z.union([
-    z.string(),
+    TextType,
     z.record(z.unknown()),
-    z.array(z.union([z.string(), z.record(z.unknown())])),
+    z.array(z.union([TextType, z.record(z.unknown())])),
   ]).optional(),
 
   "@type": z.literal("basis:Page").or(z.literal("Page")),
 
-  "@id": z.string().url().regex(/^https:\/\/.*\/pages\//),
+  "@id": UrlType.regex(/^https:\/\/.*\/pages\//),
 
-  title: z.string().min(1),
+  title: TextType.min(1),
 
-  description: z.string().optional(),
+  description: TextType.optional(),
 
-  dateCreated: z.string().date().optional(),
+  dateCreated: DateType.optional(),
 
-  dateModified: z.string().date().optional(),
+  dateModified: DateType.optional(),
 
   hasPart: z.array(
     z.union([

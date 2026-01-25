@@ -22,6 +22,16 @@ const SCHEMA_MAP: Record<string, string> = {
   "skos:Concept": "concept.schema.json",
   "schema:WebPage": "webpage.schema.json",
   "WebPage": "webpage.schema.json",
+  "schema:WebSite": "website.schema.json",
+  "WebSite": "website.schema.json",
+  "schema:WebPageElement": "webpageelement.schema.json",
+  "WebPageElement": "webpageelement.schema.json",
+  "schema:CreativeWork": "creativework.schema.json",
+  "CreativeWork": "creativework.schema.json",
+  "schema:DefinedTerm": "definedterm.schema.json",
+  "DefinedTerm": "definedterm.schema.json",
+  "schema:DefinedTermSet": "definedtermset.schema.json",
+  "DefinedTermSet": "definedtermset.schema.json",
 };
 
 /**
@@ -94,7 +104,8 @@ export async function validateNode(node: VaultNode): Promise<void> {
   const schema = await loadSchema(schemaFile);
   const ajv = createValidator();
   const validate = ajv.compile(schema);
-  const valid = validate(node);
+  const { _source, ...nodeData } = node;
+  const valid = validate(nodeData);
 
   if (!valid) {
     const errors = validate.errors?.map((e: ErrorObject) => ({

@@ -3,32 +3,33 @@
  */
 
 import { z } from "zod";
+import { DateType, TextType, UrlType } from "./datatypes.ts";
 
 /**
  * Reference schema
  */
 export const ReferenceSchema = z.object({
   "@context": z.union([
-    z.string(),
+    TextType,
     z.record(z.unknown()),
-    z.array(z.union([z.string(), z.record(z.unknown())])),
+    z.array(z.union([TextType, z.record(z.unknown())])),
   ]).optional(),
 
   "@type": z.literal("basis:Reference").or(z.literal("Reference")),
 
-  "@id": z.string().url().regex(/^https:\/\/.*\/refs\//),
+  "@id": UrlType.regex(/^https:\/\/.*\/refs\//),
 
-  title: z.string().min(1),
+  title: TextType.min(1),
 
-  description: z.string().optional(),
+  description: TextType.optional(),
 
-  url: z.string().url(),
+  url: UrlType,
 
-  author: z.string().optional(),
+  author: TextType.optional(),
 
-  dateCreated: z.string().date().optional(),
+  dateCreated: DateType.optional(),
 
-  dateAccessed: z.string().date().optional(),
+  dateAccessed: DateType.optional(),
 });
 
 /**

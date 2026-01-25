@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.org/schemas/webpageelement.schema.json",
+  "title": "WebPageElement",
+  "description": "Schema.org WebPageElement profile for Unfold validation",
+  "type": "object",
+  "required": ["@context", "@type", "@id", "isPartOf"],
+  "anyOf": [
+    { "required": ["title"] },
+    { "required": ["name"] }
+  ],
+  "properties": {
+    "@context": {
+      "description": "JSON-LD context",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" },
+        { "type": "array" }
+      ]
+    },
+    "@type": {
+      "description": "RDF type of the node",
+      "type": "string",
+      "x-jsonld-type": true,
+      "enum": ["schema:WebPageElement", "WebPageElement"]
+    },
+    "@id": {
+      "description": "Unique identifier (IRI) for this element",
+      "type": "string",
+      "format": "uri",
+      "x-jsonld-id": true
+    },
+    "title": {
+      "description": "Element title",
+      "type": "string",
+      "x-jsonld-term": "schema:name",
+      "minLength": 1
+    },
+    "name": {
+      "description": "Element name",
+      "type": "string",
+      "x-jsonld-term": "schema:name",
+      "minLength": 1
+    },
+    "description": {
+      "description": "Element description",
+      "type": "string",
+      "x-jsonld-term": "schema:description"
+    },
+    "text": {
+      "description": "Text content",
+      "type": "string",
+      "x-jsonld-term": "schema:text"
+    },
+    "isPartOf": {
+      "description": "Parent page",
+      "x-jsonld-term": "schema:isPartOf",
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "$ref": "#/definitions/nodeRef" }
+      ]
+    },
+    "hasPart": {
+      "description": "Child elements",
+      "type": "array",
+      "x-jsonld-term": "schema:hasPart",
+      "x-jsonld-container": "@set",
+      "items": {
+        "oneOf": [
+          { "type": "string", "format": "uri" },
+          { "$ref": "#/definitions/nodeRef" }
+        ]
+      }
+    },
+    "about": {
+      "description": "Topics described",
+      "x-jsonld-term": "schema:about",
+      "x-jsonld-container": "@set",
+      "$ref": "#/definitions/urlOrNodeRefArray"
+    },
+    "mentions": {
+      "description": "Mentioned things",
+      "type": "array",
+      "x-jsonld-term": "schema:mentions",
+      "x-jsonld-container": "@set",
+      "items": { "$ref": "#/definitions/urlOrNodeRef" }
+    },
+    "citation": {
+      "description": "Citations",
+      "x-jsonld-term": "schema:citation",
+      "x-jsonld-container": "@set",
+      "$ref": "#/definitions/textOrUrlOrNodeRefArray"
+    },
+    "position": {
+      "description": "Ordering position",
+      "type": "integer",
+      "x-jsonld-term": "schema:position"
+    }
+  },
+  "definitions": {
+    "nodeRef": {
+      "type": "object",
+      "required": ["@id"],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "x-jsonld-id": true
+        }
+      }
+    },
+    "urlOrNodeRef": {
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "$ref": "#/definitions/nodeRef" }
+      ]
+    },
+    "urlOrNodeRefArray": {
+      "oneOf": [
+        { "$ref": "#/definitions/urlOrNodeRef" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/definitions/urlOrNodeRef" }
+        }
+      ]
+    },
+    "textOrUrlOrNodeRef": {
+      "oneOf": [
+        { "type": "string" },
+        { "$ref": "#/definitions/urlOrNodeRef" }
+      ]
+    },
+    "textOrUrlOrNodeRefArray": {
+      "oneOf": [
+        { "$ref": "#/definitions/textOrUrlOrNodeRef" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/definitions/textOrUrlOrNodeRef" }
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

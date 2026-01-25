@@ -25,6 +25,11 @@ JSON Schema (for external tools)
 
 ## Schemas
 
+## DataTypes
+
+Schema.org-inspired datatypes are centralized in `datatypes.ts` and reused across
+schemas (Boolean, Date, DateTime, Number/Float/Integer, Text, URL, Time, etc.).
+
 ### Page
 
 ```typescript
@@ -74,6 +79,68 @@ const page: WebPage = {
   "@id": "https://example.org/pages/hello",
   "title": "Hello World",
   "description": "A schema.org WebPage profile",
+};
+```
+
+### WebSite
+
+```typescript
+import { type WebSite, WebSiteSchema } from "./website.ts";
+
+const site: WebSite = {
+  "@type": "schema:WebSite",
+  "@id": "https://example.org",
+  "name": "Example Site",
+};
+```
+
+### WebPageElement
+
+```typescript
+import { type WebPageElement, WebPageElementSchema } from "./webpage_element.ts";
+
+const section: WebPageElement = {
+  "@type": "schema:WebPageElement",
+  "@id": "https://example.org/pages/hello#intro",
+  "title": "Introduction",
+  "isPartOf": { "@id": "https://example.org/pages/hello" },
+};
+```
+
+### CreativeWork
+
+```typescript
+import { type CreativeWork, CreativeWorkSchema } from "./creative_work.ts";
+
+const work: CreativeWork = {
+  "@type": "schema:CreativeWork",
+  "@id": "https://example.org/refs/spec",
+  "name": "Example Spec",
+  "url": "https://example.org/spec",
+};
+```
+
+### DefinedTerm
+
+```typescript
+import { type DefinedTerm, DefinedTermSchema } from "./defined_term.ts";
+
+const term: DefinedTerm = {
+  "@type": "schema:DefinedTerm",
+  "@id": "https://example.org/vocab/basis#Fold",
+  "name": "Fold",
+};
+```
+
+### DefinedTermSet
+
+```typescript
+import { type DefinedTermSet, DefinedTermSetSchema } from "./defined_term_set.ts";
+
+const termSet: DefinedTermSet = {
+  "@type": "schema:DefinedTermSet",
+  "@id": "https://example.org/vocab/basis",
+  "name": "Basis Vocabulary",
 };
 ```
 

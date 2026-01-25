@@ -3,28 +3,29 @@
  */
 
 import { z } from "zod";
+import { TextType, UrlType } from "./datatypes.ts";
 
 /**
  * Node reference schema
  */
 const NodeRefSchema = z.object({
-  "@id": z.string().url(),
+  "@id": UrlType,
 });
 
 /**
  * Concept schema (SKOS-style vocabulary terms)
  */
 export const ConceptSchema = z.object({
-  "@id": z.string().url().regex(/^https:\/\/.*\/vocab\//),
+  "@id": UrlType.regex(/^https:\/\/.*\/vocab\//),
 
   "@type": z.union([
-    z.string(),
-    z.array(z.string()),
+    TextType,
+    z.array(TextType),
   ]),
 
-  label: z.string().min(1),
+  label: TextType.min(1),
 
-  definition: z.string().optional(),
+  definition: TextType.optional(),
 
   broader: NodeRefSchema.optional(),
 

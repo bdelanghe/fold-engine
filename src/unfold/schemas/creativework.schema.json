@@ -1,0 +1,192 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.org/schemas/creativework.schema.json",
+  "title": "CreativeWork",
+  "description": "Schema.org CreativeWork profile for Unfold validation",
+  "type": "object",
+  "required": ["@context", "@type", "@id"],
+  "anyOf": [
+    { "required": ["title"] },
+    { "required": ["name"] }
+  ],
+  "properties": {
+    "@context": {
+      "description": "JSON-LD context",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" },
+        { "type": "array" }
+      ]
+    },
+    "@type": {
+      "description": "RDF type of the node",
+      "type": "string",
+      "x-jsonld-type": true,
+      "enum": ["schema:CreativeWork", "CreativeWork"]
+    },
+    "@id": {
+      "description": "Unique identifier (IRI) for this work",
+      "type": "string",
+      "format": "uri",
+      "x-jsonld-id": true
+    },
+    "title": {
+      "description": "Work title",
+      "type": "string",
+      "x-jsonld-term": "schema:name",
+      "minLength": 1
+    },
+    "name": {
+      "description": "Work name",
+      "type": "string",
+      "x-jsonld-term": "schema:name",
+      "minLength": 1
+    },
+    "description": {
+      "description": "Work description",
+      "type": "string",
+      "x-jsonld-term": "schema:description"
+    },
+    "url": {
+      "description": "Canonical URL",
+      "type": "string",
+      "format": "uri",
+      "x-jsonld-term": "schema:url"
+    },
+    "sameAs": {
+      "description": "Same-as URLs",
+      "type": "array",
+      "x-jsonld-term": "schema:sameAs",
+      "x-jsonld-container": "@set",
+      "items": { "type": "string", "format": "uri" }
+    },
+    "author": {
+      "description": "Author(s)",
+      "x-jsonld-term": "schema:author",
+      "x-jsonld-container": "@set",
+      "$ref": "#/definitions/textOrUrlOrNodeRefArray"
+    },
+    "creator": {
+      "description": "Creator(s)",
+      "x-jsonld-term": "schema:creator",
+      "x-jsonld-container": "@set",
+      "$ref": "#/definitions/textOrUrlOrNodeRefArray"
+    },
+    "contributor": {
+      "description": "Contributor(s)",
+      "x-jsonld-term": "schema:contributor",
+      "x-jsonld-container": "@set",
+      "$ref": "#/definitions/textOrUrlOrNodeRefArray"
+    },
+    "publisher": {
+      "description": "Publisher",
+      "x-jsonld-term": "schema:publisher",
+      "x-jsonld-container": "@set",
+      "$ref": "#/definitions/textOrUrlOrNodeRefArray"
+    },
+    "dateCreated": {
+      "description": "Creation date",
+      "type": "string",
+      "format": "date",
+      "x-jsonld-term": "schema:dateCreated",
+      "x-jsonld-datatype": "xsd:date"
+    },
+    "dateModified": {
+      "description": "Last modification date",
+      "type": "string",
+      "format": "date",
+      "x-jsonld-term": "schema:dateModified",
+      "x-jsonld-datatype": "xsd:date"
+    },
+    "datePublished": {
+      "description": "Publication date",
+      "type": "string",
+      "format": "date",
+      "x-jsonld-term": "schema:datePublished",
+      "x-jsonld-datatype": "xsd:date"
+    },
+    "inLanguage": {
+      "description": "Language of the content",
+      "type": "string",
+      "x-jsonld-term": "schema:inLanguage"
+    },
+    "isBasedOn": {
+      "description": "Works this is based on",
+      "x-jsonld-term": "schema:isBasedOn",
+      "x-jsonld-container": "@set",
+      "$ref": "#/definitions/urlOrNodeRefArray"
+    },
+    "about": {
+      "description": "Topics or things described",
+      "x-jsonld-term": "schema:about",
+      "x-jsonld-container": "@set",
+      "$ref": "#/definitions/urlOrNodeRefArray"
+    },
+    "mentions": {
+      "description": "Mentioned things",
+      "type": "array",
+      "x-jsonld-term": "schema:mentions",
+      "x-jsonld-container": "@set",
+      "items": { "$ref": "#/definitions/urlOrNodeRef" }
+    },
+    "keywords": {
+      "description": "Keywords",
+      "x-jsonld-term": "schema:keywords",
+      "x-jsonld-container": "@set",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ]
+    },
+    "citation": {
+      "description": "Citations",
+      "x-jsonld-term": "schema:citation",
+      "x-jsonld-container": "@set",
+      "$ref": "#/definitions/textOrUrlOrNodeRefArray"
+    }
+  },
+  "definitions": {
+    "nodeRef": {
+      "type": "object",
+      "required": ["@id"],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "x-jsonld-id": true
+        }
+      }
+    },
+    "urlOrNodeRef": {
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "$ref": "#/definitions/nodeRef" }
+      ]
+    },
+    "urlOrNodeRefArray": {
+      "oneOf": [
+        { "$ref": "#/definitions/urlOrNodeRef" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/definitions/urlOrNodeRef" }
+        }
+      ]
+    },
+    "textOrUrlOrNodeRef": {
+      "oneOf": [
+        { "type": "string" },
+        { "$ref": "#/definitions/urlOrNodeRef" }
+      ]
+    },
+    "textOrUrlOrNodeRefArray": {
+      "oneOf": [
+        { "$ref": "#/definitions/textOrUrlOrNodeRef" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/definitions/textOrUrlOrNodeRef" }
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

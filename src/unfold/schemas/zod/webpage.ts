@@ -4,21 +4,22 @@
 
 import { z } from "zod";
 import { NodeRefSchema, SectionSchema } from "./page.ts";
+import { DateType, TextType, UrlType } from "./datatypes.ts";
 
 const ContextSchema = z.union([
-  z.string(),
+  TextType,
   z.record(z.unknown()),
-  z.array(z.union([z.string(), z.record(z.unknown())])),
+  z.array(z.union([TextType, z.record(z.unknown())])),
 ]).optional();
 
-const UrlSchema = z.string().url();
+const UrlSchema = UrlType;
 const UrlOrNodeRefSchema = z.union([UrlSchema, NodeRefSchema]);
 const UrlOrNodeRefListSchema = z.union([
   UrlOrNodeRefSchema,
   z.array(UrlOrNodeRefSchema),
 ]);
-const TextOrStringArraySchema = z.union([z.string(), z.array(z.string())]);
-const TextOrUrlOrNodeRefSchema = z.union([z.string(), UrlOrNodeRefSchema]);
+const TextOrStringArraySchema = z.union([TextType, z.array(TextType)]);
+const TextOrUrlOrNodeRefSchema = z.union([TextType, UrlOrNodeRefSchema]);
 const TextOrUrlOrNodeRefListSchema = z.union([
   TextOrUrlOrNodeRefSchema,
   z.array(TextOrUrlOrNodeRefSchema),
@@ -31,27 +32,27 @@ export const WebPageSchema = z.object({
 
   "@id": UrlSchema.regex(/^https:\/\/.*\/pages\//),
 
-  title: z.string().min(1).optional(),
+  title: TextType.min(1).optional(),
 
-  name: z.string().min(1).optional(),
+  name: TextType.min(1).optional(),
 
-  description: z.string().optional(),
+  description: TextType.optional(),
 
-  abstract: z.string().optional(),
+  abstract: TextType.optional(),
 
-  headline: z.string().optional(),
+  headline: TextType.optional(),
 
-  alternativeHeadline: z.string().optional(),
+  alternativeHeadline: TextType.optional(),
 
-  dateCreated: z.string().date().optional(),
+  dateCreated: DateType.optional(),
 
-  dateModified: z.string().date().optional(),
+  dateModified: DateType.optional(),
 
-  datePublished: z.string().date().optional(),
+  datePublished: DateType.optional(),
 
-  lastReviewed: z.string().date().optional(),
+  lastReviewed: DateType.optional(),
 
-  inLanguage: z.string().optional(),
+  inLanguage: TextType.optional(),
 
   keywords: TextOrStringArraySchema.optional(),
 
