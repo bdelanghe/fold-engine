@@ -74,18 +74,14 @@ const detectRunningUnfoldServer = async (port: number): Promise<boolean> => {
   const timeout = setTimeout(() => controller.abort(), 300);
   try {
     const response = await fetch(
-      `http://localhost:${port}/site.manifest.json`,
+      `http://localhost:${port}/healthz`,
       { signal: controller.signal },
     );
     if (!response.ok) {
       return false;
     }
-    const data = await response.json().catch(() => null);
-    return Boolean(
-      data &&
-        typeof data.generatedAt === "string" &&
-        Array.isArray(data.pages),
-    );
+    const text = await response.text().catch(() => "");
+    return text.trim() === "ok";
   } catch {
     return false;
   } finally {

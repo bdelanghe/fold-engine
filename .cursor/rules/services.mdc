@@ -1,0 +1,12 @@
+---
+description: Service topology and runtime contract
+alwaysApply: true
+---
+
+# Unfold Service Topology
+
+- Unfold runs as a long-lived HTTP service on port 3000.
+- Compose service name is `unfold`; Compose is the runtime manager.
+- Health check is `GET /healthz`.
+- Bake is the canonical image build graph; Compose never builds images directly.
+

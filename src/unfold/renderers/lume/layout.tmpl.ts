@@ -222,18 +222,19 @@ export default (data: LayoutData) => {
   const twitterCard = data.twitter_card ??
     (resolvedImage ? "summary_large_image" : "summary");
   const jsonld = buildJsonLd(data, metaDescription, resolvedImage);
+  const escapedPageUrl = pageUrl ? escapeAttribute(pageUrl) : "";
   const metaDescriptionMarkup = metaDescription
     ? `<meta name="description" content="${
       escapeAttribute(metaDescription)
     }" />`
     : "";
   const canonicalMarkup = pageUrl
-    ? `<link rel="canonical" href="${pageUrl}" />
-      <meta itemprop="url" content="${pageUrl}" />`
+    ? `<link rel="canonical" href="${escapedPageUrl}" />
+      <meta itemprop="url" content="${escapedPageUrl}" />`
     : "";
   const shareMarkup = pageUrl
     ? `<meta property="og:type" content="website" />
-      <meta property="og:url" content="${pageUrl}" />
+      <meta property="og:url" content="${escapedPageUrl}" />
       <meta property="og:title" content="${escapeAttribute(title)}" />
       ${
       metaDescription
@@ -302,8 +303,8 @@ export default (data: LayoutData) => {
     }`
     : "";
   const articleMetaMarkup = pageUrl
-    ? `<meta itemprop="mainEntityOfPage" content="${pageUrl}" />
-        <meta itemprop="url" content="${pageUrl}" />
+    ? `<meta itemprop="mainEntityOfPage" content="${escapedPageUrl}" />
+        <meta itemprop="url" content="${escapedPageUrl}" />
         <meta itemprop="author" content="${escapeAttribute(authorName)}" />
         ${
       authorUrl

@@ -2,18 +2,74 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Dev: Lume",
+      "label": "Dev: Bake (dev)",
       "type": "shell",
-      "command": "deno task dev",
+      "command": "docker buildx bake dev",
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: Up",
+      "type": "shell",
+      "command": "docker compose up -d",
+      "dependsOn": ["Dev: Bake (dev)"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: Logs",
+      "type": "shell",
+      "command": "docker compose logs -f unfold",
       "problemMatcher": [],
       "isBackground": true,
       "presentation": {
         "reveal": "always",
         "panel": "dedicated"
-      },
-      "runOptions": {
-        "runOn": "folderOpen"
       }
+    },
+    {
+      "label": "Dev: Up + Logs",
+      "dependsOn": ["Dev: Up", "Dev: Logs"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: Restart",
+      "type": "shell",
+      "command": "docker compose restart unfold",
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: Down",
+      "type": "shell",
+      "command": "docker compose down",
+      "problemMatcher": []
+    },
+    {
+      "label": "CI: Bake (all)",
+      "type": "shell",
+      "command": "docker buildx bake",
+      "problemMatcher": []
+    },
+    {
+      "label": "Check: Watch (host)",
+      "type": "shell",
+      "command": "deno task check:watch",
+      "problemMatcher": [],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Check: Watch (container)",
+      "type": "shell",
+      "command": "docker compose exec -T unfold deno task check:watch",
+      "problemMatcher": []
+    },
+    {
+      "label": "Check: Status",
+      "type": "shell",
+      "command": "deno eval --allow-read \"console.log(await Deno.readTextFile('.unfold/status.json'))\"",
+      "problemMatcher": []
     }
   ]
 }

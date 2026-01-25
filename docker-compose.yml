@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  unfold:
+    image: local/unfold-dev:latest
+    working_dir: /workspaces/schema-nodes
+    command: ["deno", "task", "dev"]
+    volumes:
+      - .:/workspaces/schema-nodes
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "deno",
+          "eval",
+          "--quiet",
+          "const r = await fetch('http://localhost:3000/healthz'); if (!r.ok) Deno.exit(1);",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s

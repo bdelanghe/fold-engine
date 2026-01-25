@@ -1,6 +1,9 @@
 {
   "name": "fold-engine",
-  "image": "denoland/deno:latest",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "unfold",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "shutdownAction": "stopCompose",
   "postCreateCommand": "deno --version",
   "forwardPorts": [3000, 3001],
   "portsAttributes": {

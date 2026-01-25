@@ -189,3 +189,16 @@ Deno.test("site manifest matches schema and invariants", async () => {
     }
   }
 });
+
+Deno.test("healthz file is generated", async () => {
+  if (!await hasRequiredPermissions()) {
+    console.warn("Skipping healthz file check (missing permissions).");
+    return;
+  }
+  const site = await loadSite();
+  await site.build();
+
+  const healthPath = site.dest("healthz");
+  const healthContents = await Deno.readTextFile(healthPath);
+  assertEquals(healthContents.trim(), "ok");
+});

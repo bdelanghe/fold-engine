@@ -29,3 +29,6 @@ vendor/
 *.log
 .tmp/
 .tmp/**
+
+# Local watch status
+.unfold/

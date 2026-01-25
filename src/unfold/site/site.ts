@@ -59,6 +59,9 @@ export const createSite = () => {
     const outputPath = site.dest("site.manifest.json");
     await Deno.writeTextFile(outputPath, JSON.stringify(manifest, null, 2));
 
+    const healthPath = site.dest("healthz");
+    await Deno.writeTextFile(healthPath, "ok\n");
+
     const llmsPath = site.dest("llms.txt");
     const llmsTxt = await buildLlmsTxt(pages, { siteUrl });
     await Deno.writeTextFile(llmsPath, llmsTxt);
