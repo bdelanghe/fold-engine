@@ -10,6 +10,9 @@ export const sanitizeVaultPath = (input: string): string => {
   if (input.startsWith("/")) {
     throw new Error("Vault path must be relative");
   }
+  if (input.split("/").some((segment) => segment === "..")) {
+    throw new Error("Vault path contains traversal");
+  }
   const normalized = normalize(input);
   if (
     normalized === "." ||

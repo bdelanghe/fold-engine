@@ -258,32 +258,6 @@ export const validateNoteContent = (
 
 const mdExtensions = new Set([".md", ".markdown"]);
 
-const IGNORED_PREFIXES = [
-  ".cursor/",
-  ".devcontainer/",
-  ".git/",
-  ".github/",
-  ".unfold/",
-  ".vscode/",
-  "dist/",
-  "node_modules/",
-  "src/",
-  "src/unfold/vault_api/support/",
-  "vendor/",
-];
-
-const IGNORED_FILES = new Set([
-  ".cursorindexingignore",
-  ".dockerignore",
-  ".gitignore",
-  ".nojekyll",
-  "deno.json",
-  "deno.lock",
-  "docker-bake.hcl",
-  "docker-compose.yml",
-  "Dockerfile",
-]);
-
 async function* walk(dir: URL): AsyncGenerator<URL> {
   for await (const entry of Deno.readDir(dir)) {
     const entryUrl = new URL(entry.name + (entry.isDirectory ? "/" : ""), dir);
@@ -300,7 +274,7 @@ export const validateNotes = async (): Promise<void> => {
   try {
     await Deno.stat(sourceRoot);
   } catch {
-    writeWarning("Skipping note validation (missing vault content).");
+    console.warn("Skipping note validation (missing vault content).");
     return;
   }
   const errors: string[] = [];
