@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.org/schemas/page.schema.json",
+  "title": "Page",
+  "description": "A page or article object in the knowledge graph",
+  "type": "object",
+  "required": ["@context", "@type", "@id", "title"],
+  "properties": {
+    "@context": {
+      "description": "JSON-LD context",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" },
+        { "type": "array" }
+      ]
+    },
+    "@type": {
+      "description": "RDF type of the node",
+      "type": "string",
+      "x-jsonld-type": true,
+      "enum": ["basis:Page", "Page"]
+    },
+    "@id": {
+      "description": "Unique identifier (IRI) for this page",
+      "type": "string",
+      "format": "uri",
+      "x-jsonld-id": true,
+      "pattern": "^https://example\\.org/pages/"
+    },
+    "title": {
+      "description": "Page title",
+      "type": "string",
+      "x-jsonld-term": "schema:name",
+      "minLength": 1
+    },
+    "description": {
+      "description": "Page description",
+      "type": "string",
+      "x-jsonld-term": "schema:description"
+    },
+    "dateCreated": {
+      "description": "Creation date",
+      "type": "string",
+      "format": "date",
+      "x-jsonld-term": "schema:dateCreated",
+      "x-jsonld-datatype": "xsd:date"
+    },
+    "dateModified": {
+      "description": "Last modification date",
+      "type": "string",
+      "format": "date",
+      "x-jsonld-term": "schema:dateModified",
+      "x-jsonld-datatype": "xsd:date"
+    },
+    "hasPart": {
+      "description": "Sections or parts of this page",
+      "type": "array",
+      "x-jsonld-term": "schema:hasPart",
+      "x-jsonld-container": "@set",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["@id"],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "x-jsonld-id": true
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["@id", "@type", "title"],
+            "properties": {
+              "@id": {
+                "type": "string",
+                "format": "uri",
+                "x-jsonld-id": true
+              },
+              "@type": {
+                "type": "string",
+                "x-jsonld-type": true
+              },
+              "title": {
+                "type": "string",
+                "x-jsonld-term": "schema:name"
+              },
+              "content": {
+                "type": "string",
+                "x-jsonld-term": "schema:text"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "mentions": {
+      "description": "Referenced concepts or resources",
+      "type": "array",
+      "x-jsonld-term": "schema:mentions",
+      "x-jsonld-container": "@set",
+      "items": {
+        "type": "object",
+        "required": ["@id"],
+        "properties": {
+          "@id": {
+            "type": "string",
+            "format": "uri",
+            "x-jsonld-id": true
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

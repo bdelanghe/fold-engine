@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.org/schemas/concept.schema.json",
+  "title": "Concept",
+  "description": "A vocabulary term or concept definition",
+  "type": "object",
+  "required": ["@id", "@type", "label"],
+  "properties": {
+    "@id": {
+      "description": "Unique identifier (IRI) for this concept",
+      "type": "string",
+      "format": "uri",
+      "x-jsonld-id": true,
+      "pattern": "^https://example\\.org/vocab/"
+    },
+    "@type": {
+      "description": "RDF types for this concept",
+      "oneOf": [
+        {
+          "type": "string",
+          "x-jsonld-type": true
+        },
+        {
+          "type": "array",
+          "x-jsonld-type": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "label": {
+      "description": "Human-readable label",
+      "type": "string",
+      "x-jsonld-term": "rdfs:label",
+      "minLength": 1
+    },
+    "definition": {
+      "description": "Definition of this concept",
+      "type": "string",
+      "x-jsonld-term": "skos:definition"
+    },
+    "broader": {
+      "description": "Broader concept in hierarchy",
+      "type": "object",
+      "x-jsonld-term": "skos:broader",
+      "required": ["@id"],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "x-jsonld-id": true
+        }
+      }
+    },
+    "narrower": {
+      "description": "Narrower concepts in hierarchy",
+      "type": "array",
+      "x-jsonld-term": "skos:narrower",
+      "x-jsonld-container": "@set",
+      "items": {
+        "type": "object",
+        "required": ["@id"],
+        "properties": {
+          "@id": {
+            "type": "string",
+            "format": "uri",
+            "x-jsonld-id": true
+          }
+        }
+      }
+    },
+    "related": {
+      "description": "Related concepts",
+      "type": "array",
+      "x-jsonld-term": "skos:related",
+      "x-jsonld-container": "@set",
+      "items": {
+        "type": "object",
+        "required": ["@id"],
+        "properties": {
+          "@id": {
+            "type": "string",
+            "format": "uri",
+            "x-jsonld-id": true
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
