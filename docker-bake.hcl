@@ -15,3 +15,7 @@ target "dev" {
   dockerfile = "Dockerfile"
   tags = ["${IMAGE_NAME}:${IMAGE_TAG}"]
 }
+
+target "unfold-dev" {
+  inherits = ["dev"]
+}
