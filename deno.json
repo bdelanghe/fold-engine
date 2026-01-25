@@ -17,8 +17,8 @@
     "test": "deno test -A",
     "check": "deno task fmt:check && deno task lint && deno task test && deno task validate",
     "ci": "deno task check",
-    "check:emit": "deno run -A tools/watch_status.ts",
-    "check:watch": "deno run -A --watch tools/watch_status.ts",
+    "check:emit": "deno run -A src/unfold/tools/watch_status.ts",
+    "check:watch": "deno run -A --watch src/unfold/tools/watch_status.ts",
     "clean": "rm -rf .unfold dist _site site/.lume"
   },
   "imports": {
@@ -33,5 +33,45 @@
     "lume/": "https://deno.land/x/lume@v3.1.4/",
     "lume/plugins/": "https://deno.land/x/lume@v3.1.4/plugins/",
     "zod": "npm:zod@^3.25.76"
+  },
+  "lint": {
+    "exclude": [
+      "**/*_test.ts"
+    ],
+    "rules": {
+      "tags": [
+        "recommended",
+        "jsr",
+        "react",
+        "fresh",
+        "workspace"
+      ],
+      "include": [
+        "ban-untagged-todo",
+        "camelcase",
+        "default-param-last",
+        "eqeqeq",
+        "explicit-function-return-type",
+        "explicit-module-boundary-types",
+        "no-await-in-loop",
+        "no-boolean-literal-for-arguments",
+        "no-console",
+        "no-eval",
+        "no-inner-declarations",
+        "no-non-null-asserted-optional-chain",
+        "no-non-null-assertion",
+        "no-self-compare",
+        "no-sparse-arrays",
+        "no-sync-fn-in-async-fn",
+        "no-top-level-await",
+        "no-undef",
+        "no-unsafe-finally",
+        "no-unsafe-negation",
+        "no-use-before-define",
+        "no-throw-literal",
+        "prefer-ascii",
+        "single-var-declarator"
+      ]
+    }
   }
 }

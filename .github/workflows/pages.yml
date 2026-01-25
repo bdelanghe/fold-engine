@@ -48,21 +48,24 @@ jobs:
         run: deno task validate
         env:
           SITE_URL: ${{ steps.site.outputs.site_url }}
+          SITE_OUTPUT_DIR: .unfold/site
 
       - name: Build site
         run: deno task build
         env:
           SITE_URL: ${{ steps.site.outputs.site_url }}
+          SITE_OUTPUT_DIR: .unfold/site
 
       - name: Validate AI exports
         run: deno test -A src/unfold/tests/exporters_ai_test.ts
         env:
           SITE_URL: ${{ steps.site.outputs.site_url }}
+          SITE_OUTPUT_DIR: .unfold/site
 
-      - name: Upload Pages artifact (dist/site)
+      - name: Upload Pages artifact (.unfold/site)
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/site
+          path: .unfold/site
 
   container-smoke:
     runs-on: ubuntu-latest

@@ -1,3 +1,4 @@
+// deno-lint-ignore-file camelcase
 type EntryPoint = {
   url?: string;
   name?: string;
@@ -124,9 +125,9 @@ const buildJsonLd = (
 
     const graph = [webpage, article, website].map((node) =>
       Object.fromEntries(
-        Object.entries(node).filter(([, value]) =>
-          value !== "" && value != null
-        ),
+      Object.entries(node).filter(([, value]) =>
+        value !== "" && value !== null && value !== undefined
+      ),
       )
     );
 
@@ -195,7 +196,7 @@ const buildJsonLd = (
   );
 };
 
-export default (data: LayoutData) => {
+export default (data: LayoutData): string => {
   const title = data.title ?? "";
   const siteUrl = data.site?.url ?? "";
   const siteName = data.site?.name ?? data.site_name ?? "";

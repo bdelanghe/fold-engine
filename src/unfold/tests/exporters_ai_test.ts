@@ -1,4 +1,5 @@
 import { assert, assertEquals } from "@std/assert";
+import { scanVault } from "../inputs/vault/load_vault.ts";
 
 const hasRequiredPermissions = async (): Promise<boolean> => {
   const required: Deno.PermissionDescriptor[] = [
@@ -12,6 +13,15 @@ const hasRequiredPermissions = async (): Promise<boolean> => {
     if (status.state !== "granted") {
       return false;
     }
+  }
+  return true;
+};
+
+const hasVaultContent = async (): Promise<boolean> => {
+  const manifest = await scanVault();
+  if (!manifest.hasConfig || manifest.files.length === 0) {
+    console.warn("Skipping AI export test (missing vault content).");
+    return false;
   }
   return true;
 };
@@ -31,21 +41,28 @@ const runBuild = async () => {
   }
 };
 
+const getSiteDir = (): string =>
+  Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
+
 Deno.test("exports llms.txt and mcp bundle", async () => {
   if (!await hasRequiredPermissions()) {
     console.warn("Skipping AI export test (missing permissions).");
     return;
   }
+  if (!await hasVaultContent()) {
+    return;
+  }
   await runBuild();
+  const siteDir = getSiteDir();
 
-  const llms = await Deno.readTextFile("dist/site/llms.txt");
+  const llms = await Deno.readTextFile(`${siteDir}/llms.txt`);
   assert(llms.includes("allow:"), "Missing allow directive");
   assert(
     llms.split("\n").some((line) => line.startsWith("index: ")),
     "Missing index directive",
   );
 
-  const mcpRaw = await Deno.readTextFile("dist/site/mcp/site.json");
+  const mcpRaw = await Deno.readTextFile(`${siteDir}/mcp/site.json`);
   const mcp = JSON.parse(mcpRaw) as {
     version?: string;
     generatedAt?: string;

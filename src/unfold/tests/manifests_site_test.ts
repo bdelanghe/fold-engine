@@ -12,6 +12,7 @@ import contractSchema from "../schemas/site.manifest.contract.schema.json" with 
 import siteSchema from "../schemas/site.manifest.schema.json" with {
   type: "json",
 };
+import { scanVault } from "../inputs/vault/load_vault.ts";
 
 type Expectations = {
   siteUrl?: string;
@@ -50,6 +51,15 @@ const hasRequiredPermissions = async (): Promise<boolean> => {
   return true;
 };
 
+const hasVaultContent = async (): Promise<boolean> => {
+  const manifest = await scanVault();
+  if (!manifest.hasConfig || manifest.files.length === 0) {
+    console.warn("Skipping site manifest (missing vault content).");
+    return false;
+  }
+  return true;
+};
+
 const loadSite = async () => (await import("../site/site.ts")).createSite();
 
 const runBuild = async () => {
@@ -79,16 +89,23 @@ const assertLinksResolve = (paths: Set<string>, links: string[]) => {
   }
 };
 
+const getSiteDir = (): string =>
+  Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
+
 Deno.test("site manifest contract", async () => {
   if (!await hasRequiredPermissions()) {
     console.warn("Skipping site manifest contract (missing permissions).");
     return;
   }
+  if (!await hasVaultContent()) {
+    return;
+  }
   await runBuild();
-  const manifest = await generateSiteManifest({ siteDir: "dist/site" });
+  const siteDir = getSiteDir();
+  const manifest = await generateSiteManifest({ siteDir });
 
   await Deno.writeTextFile(
-    "dist/site/site.manifest.json",
+    `${siteDir.replace(/\/$/, "")}/site.manifest.json`,
     JSON.stringify(manifest, null, 2),
   );
 
@@ -155,6 +172,9 @@ Deno.test("site manifest matches schema and invariants", async () => {
     console.warn("Skipping site manifest invariants (missing permissions).");
     return;
   }
+  if (!await hasVaultContent()) {
+    return;
+  }
   const site = await loadSite();
   await site.build();
 
@@ -193,6 +213,9 @@ Deno.test("site manifest matches schema and invariants", async () => {
 Deno.test("healthz file is generated", async () => {
   if (!await hasRequiredPermissions()) {
     console.warn("Skipping healthz file check (missing permissions).");
+    return;
+  }
+  if (!await hasVaultContent()) {
     return;
   }
   const site = await loadSite();

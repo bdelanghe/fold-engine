@@ -72,7 +72,9 @@ export const buildWikiHref = (
   return `${prefix}${encodedTarget}${suffix}`;
 };
 
-export default function wikiLinks(options: WikiLinkOptions = {}) {
+export default function wikiLinks(
+  options: WikiLinkOptions = {},
+): (md: MarkdownIt) => void {
   return (md: MarkdownIt) => {
     md.inline.ruler.before("emphasis", "wikilink", (state, silent) => {
       const start = state.pos;

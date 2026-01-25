@@ -25,8 +25,9 @@ type DomParserConstructor = {
 };
 
 const getDomParser = async (): Promise<DomParserConstructor> => {
-  if (typeof DOMParser !== "undefined") {
-    return DOMParser as unknown as DomParserConstructor;
+  const existingParser = globalThis.DOMParser;
+  if (typeof existingParser !== "undefined") {
+    return existingParser as unknown as DomParserConstructor;
   }
   const { DOMParser: DenoDomParser } = await import(
     "deno-dom-wasm"
@@ -133,6 +134,9 @@ const defaultSiteUrl = () =>
 
 const defaultBuildMode = () =>
   Deno.env.get("LUME_ENV") ?? Deno.env.get("BUILD_MODE") ?? "production";
+
+const getSiteDir = (): string =>
+  Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
 
 const normalizePathname = (pathname: string): string => {
   if (!pathname.startsWith("/")) {
@@ -276,41 +280,41 @@ const detectForbiddenMarkers = (html: string): string[] => {
 export const generateSiteManifest = async (
   options: ManifestOptions = {},
 ): Promise<SiteContractManifest> => {
-  const siteDir = options.siteDir ?? "dist/site";
+  const siteDir = options.siteDir ?? getSiteDir();
   const siteUrl = (options.siteUrl ?? defaultSiteUrl()).replace(/\/$/, "");
   const buildMode = options.buildMode ?? defaultBuildMode();
   const htmlFiles = await collectHtmlFiles(siteDir);
 
-  const pages: ContractManifestPage[] = [];
+  const pages = await Promise.all(
+    htmlFiles.map(async (filePath) => {
+      const html = await Deno.readTextFile(filePath);
+      const doc = await parseHtml(html, filePath);
 
-  for (const filePath of htmlFiles) {
-    const html = await Deno.readTextFile(filePath);
-    const doc = await parseHtml(html, filePath);
+      const path = pathFromHtmlFile(siteDir, filePath);
+      const pageUrl = new URL(path, siteUrl).toString();
+      const title = doc.querySelector("title")?.textContent?.trim() ?? "";
+      const h1 = doc.querySelector("h1")?.textContent?.trim() ?? "";
+      const hasCharset = Boolean(doc.querySelector("meta[charset]"));
+      const hasViewport = Boolean(
+        doc.querySelector('meta[name="viewport"]'),
+      );
+      const canonical = getCanonicalUrl(doc, siteUrl);
+      const { hasJsonLd, jsonLdErrors } = extractJsonLd(doc);
 
-    const path = pathFromHtmlFile(siteDir, filePath);
-    const pageUrl = new URL(path, siteUrl).toString();
-    const title = doc.querySelector("title")?.textContent?.trim() ?? "";
-    const h1 = doc.querySelector("h1")?.textContent?.trim() ?? "";
-    const hasCharset = Boolean(doc.querySelector("meta[charset]"));
-    const hasViewport = Boolean(
-      doc.querySelector('meta[name="viewport"]'),
-    );
-    const canonical = getCanonicalUrl(doc, siteUrl);
-    const { hasJsonLd, jsonLdErrors } = extractJsonLd(doc);
-
-    pages.push({
-      path,
-      title,
-      h1,
-      links: extractLinks(doc, pageUrl, siteUrl),
-      hasJsonLd,
-      jsonLdErrors,
-      canonical,
-      hasCharset,
-      hasViewport,
-      forbiddenMarkersFound: detectForbiddenMarkers(html),
-    });
-  }
+      return {
+        path,
+        title,
+        h1,
+        links: extractLinks(doc, pageUrl, siteUrl),
+        hasJsonLd,
+        jsonLdErrors,
+        canonical,
+        hasCharset,
+        hasViewport,
+        forbiddenMarkersFound: detectForbiddenMarkers(html),
+      };
+    }),
+  );
 
   pages.sort((a, b) => a.path.localeCompare(b.path));
 

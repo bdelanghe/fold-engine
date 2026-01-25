@@ -16,7 +16,7 @@ const startServer = async () => {
   await new Promise(() => {});
 };
 
-if (import.meta.main) {
+const run = async (): Promise<void> => {
   try {
     await startServer();
   } catch (error) {
@@ -27,4 +27,8 @@ if (import.meta.main) {
     }
     throw error;
   }
+};
+
+if (import.meta.main) {
+  void run();
 }

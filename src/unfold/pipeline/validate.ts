@@ -5,10 +5,12 @@ export const runValidate = async (): Promise<void> => {
   // Validate vault structure
   const vaultErrors = await validateVault();
   if (vaultErrors.length > 0) {
-    console.error("Vault validation failed:");
-    for (const error of vaultErrors) {
-      console.error(`  - ${error}`);
-    }
+    const errorLines = [
+      "Vault validation failed:",
+      ...vaultErrors.map((error) => `  - ${error}`),
+    ];
+    const encoder = new TextEncoder();
+    await Deno.stderr.write(encoder.encode(`${errorLines.join("\n")}\n`));
     throw new Error("Vault validation failed");
   }
 

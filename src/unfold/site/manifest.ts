@@ -172,47 +172,50 @@ const detectForbiddenMarkers = (html: string): string[] => {
     .map((marker) => marker.id);
 };
 
+const getSiteDir = (): string =>
+  Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
+
 export const generateSiteManifest = async (
   options: ManifestOptions = {},
 ): Promise<SiteManifest> => {
-  const siteDir = options.siteDir ?? "dist/site";
+  const siteDir = options.siteDir ?? getSiteDir();
   const siteUrl = (options.siteUrl ?? defaultSiteUrl()).replace(/\/$/, "");
   const buildMode = options.buildMode ?? defaultBuildMode();
   const htmlFiles = await collectHtmlFiles(siteDir);
 
-  const pages: ManifestPage[] = [];
+  const pages = await Promise.all(
+    htmlFiles.map(async (filePath) => {
+      const html = await Deno.readTextFile(filePath);
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      if (!doc) {
+        throw new Error(`Failed to parse HTML for ${filePath}`);
+      }
 
-  for (const filePath of htmlFiles) {
-    const html = await Deno.readTextFile(filePath);
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    if (!doc) {
-      throw new Error(`Failed to parse HTML for ${filePath}`);
-    }
+      const path = pathFromHtmlFile(siteDir, filePath);
+      const pageUrl = new URL(path, siteUrl).toString();
+      const title = doc.querySelector("title")?.textContent?.trim() ?? "";
+      const h1 = doc.querySelector("h1")?.textContent?.trim() ?? "";
+      const hasCharset = Boolean(doc.querySelector("meta[charset]"));
+      const hasViewport = Boolean(
+        doc.querySelector('meta[name="viewport"]'),
+      );
+      const canonical = getCanonicalUrl(doc, siteUrl);
+      const { hasJsonLd, jsonLdErrors } = extractJsonLd(doc);
 
-    const path = pathFromHtmlFile(siteDir, filePath);
-    const pageUrl = new URL(path, siteUrl).toString();
-    const title = doc.querySelector("title")?.textContent?.trim() ?? "";
-    const h1 = doc.querySelector("h1")?.textContent?.trim() ?? "";
-    const hasCharset = Boolean(doc.querySelector("meta[charset]"));
-    const hasViewport = Boolean(
-      doc.querySelector('meta[name="viewport"]'),
-    );
-    const canonical = getCanonicalUrl(doc, siteUrl);
-    const { hasJsonLd, jsonLdErrors } = extractJsonLd(doc);
-
-    pages.push({
-      path,
-      title,
-      h1,
-      links: extractLinks(doc, pageUrl, siteUrl),
-      hasJsonLd,
-      jsonLdErrors,
-      canonical,
-      hasCharset,
-      hasViewport,
-      forbiddenMarkersFound: detectForbiddenMarkers(html),
-    });
-  }
+      return {
+        path,
+        title,
+        h1,
+        links: extractLinks(doc, pageUrl, siteUrl),
+        hasJsonLd,
+        jsonLdErrors,
+        canonical,
+        hasCharset,
+        hasViewport,
+        forbiddenMarkersFound: detectForbiddenMarkers(html),
+      };
+    }),
+  );
 
   pages.sort((a, b) => a.path.localeCompare(b.path));
 

@@ -266,6 +266,15 @@ export const validateNotes = async (): Promise<void> => {
 };
 
 if (import.meta.main) {
-  await validateNotes();
-  console.log("Note validation passed.");
+  void validateNotes()
+    .then(() => {
+      const encoder = new TextEncoder();
+      void Deno.stdout.write(encoder.encode("Note validation passed.\n"));
+    })
+    .catch((error) => {
+      const message = error instanceof Error ? error.message : String(error);
+      const encoder = new TextEncoder();
+      void Deno.stderr.write(encoder.encode(`${message}\n`));
+      Deno.exit(1);
+    });
 }

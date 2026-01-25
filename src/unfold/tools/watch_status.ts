@@ -31,7 +31,7 @@ export const truncateTail = (
   text: string,
   maxLines = MAX_TAIL_LINES,
   maxChars = MAX_TAIL_CHARS,
-) => {
+): string => {
   const lines = text.split("\n");
   const tailLines = lines.slice(-maxLines);
   let tail = tailLines.join("\n");
@@ -93,12 +93,9 @@ const writeStatus = async (status: Status): Promise<void> => {
   await Deno.writeTextFile(statusPath, JSON.stringify(status, null, 2));
 };
 
-const run = async () => {
+const run = async (): Promise<void> => {
   const startedAt = Date.now();
-  const results: StepResult[] = [];
-  for (const step of STEPS) {
-    results.push(await runStep(step));
-  }
+  const results = await Promise.all(STEPS.map((step) => runStep(step)));
   const endedAt = Date.now();
   const status = buildStatus(results, { startedAt, endedAt });
   await writeStatus(status);
@@ -106,5 +103,5 @@ const run = async () => {
 };
 
 if (import.meta.main) {
-  await run();
+  void run();
 }

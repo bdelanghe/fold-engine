@@ -1,5 +1,5 @@
 import lume from "lume/mod.ts";
-import { dirname, fromFileUrl } from "@std/path";
+import { dirname, fromFileUrl, isAbsolute, join } from "@std/path";
 import jsonLd from "lume/plugins/json_ld.ts";
 import metas from "lume/plugins/metas.ts";
 import robots from "lume/plugins/robots.ts";
@@ -24,16 +24,29 @@ const getWorkspaceRoot = () =>
 const getLayoutPath = () =>
   fromFileUrl(new URL("../renderers/lume/layout.tmpl.ts", import.meta.url));
 
-export const createSite = () => {
+const getVaultPath = (): string => {
+  const override = Deno.env.get("VAULT_PATH")?.trim();
+  if (!override) {
+    return "obsidian_vault";
+  }
+  return isAbsolute(override) ? override : join(getWorkspaceRoot(), override);
+};
+
+const getSiteDest = (): string =>
+  Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
+
+export const createSite = (): ReturnType<typeof lume> => {
   const siteUrl = getSiteUrl();
   const basePath = getSiteBasePath();
   const workspaceRoot = getWorkspaceRoot();
   const layoutPath = getLayoutPath();
+  const vaultPath = getVaultPath();
+  const destPath = getSiteDest();
 
   const site = lume({
     cwd: workspaceRoot,
-    src: "obsidian_vault",
-    dest: "dist/site",
+    src: vaultPath,
+    dest: destPath,
     location: new URL(siteUrl),
   });
 

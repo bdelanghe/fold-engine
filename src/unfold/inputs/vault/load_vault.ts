@@ -1,8 +1,16 @@
 import { walk } from "@std/fs";
-import { relative } from "@std/path";
+import { isAbsolute, join, relative, toFileUrl } from "@std/path";
 
-export const loadVaultRoot = (): URL =>
-  new URL("../../../../obsidian_vault/", import.meta.url);
+export const loadVaultRoot = (): URL => {
+  const override = Deno.env.get("VAULT_PATH")?.trim();
+  if (override) {
+    const resolved = isAbsolute(override)
+      ? override
+      : join(Deno.cwd(), override);
+    return toFileUrl(resolved.endsWith("/") ? resolved : `${resolved}/`);
+  }
+  return new URL("../../../../obsidian_vault/", import.meta.url);
+};
 
 /** Obsidian accepted file extensions by type */
 export const ACCEPTED_EXTENSIONS = {

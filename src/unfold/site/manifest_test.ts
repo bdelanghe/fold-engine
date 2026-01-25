@@ -3,12 +3,13 @@ import addFormatsModule from "ajv-formats";
 import type { FormatsPlugin } from "ajv-formats";
 import { assert, assertEquals } from "@std/assert";
 import { generateSiteManifest } from "./manifest.ts";
-import expectations from "../unfold/contracts/site.manifest.expectations.json" with {
+import expectations from "../contracts/site.manifest.expectations.json" with {
   type: "json",
 };
-import schema from "../unfold/contracts/site.manifest.schema.json" with {
+import schema from "../contracts/site.manifest.schema.json" with {
   type: "json",
 };
+import { scanVault } from "../inputs/vault/load_vault.ts";
 
 type Expectations = {
   siteUrl?: string;
@@ -47,8 +48,16 @@ const hasRequiredPermissions = async (): Promise<boolean> => {
   return true;
 };
 
-const loadSite = async () =>
-  (await import("../unfold/site/site.ts")).createSite();
+const hasVaultContent = async (): Promise<boolean> => {
+  const manifest = await scanVault();
+  if (!manifest.hasConfig || manifest.files.length === 0) {
+    console.warn("Skipping site manifest (missing vault content).");
+    return false;
+  }
+  return true;
+};
+
+const loadSite = async () => (await import("./site.ts")).createSite();
 
 const runBuild = async () => {
   const command = new Deno.Command(Deno.execPath(), {
@@ -77,16 +86,23 @@ const assertLinksResolve = (paths: Set<string>, links: string[]) => {
   }
 };
 
+const getSiteDir = (): string =>
+  Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
+
 Deno.test("site manifest contract", async () => {
   if (!await hasRequiredPermissions()) {
     console.warn("Skipping site manifest contract (missing permissions).");
     return;
   }
+  if (!await hasVaultContent()) {
+    return;
+  }
   await runBuild();
-  const manifest = await generateSiteManifest({ siteDir: "dist/site" });
+  const siteDir = getSiteDir();
+  const manifest = await generateSiteManifest({ siteDir });
 
   await Deno.writeTextFile(
-    "dist/site/site.manifest.json",
+    `${siteDir.replace(/\/$/, "")}/site.manifest.json`,
     JSON.stringify(manifest, null, 2),
   );
 
@@ -160,8 +176,7 @@ Deno.test("site manifest matches schema and invariants", async () => {
   await site.build();
 
   const schema = await readJson(
-    new URL("../unfold/schemas/site.manifest.schema.json", import.meta.url)
-      .pathname,
+    new URL("../schemas/site.manifest.schema.json", import.meta.url).pathname,
   );
   const manifestPath = site.dest("site.manifest.json");
   const manifest = await readJson(manifestPath) as SiteManifestForTest;

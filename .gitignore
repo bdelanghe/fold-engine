@@ -21,6 +21,7 @@ vendor/
 **/.obsidian/workspace
 **/.obsidian/cache/
 **/.obsidian/graph.json
+obsidian_vault/
 
 # Deno artifacts
 .deno/
