@@ -22,8 +22,5 @@ Deno.test("sanitizeVaultPath rejects absolute paths", () => {
 });
 
 Deno.test("encodeVaultPath encodes segments", () => {
-  assertEquals(
-    encodeVaultPath("notes/hello world.md"),
-    "notes/hello%20world.md",
-  );
+  assertEquals(encodeVaultPath("notes/hello world.md"), "notes/hello%20world.md");
 });

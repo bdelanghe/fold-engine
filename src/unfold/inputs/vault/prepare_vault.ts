@@ -8,14 +8,7 @@ const getVaultBaseUrl = (): string | undefined => {
   return raw && raw.length > 0 ? raw : undefined;
 };
 
-const shouldRequireBaseUrl = (): boolean => {
-  const raw = Deno.env.get("VAULT_REQUIRE_BASE_URL")?.trim();
-  return raw === "1" || raw?.toLowerCase() === "true";
-};
-
-const getWorkspaceRoot = (): string => Deno.realPathSync(Deno.cwd());
-
-const getCacheRoot = (): string => join(getWorkspaceRoot(), ".unfold", "vault");
+const getCacheRoot = (): string => join(Deno.cwd(), ".unfold", "vault");
 
 const getIndexPath = (cacheRoot: string): string =>
   join(cacheRoot, ".vault-index.json");
@@ -43,29 +36,10 @@ const fetchIndex = async (baseUrl: string): Promise<VaultIndex> => {
   return await response.json() as VaultIndex;
 };
 
-const toArrayBuffer = (data: Uint8Array): ArrayBuffer => {
-  const copy = new Uint8Array(data.byteLength);
-  copy.set(data);
-  return copy.buffer;
-};
-
-const sha256Hex = async (data: Uint8Array): Promise<string> => {
-  const digest = await crypto.subtle.digest("SHA-256", toArrayBuffer(data));
-  return Array.from(new Uint8Array(digest))
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-};
-
-const writeWarning = (message: string): void => {
-  const encoder = new TextEncoder();
-  void Deno.stderr.write(encoder.encode(`${message}\n`));
-};
-
 const downloadFile = async (
   baseUrl: string,
   relPath: string,
   targetPath: string,
-  expectedHash: string,
 ): Promise<void> => {
   const url = new URL(`/v1/files/${encodeVaultPath(relPath)}`, baseUrl);
   const response = await fetch(url);
@@ -73,10 +47,6 @@ const downloadFile = async (
     throw new Error(`Vault API file fetch failed for ${relPath}`);
   }
   const buffer = new Uint8Array(await response.arrayBuffer());
-  const actualHash = await sha256Hex(buffer);
-  if (actualHash !== expectedHash) {
-    throw new Error(`Vault API hash mismatch for ${relPath}`);
-  }
   await Deno.mkdir(dirname(targetPath), { recursive: true });
   await Deno.writeFile(targetPath, buffer);
 };
@@ -84,27 +54,6 @@ const downloadFile = async (
 export const prepareVault = async (): Promise<void> => {
   const baseUrl = getVaultBaseUrl();
   if (!baseUrl) {
-    if (shouldRequireBaseUrl()) {
-      throw new Error("VAULT_BASE_URL is required but not set");
-    }
-    return;
-  }
-
-  let index: VaultIndex | null = null;
-  try {
-    index = await fetchIndex(baseUrl);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    writeWarning(
-      `Vault API unavailable (${message}). Falling back to local vault.`,
-    );
-    return;
-  }
-
-  if (index.entries.length === 0) {
-    writeWarning(
-      "Vault API returned no entries. Falling back to local vault.",
-    );
     return;
   }
 
@@ -112,35 +61,33 @@ export const prepareVault = async (): Promise<void> => {
   await Deno.mkdir(cacheRoot, { recursive: true });
   const indexPath = getIndexPath(cacheRoot);
 
-  const previousIndex = await readIndex(indexPath);
+  const [index, previousIndex] = await Promise.all([
+    fetchIndex(baseUrl),
+    readIndex(indexPath),
+  ]);
 
   const previousHashes = new Map(
     (previousIndex?.entries ?? []).map((entry) => [entry.path, entry.sha256]),
   );
   const expectedPaths = new Set<string>();
-  const downloadTasks: Promise<void>[] = [];
 
   for (const entry of index.entries) {
     const relPath = sanitizeVaultPath(entry.path);
     expectedPaths.add(relPath);
     const targetPath = join(cacheRoot, relPath);
     const previousHash = previousHashes.get(relPath);
-    downloadTasks.push((async () => {
-      if (previousHash && previousHash === entry.sha256) {
-        try {
-          const stat = await Deno.stat(targetPath);
-          if (stat.isFile) {
-            return;
-          }
-        } catch {
-          // Fall through to download if the file is missing.
+    if (previousHash && previousHash === entry.sha256) {
+      try {
+        const stat = await Deno.stat(targetPath);
+        if (stat.isFile) {
+          continue;
         }
+      } catch {
+        // Fall through to download if the file is missing.
       }
-      await downloadFile(baseUrl, relPath, targetPath, entry.sha256);
-    })());
+    }
+    await downloadFile(baseUrl, relPath, targetPath);
   }
-
-  await Promise.all(downloadTasks);
 
   for await (const entry of walk(cacheRoot, { includeDirs: false })) {
     const relPath = normalizeRelativePath(cacheRoot, entry.path);
@@ -153,5 +100,5 @@ export const prepareVault = async (): Promise<void> => {
   }
 
   await Deno.writeTextFile(indexPath, JSON.stringify(index, null, 2));
-  Deno.env.set("VAULT_PATH", relative(getWorkspaceRoot(), cacheRoot));
+  Deno.env.set("VAULT_PATH", cacheRoot);
 };
