@@ -71,6 +71,7 @@ bd sync
 ```
 
 **Important:** This project uses beads for AI-native issue tracking. Issues are stored in `.beads/` and synced with git.
+**Worktrees:** Run `bd` from a worktree checkout (not the bare repo store). Use `./scripts/bd` to auto-hop out of a bare repo and pin the local `.beads/beads.db` when present.
 
 ### Docker Workflow
 ```bash
