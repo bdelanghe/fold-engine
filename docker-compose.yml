@@ -53,10 +53,10 @@ services:
       [
         "sh",
         "-c",
-        "apk add --no-cache git openssh-client ca-certificates >/dev/null && if [ -z \"${VAULT_REPO}\" ]; then echo \"VAULT_REPO is not set\" >&2; exit 1; fi && if [ ! -d .git ]; then git clone --depth=1 --branch \"${VAULT_BRANCH}\" \"${VAULT_REPO}\" .; else git fetch origin \"${VAULT_BRANCH}\" && git reset --hard \"origin/${VAULT_BRANCH}\"; fi && tail -f /dev/null",
+        "apk add --no-cache git openssh-client ca-certificates >/dev/null && if [ -z \"${VAULT_REPO}\" ]; then echo \"VAULT_REPO is not set; initializing empty repo\" >&2; if [ ! -d .git ]; then git init; fi; else if [ ! -d .git ]; then git clone --depth=1 --branch \"${VAULT_BRANCH}\" \"${VAULT_REPO}\" .; else git fetch origin \"${VAULT_BRANCH}\" && git reset --hard \"origin/${VAULT_BRANCH}\"; fi; fi && tail -f /dev/null",
       ]
     environment:
-      VAULT_REPO: ${VAULT_REPO}
+      VAULT_REPO: ${VAULT_REPO:-git@github.com:bdelanghe/unfold-obsidian-vault.git}
       VAULT_BRANCH: ${VAULT_BRANCH:-main}
       GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=accept-new"
     volumes:
