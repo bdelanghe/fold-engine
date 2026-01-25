@@ -1,7 +1,7 @@
 {
   "tasks": {
-    "unfold:server": "deno run -A --no-lock=false --lock=deno.lock src/unfold/server.ts",
-    "unfold:cli": "deno run -A --no-lock=false --lock=deno.lock src/unfold/cli/main.ts",
+    "unfold:server": "deno run -A --lock=deno.lock src/unfold/server.ts",
+    "unfold:cli": "deno run -A --lock=deno.lock src/unfold/cli/main.ts",
     "dev": "deno task unfold:server",
     "start": "deno task dev",
     "preview": "deno task dev",
