@@ -2,10 +2,10 @@
   "name": "fold-engine",
   "dockerComposeFile": ["../docker-compose.yml"],
   "service": "unfold",
-  "runServices": ["unfold"],
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "shutdownAction": "stopCompose",
-  "forwardPorts": [3000],
+  "postCreateCommand": "deno --version",
+  "forwardPorts": [3000, 3001],
   "portsAttributes": {
     "3000": {
       "label": "Lume dev server",

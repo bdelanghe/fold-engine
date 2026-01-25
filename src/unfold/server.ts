@@ -1,4 +1,3 @@
-import { prepareVault } from "./inputs/vault/prepare_vault.ts";
 import { createSite } from "./site/site.ts";
 
 const resolvePort = () => {
@@ -8,7 +7,6 @@ const resolvePort = () => {
 };
 
 const startServer = async () => {
-  await prepareVault();
   const site = createSite();
   await site.build();
   const server = site.getServer();
@@ -18,7 +16,7 @@ const startServer = async () => {
   await new Promise(() => {});
 };
 
-const run = async (): Promise<void> => {
+if (import.meta.main) {
   try {
     await startServer();
   } catch (error) {
@@ -29,8 +27,4 @@ const run = async (): Promise<void> => {
     }
     throw error;
   }
-};
-
-if (import.meta.main) {
-  void run();
 }
