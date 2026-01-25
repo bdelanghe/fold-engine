@@ -10,7 +10,8 @@ export const loadVaultRoot = (): URL => {
       : join(Deno.cwd(), override);
     return toFileUrl(resolved.endsWith("/") ? resolved : `${resolved}/`);
   }
-  return new URL("../../../../obsidian_vault/", import.meta.url);
+  const cwd = Deno.cwd().replace(/\/$/, "");
+  return toFileUrl(`${cwd}/`);
 };
 
 /** Obsidian accepted file extensions by type */
@@ -132,7 +133,7 @@ export const scanVault = async (vaultRoot?: URL): Promise<VaultManifest> => {
     }
     if (
       IGNORED_FILES.has(relPath) ||
-      ignoredPrefixes.some((prefix) => relPath.startsWith(prefix))
+      IGNORED_PREFIXES.some((prefix) => relPath.startsWith(prefix))
     ) {
       continue;
     }

@@ -1,4 +1,5 @@
 import lume from "lume/mod.ts";
+import type { Page } from "lume/core/file.ts";
 import { dirname, fromFileUrl, isAbsolute, join, relative } from "@std/path";
 import jsonLd from "lume/plugins/json_ld.ts";
 import metas from "lume/plugins/metas.ts";
@@ -34,7 +35,7 @@ const getLayoutPath = () =>
 const getVaultPath = (): string => {
   const override = Deno.env.get("VAULT_PATH")?.trim();
   if (!override) {
-    return "obsidian_vault";
+    return ".";
   }
   if (isAbsolute(override)) {
     const workspaceRoot = getWorkspaceRoot().replace(/\/$/, "");
@@ -86,9 +87,6 @@ export const createSite = (): ReturnType<typeof lume> => {
     "src/unfold/vault_api/support/",
     "vendor/",
   ];
-  if (srcPath.replace(/\/$/, "") === "vault") {
-    ignorePrefixes.push("vault/vault/");
-  }
   const ignoreFiles = new Set([
     ".cursorindexingignore",
     ".dockerignore",
