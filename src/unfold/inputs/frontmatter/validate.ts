@@ -3,11 +3,29 @@ import { basename } from "@std/path";
 import { z } from "zod";
 import { loadVaultRoot } from "../vault/load_vault.ts";
 
+const schemaOrgSchema = z
+  .object({
+    pageType: z.string().min(1).optional(),
+    pageSubtypes: z.array(z.string().min(1)).optional(),
+    about: z
+      .array(
+        z
+          .object({
+            type: z.string().min(1),
+            id: z.string().url().optional(),
+            name: z.string().min(1).optional(),
+          })
+          .strict(),
+      )
+      .optional(),
+  })
+  .strict();
+
 const frontmatterSchema = z
   .object({
     title: z.string().min(1),
     tags: z.array(z.string().min(1)).optional(),
-    schema: z.string().min(1).optional(),
+    schema: z.union([z.string().min(1), schemaOrgSchema]).optional(),
     fold: z.string().min(1).optional(),
     layout: z.string().min(1).optional(),
     jsonld: z.union([z.string().min(1), z.record(z.string(), z.unknown())]),
