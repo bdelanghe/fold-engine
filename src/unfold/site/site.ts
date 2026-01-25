@@ -1,10 +1,12 @@
 import lume from "lume/mod.ts";
-import { fromFileUrl } from "@std/path";
+import { dirname, fromFileUrl } from "@std/path";
 import jsonLd from "lume/plugins/json_ld.ts";
 import metas from "lume/plugins/metas.ts";
 import robots from "lume/plugins/robots.ts";
 import sitemap from "lume/plugins/sitemap.ts";
 import vento from "lume/plugins/vento.ts";
+import { buildLlmsTxt } from "../exporters/llms.ts";
+import { buildMcpBundle } from "../exporters/mcp.ts";
 import wikilinks from "../inputs/markdown/wikilinks.ts";
 import { buildSiteManifest } from "../manifests/site_manifest.ts";
 
@@ -56,6 +58,15 @@ export const createSite = () => {
     const manifest = buildSiteManifest(pages);
     const outputPath = site.dest("site.manifest.json");
     await Deno.writeTextFile(outputPath, JSON.stringify(manifest, null, 2));
+
+    const llmsPath = site.dest("llms.txt");
+    const llmsTxt = await buildLlmsTxt(pages, { siteUrl });
+    await Deno.writeTextFile(llmsPath, llmsTxt);
+
+    const mcpPath = site.dest("mcp/site.json");
+    await Deno.mkdir(dirname(mcpPath), { recursive: true });
+    const mcpBundle = await buildMcpBundle(pages, { url: siteUrl });
+    await Deno.writeTextFile(mcpPath, JSON.stringify(mcpBundle, null, 2));
   });
 
   return site;

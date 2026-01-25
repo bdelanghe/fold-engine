@@ -1,30 +1,13 @@
 import type { Page } from "lume/core/file.ts";
 import { isAbsolute, join } from "@std/path";
 
-type McpSite = {
-  url: string;
-  name?: string;
+type LlmsOptions = {
+  siteUrl: string;
+  generatedAt?: string;
 };
 
-type McpHeading = {
-  level: number;
-  text: string;
-};
-
-type McpPage = {
-  url: string;
-  title: string;
-  description?: string;
-  excerpt: string;
-  headings: McpHeading[];
-};
-
-export type McpBundle = {
-  version: "v1";
-  generatedAt: string;
-  site: McpSite;
-  pages: McpPage[];
-};
+const ensureTrailingSlash = (value: string): string =>
+  value.endsWith("/") ? value : `${value}/`;
 
 const normalizeText = (value: string | null | undefined): string =>
   (value ?? "").replace(/\s+/g, " ").trim();
@@ -82,56 +65,51 @@ const resolveCanonical = (page: Page, siteUrl: string): string => {
   }
 };
 
-const extractHeadings = (document: Document | null): McpHeading[] => {
-  if (!document) {
-    return [];
-  }
-  const headings = Array.from(document.querySelectorAll("h1, h2, h3"));
-  return headings
-    .map((heading) => {
-      const level = Number(heading.tagName.replace("H", ""));
-      const text = normalizeText(heading.textContent);
-      return { level, text };
-    })
-    .filter((heading) => heading.text);
-};
-
-export const buildMcpBundle = async (
+export const buildLlmsTxt = async (
   pages: Page[],
-  site: McpSite,
-): Promise<McpBundle> => {
-  const siteUrl = site.url.replace(/\/$/, "");
-  const mapped: McpPage[] = [];
+  options: LlmsOptions,
+): Promise<string> => {
+  const siteUrl = options.siteUrl.replace(/\/$/, "");
+  const generatedAt = options.generatedAt ?? new Date().toISOString();
+
+  const entries: Array<{ url: string; title: string; excerpt: string }> = [];
   for (const page of pages) {
     const url = resolveCanonical(page, siteUrl);
     const title = normalizeText(page.document?.querySelector("title")?.textContent);
-    const description = normalizeText(
-      page.document?.querySelector('meta[name="description"]')?.getAttribute(
-        "content",
-      ),
-    );
-    if (!url || !title) {
+    if (!url) {
       continue;
     }
-    const excerpt = await readMarkdownExcerpt(page, 240);
-    mapped.push({
-      url,
-      title,
-      description: description || undefined,
-      excerpt,
-      headings: extractHeadings(page.document ?? null),
-    });
+    const excerpt = await readMarkdownExcerpt(page, 200);
+    entries.push({ url, title, excerpt });
   }
 
-  mapped.sort((a, b) => a.url.localeCompare(b.url));
+  entries.sort((a, b) => a.url.localeCompare(b.url));
 
-  return {
-    version: "v1",
-    generatedAt: new Date().toISOString(),
-    site: {
-      url: siteUrl,
-      name: site.name,
-    },
-    pages: mapped,
-  };
+  const uniqueUrls = new Set<string>();
+  const lines = [
+    "# llms.txt",
+    `# site: ${siteUrl}`,
+    `# generated: ${generatedAt}`,
+    "",
+    `allow: ${ensureTrailingSlash(siteUrl)}`,
+  ];
+
+  for (const entry of entries) {
+    if (uniqueUrls.has(entry.url)) {
+      continue;
+    }
+    uniqueUrls.add(entry.url);
+    lines.push(`index: ${entry.url}`);
+  }
+
+  for (const entry of entries) {
+    if (entry.title) {
+      lines.push(`topic: ${entry.title} | ${entry.url}`);
+    }
+    if (entry.excerpt) {
+      lines.push(`summary: ${entry.excerpt} | ${entry.url}`);
+    }
+  }
+
+  return `${lines.join("\n")}\n`;
 };
