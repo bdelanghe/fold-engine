@@ -16,7 +16,7 @@ artifacts. Publishing is static and deterministic.
 ## Pipeline (logical)
 
 ```
-obsidian_vault/
+vault/
   ↓
 validate frontmatter + JSON-LD
   ↓

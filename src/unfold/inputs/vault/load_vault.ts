@@ -10,6 +10,14 @@ export const loadVaultRoot = (): URL => {
     return toFileUrl(resolved.endsWith("/") ? resolved : `${resolved}/`);
   }
   const cwd = Deno.cwd().replace(/\/$/, "");
+  try {
+    const stat = Deno.statSync(join(cwd, "vault"));
+    if (stat.isDirectory) {
+      return toFileUrl(`${cwd}/vault/`);
+    }
+  } catch {
+    // Fall through to repo root.
+  }
   return toFileUrl(`${cwd}/`);
 };
 
@@ -90,6 +98,7 @@ export const scanVault = async (vaultRoot?: URL): Promise<VaultManifest> => {
   let hasConfig = false;
   const files: VaultFile[] = [];
   const invalidFiles: VaultFile[] = [];
+  const ignoredPrefixes = [...IGNORED_PREFIXES];
 
   try {
     await Deno.stat(root);
@@ -102,6 +111,10 @@ export const scanVault = async (vaultRoot?: URL): Promise<VaultManifest> => {
     hasConfig = true;
   } catch {
     hasConfig = false;
+  }
+
+  if (rootPath.replace(/\/$/, "").endsWith("/vault")) {
+    ignoredPrefixes.push("vault/");
   }
 
   for await (const entry of walk(root, { includeDirs: false })) {
@@ -117,7 +130,7 @@ export const scanVault = async (vaultRoot?: URL): Promise<VaultManifest> => {
     }
     if (
       IGNORED_FILES.has(relPath) ||
-      IGNORED_PREFIXES.some((prefix) => relPath.startsWith(prefix))
+      ignoredPrefixes.some((prefix) => relPath.startsWith(prefix))
     ) {
       continue;
     }
