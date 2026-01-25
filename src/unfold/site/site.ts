@@ -1,4 +1,5 @@
 import lume from "lume/mod.ts";
+import type { Page } from "lume/core/file.ts";
 import { dirname, fromFileUrl, isAbsolute, join, relative } from "@std/path";
 import jsonLd from "lume/plugins/json_ld.ts";
 import metas from "lume/plugins/metas.ts";
@@ -27,7 +28,7 @@ const getLayoutPath = () =>
 const getVaultPath = (): string => {
   const override = Deno.env.get("VAULT_PATH")?.trim();
   if (!override) {
-    return "obsidian_vault";
+    return ".";
   }
   if (isAbsolute(override)) {
     const workspaceRoot = getWorkspaceRoot().replace(/\/$/, "");
@@ -61,6 +62,57 @@ export const createSite = (): ReturnType<typeof lume> => {
     location: new URL(siteUrl),
   });
 
+  const ignorePrefixes = [
+    ".cursor/",
+    ".devcontainer/",
+    ".git/",
+    ".github/",
+    ".unfold/",
+    ".vscode/",
+    "dist/",
+    "node_modules/",
+    "src/",
+    "src/unfold/vault_api/support/",
+    "vendor/",
+  ];
+  const ignoreFiles = new Set([
+    ".cursorindexingignore",
+    ".dockerignore",
+    ".gitignore",
+    ".nojekyll",
+    "deno.json",
+    "deno.lock",
+    "docker-bake.hcl",
+    "docker-compose.yml",
+    "Dockerfile",
+  ]);
+  const normalizePath = (value: string) => value.replaceAll("\\", "/");
+  const stripWorkspace = (value: string) => {
+    const normalized = normalizePath(value);
+    if (normalized.startsWith(`${workspaceRoot}/`)) {
+      return normalized.slice(workspaceRoot.length + 1);
+    }
+    if (normalized.startsWith(workspaceRoot)) {
+      return normalized.slice(workspaceRoot.length).replace(/^\/+/, "");
+    }
+    return normalized.replace(/^\/+/, "");
+  };
+  const ignoreFilter = (path: string) => {
+    const relativePath = stripWorkspace(path);
+    return (
+      ignoreFiles.has(relativePath) ||
+      ignorePrefixes.some((prefix) => relativePath.startsWith(prefix))
+    );
+  };
+  const ignore = (
+    site as {
+      ignore?: (...paths: (string | ((path: string) => boolean))[]) => void;
+    }
+  ).ignore;
+  if (typeof ignore === "function") {
+    ignore.call(site, ignoreFilter);
+  }
+
   // Register the layout from external location
   site.remoteFile("_includes/layout.tmpl.ts", layoutPath);
   site.data("site", { url: siteUrl, basePath });
@@ -79,7 +131,18 @@ export const createSite = (): ReturnType<typeof lume> => {
     )
   );
   site.process([".html"], async (pages) => {
-    const manifest = buildSiteManifest(pages);
+    let pageList: Page[] = [];
+    if (Array.isArray(pages)) {
+      pageList = pages;
+    } else {
+      try {
+        pageList = Array.from(pages as Iterable<Page>);
+      } catch {
+        pageList = [];
+      }
+    }
+
+    const manifest = buildSiteManifest(pageList);
     const outputPath = site.dest("site.manifest.json");
     await Deno.writeTextFile(outputPath, JSON.stringify(manifest, null, 2));
 
@@ -87,13 +150,42 @@ export const createSite = (): ReturnType<typeof lume> => {
     await Deno.writeTextFile(healthPath, "ok\n");
 
     const llmsPath = site.dest("llms.txt");
-    const llmsTxt = await buildLlmsTxt(pages, { siteUrl });
+    const llmsTxt = await buildLlmsTxt(pageList, { siteUrl });
     await Deno.writeTextFile(llmsPath, llmsTxt);
 
     const mcpPath = site.dest("mcp/site.json");
     await Deno.mkdir(dirname(mcpPath), { recursive: true });
-    const mcpBundle = await buildMcpBundle(pages, { url: siteUrl });
+    const mcpBundle = await buildMcpBundle(pageList, { url: siteUrl });
     await Deno.writeTextFile(mcpPath, JSON.stringify(mcpBundle, null, 2));
+
+    const hasRootPage = pageList.some((page) => page.data.url === "/");
+    if (!hasRootPage) {
+      const sortedPages = [...pageList].sort((a, b) =>
+        a.data.url.localeCompare(b.data.url)
+      );
+      const fallbackTarget = sortedPages[0]?.data.url ?? basePath;
+      const indexPath = site.dest("index.html");
+      try {
+        await Deno.stat(indexPath);
+      } catch {
+        const target = fallbackTarget.startsWith("/") ? fallbackTarget : "/";
+        const html = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="0; url=${target}">
+    <title>Fold Engine</title>
+    <link rel="canonical" href="${target}">
+  </head>
+  <body>
+    <p>Index not built. Continue to <a href="${target}">${target}</a>.</p>
+  </body>
+</html>
+`;
+        await Deno.writeTextFile(indexPath, html);
+      }
+    }
   });
 
   return site;

@@ -9,7 +9,8 @@ export const loadVaultRoot = (): URL => {
       : join(Deno.cwd(), override);
     return toFileUrl(resolved.endsWith("/") ? resolved : `${resolved}/`);
   }
-  return new URL("../../../../obsidian_vault/", import.meta.url);
+  const cwd = Deno.cwd().replace(/\/$/, "");
+  return toFileUrl(`${cwd}/`);
 };
 
 /** Obsidian accepted file extensions by type */
@@ -55,6 +56,32 @@ const getFileType = (ext: string): FileType => {
   return "unknown";
 };
 
+const IGNORED_PREFIXES = [
+  ".cursor/",
+  ".devcontainer/",
+  ".git/",
+  ".github/",
+  ".unfold/",
+  ".vscode/",
+  "dist/",
+  "node_modules/",
+  "src/",
+  "src/unfold/vault_api/support/",
+  "vendor/",
+];
+
+const IGNORED_FILES = new Set([
+  ".cursorindexingignore",
+  ".dockerignore",
+  ".gitignore",
+  ".nojekyll",
+  "deno.json",
+  "deno.lock",
+  "docker-bake.hcl",
+  "docker-compose.yml",
+  "Dockerfile",
+]);
+
 /** Scan vault and produce a manifest */
 export const scanVault = async (vaultRoot?: URL): Promise<VaultManifest> => {
   const root = vaultRoot ?? loadVaultRoot();
@@ -85,6 +112,12 @@ export const scanVault = async (vaultRoot?: URL): Promise<VaultManifest> => {
       relPath.startsWith(".obsidian") ||
       relPath.startsWith(".") ||
       relPath.startsWith("_includes/")
+    ) {
+      continue;
+    }
+    if (
+      IGNORED_FILES.has(relPath) ||
+      IGNORED_PREFIXES.some((prefix) => relPath.startsWith(prefix))
     ) {
       continue;
     }

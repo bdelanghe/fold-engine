@@ -1,5 +1,5 @@
 import { extractYaml } from "@std/front-matter";
-import { basename } from "@std/path";
+import { basename, relative } from "@std/path";
 import { z } from "zod";
 import { loadVaultRoot } from "../vault/load_vault.ts";
 
@@ -254,6 +254,32 @@ export const validateNoteContent = (
 
 const mdExtensions = new Set([".md", ".markdown"]);
 
+const IGNORED_PREFIXES = [
+  ".cursor/",
+  ".devcontainer/",
+  ".git/",
+  ".github/",
+  ".unfold/",
+  ".vscode/",
+  "dist/",
+  "node_modules/",
+  "src/",
+  "src/unfold/vault_api/support/",
+  "vendor/",
+];
+
+const IGNORED_FILES = new Set([
+  ".cursorindexingignore",
+  ".dockerignore",
+  ".gitignore",
+  ".nojekyll",
+  "deno.json",
+  "deno.lock",
+  "docker-bake.hcl",
+  "docker-compose.yml",
+  "Dockerfile",
+]);
+
 async function* walk(dir: URL): AsyncGenerator<URL> {
   for await (const entry of Deno.readDir(dir)) {
     const entryUrl = new URL(entry.name + (entry.isDirectory ? "/" : ""), dir);
@@ -274,12 +300,19 @@ export const validateNotes = async (): Promise<void> => {
     return;
   }
   const errors: string[] = [];
+  const rootPath = sourceRoot.pathname;
 
   for await (const fileUrl of walk(sourceRoot)) {
     const path = fileUrl.pathname;
     if (!mdExtensions.has(path.slice(path.lastIndexOf(".")))) continue;
     if (basename(path).startsWith(".")) continue;
-
+    const relPath = relative(rootPath, path).replaceAll("\\", "/");
+    if (
+      IGNORED_FILES.has(relPath) ||
+      IGNORED_PREFIXES.some((prefix) => relPath.startsWith(prefix))
+    ) {
+      continue;
+    }
     const content = await Deno.readTextFile(fileUrl);
     errors.push(...validateNoteContent(path, content));
   }
