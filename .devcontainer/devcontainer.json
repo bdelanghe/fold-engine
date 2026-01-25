@@ -4,8 +4,7 @@
   "service": "unfold",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "shutdownAction": "stopCompose",
-  "postCreateCommand": "deno --version",
-  "forwardPorts": [3000, 3001],
+  "forwardPorts": [3000],
   "portsAttributes": {
     "3000": {
       "label": "Lume dev server",
