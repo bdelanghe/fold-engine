@@ -24,7 +24,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.x
+          deno-version: 2.6.6
 
       - name: Compute site URL
         id: site
@@ -37,12 +37,18 @@ jobs:
             echo "site_url=https://${OWNER}.github.io/${REPO}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Cache Deno
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/deno
+          key: deno-${{ runner.os }}-${{ hashFiles('deno.lock') }}
+
       - name: Build site
         run: deno task build
         env:
           SITE_URL: ${{ steps.site.outputs.site_url }}
 
-      - name: Upload Pages artifact
+      - name: Upload Pages artifact (dist/site)
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist/site
