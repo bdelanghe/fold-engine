@@ -98,18 +98,12 @@ const addListAccessibility = (
     ensureAttribute(attrs, "role", "listitem");
 
   return content
-    .replace(
-      /<ul(\s[^>]*)?>/gi,
-      (_match, attrs = "") => `<ul${enhanceListAttrs(attrs)}>`,
-    )
-    .replace(
-      /<ol(\s[^>]*)?>/gi,
-      (_match, attrs = "") => `<ol${enhanceListAttrs(attrs)}>`,
-    )
-    .replace(
-      /<li(\s[^>]*)?>/gi,
-      (_match, attrs = "") => `<li${enhanceItemAttrs(attrs)}>`,
-    );
+    .replace(/<ul(\s[^>]*)?>/gi, (_match, attrs = "") =>
+      `<ul${enhanceListAttrs(attrs)}>`)
+    .replace(/<ol(\s[^>]*)?>/gi, (_match, attrs = "") =>
+      `<ol${enhanceListAttrs(attrs)}>`)
+    .replace(/<li(\s[^>]*)?>/gi, (_match, attrs = "") =>
+      `<li${enhanceItemAttrs(attrs)}>`);
 };
 
 const buildJsonLd = (
@@ -272,6 +266,8 @@ export default (data: LayoutData): string => {
     (resolvedImage ? "summary_large_image" : "summary");
   const jsonld = buildJsonLd(data, metaDescription, resolvedImage);
   const escapedPageUrl = pageUrl ? escapeAttribute(pageUrl) : "";
+  const listLabel = title ? `${title} list` : "List";
+  const contentWithListA11y = addListAccessibility(content, listLabel);
   const metaDescriptionMarkup = metaDescription
     ? `<meta name="description" content="${
       escapeAttribute(metaDescription)
