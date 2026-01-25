@@ -50,7 +50,7 @@ const hasRequiredPermissions = async (): Promise<boolean> => {
   return true;
 };
 
-const loadSite = async () => (await import("../../../lume.config.ts")).default;
+const loadSite = async () => (await import("../site/site.ts")).createSite();
 
 const runBuild = async () => {
   const command = new Deno.Command(Deno.execPath(), {

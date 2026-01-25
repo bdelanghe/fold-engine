@@ -73,25 +73,24 @@ const createDefaultDependencies = async (): Promise<CommandDependencies> => {
   const { runBuild } = await import("../pipeline/build.ts");
   const { runRender } = await import("../pipeline/render.ts");
   const { runValidate } = await import("../pipeline/validate.ts");
+  const { createSite } = await import("../site/site.ts");
 
   return {
     validateNotes: runValidate,
     buildSite: runRender,
     build: runBuild,
     cache: async () => {
-      await runCommandProcess(["cache", "--vendor", "lume.config.ts"]);
+      await runCommandProcess([
+        "cache",
+        "--vendor",
+        "src/unfold/site/site.ts",
+      ]);
     },
     dev: async () => {
-      await runCommandProcess([
-        "run",
-        "-A",
-        "--vendor",
-        "https://deno.land/x/lume/cli.ts",
-        "--config=lume.config.ts",
-        "--src=obsidian_vault",
-        "-s",
-        "--dest=dist/site",
-      ]);
+      const site = createSite();
+      await site.build();
+      const server = site.getServer();
+      await server.start();
     },
     docs: async () => {
       await runCommandProcess([
