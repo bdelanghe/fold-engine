@@ -6,9 +6,14 @@ import metas from "lume/plugins/metas.ts";
 import robots from "lume/plugins/robots.ts";
 import sitemap from "lume/plugins/sitemap.ts";
 import vento from "lume/plugins/vento.ts";
+import {
+  buildExternalLinksHtml,
+  buildExternalLinksXml,
+  collectExternalLinks,
+} from "../exporters/external_links.ts";
 import { buildLlmsTxt } from "../exporters/llms.ts";
 import { buildMcpBundle } from "../exporters/mcp.ts";
-import wikilinks from "../inputs/markdown/wikilinks.ts";
+import wikilinks, { buildSitemapLinkMap } from "../inputs/markdown/wikilinks.ts";
 import { buildSiteManifest } from "../manifests/site_manifest.ts";
 import { normalizeSiteUrl } from "./site_url.ts";
 
@@ -53,12 +58,23 @@ const getVaultPath = (): string => {
 const getSiteDest = (): string =>
   Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
 
+const loadSitemapLinkMap = (vaultPath: string): Map<string, string> | null => {
+  try {
+    const sitemapPath = join(getWorkspaceRoot(), vaultPath, "sitemap.xml");
+    const content = Deno.readTextFileSync(sitemapPath);
+    return buildSitemapLinkMap(content);
+  } catch {
+    return null;
+  }
+};
+
 export const createSite = (): ReturnType<typeof lume> => {
   const siteUrl = getSiteUrl();
   const basePath = getSiteBasePath();
   const workspaceRoot = getWorkspaceRoot();
   const layoutPath = getLayoutPath();
   const vaultPath = getVaultPath();
+  const sitemapLinks = loadSitemapLinkMap(vaultPath);
   const normalizedWorkspaceRoot = workspaceRoot.replace(/\/$/, "");
   const srcPath = vaultPath.startsWith(`${normalizedWorkspaceRoot}/`)
     ? relative(normalizedWorkspaceRoot, vaultPath)
@@ -140,6 +156,7 @@ export const createSite = (): ReturnType<typeof lume> => {
       wikilinks({
         prefix: basePath,
         suffix: "/",
+        sitemap: sitemapLinks ?? undefined,
       }),
     )
   );
@@ -170,6 +187,16 @@ export const createSite = (): ReturnType<typeof lume> => {
     await Deno.mkdir(dirname(mcpPath), { recursive: true });
     const mcpBundle = await buildMcpBundle(pageList, { url: siteUrl });
     await Deno.writeTextFile(mcpPath, JSON.stringify(mcpBundle, null, 2));
+
+    const externalLinks = collectExternalLinks(pageList, { siteUrl });
+    const externalXmlPath = site.dest("external-links.xml");
+    const externalXml = buildExternalLinksXml(externalLinks, { siteUrl });
+    await Deno.writeTextFile(externalXmlPath, externalXml);
+
+    const externalHtmlPath = site.dest("external-links/index.html");
+    await Deno.mkdir(dirname(externalHtmlPath), { recursive: true });
+    const externalHtml = buildExternalLinksHtml(externalLinks, { siteUrl });
+    await Deno.writeTextFile(externalHtmlPath, externalHtml);
 
     const hasRootPage = pageList.some((page) => page.data.url === "/");
     if (!hasRootPage) {
