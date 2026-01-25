@@ -8,6 +8,11 @@ const getVaultBaseUrl = (): string | undefined => {
   return raw && raw.length > 0 ? raw : undefined;
 };
 
+const shouldRequireBaseUrl = (): boolean => {
+  const raw = Deno.env.get("VAULT_REQUIRE_BASE_URL")?.trim();
+  return raw === "1" || raw?.toLowerCase() === "true";
+};
+
 const getCacheRoot = (): string => join(Deno.cwd(), ".unfold", "vault");
 
 const getIndexPath = (cacheRoot: string): string =>
@@ -36,10 +41,18 @@ const fetchIndex = async (baseUrl: string): Promise<VaultIndex> => {
   return await response.json() as VaultIndex;
 };
 
+const sha256Hex = async (data: Uint8Array): Promise<string> => {
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+};
+
 const downloadFile = async (
   baseUrl: string,
   relPath: string,
   targetPath: string,
+  expectedHash: string,
 ): Promise<void> => {
   const url = new URL(`/v1/files/${encodeVaultPath(relPath)}`, baseUrl);
   const response = await fetch(url);
@@ -47,6 +60,10 @@ const downloadFile = async (
     throw new Error(`Vault API file fetch failed for ${relPath}`);
   }
   const buffer = new Uint8Array(await response.arrayBuffer());
+  const actualHash = await sha256Hex(buffer);
+  if (actualHash !== expectedHash) {
+    throw new Error(`Vault API hash mismatch for ${relPath}`);
+  }
   await Deno.mkdir(dirname(targetPath), { recursive: true });
   await Deno.writeFile(targetPath, buffer);
 };
@@ -54,6 +71,9 @@ const downloadFile = async (
 export const prepareVault = async (): Promise<void> => {
   const baseUrl = getVaultBaseUrl();
   if (!baseUrl) {
+    if (shouldRequireBaseUrl()) {
+      throw new Error("VAULT_BASE_URL is required but not set");
+    }
     return;
   }
 
@@ -86,7 +106,7 @@ export const prepareVault = async (): Promise<void> => {
         // Fall through to download if the file is missing.
       }
     }
-    await downloadFile(baseUrl, relPath, targetPath);
+    await downloadFile(baseUrl, relPath, targetPath, entry.sha256);
   }
 
   for await (const entry of walk(cacheRoot, { includeDirs: false })) {

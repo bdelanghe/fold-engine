@@ -6,6 +6,7 @@ services:
     command: ["deno", "task", "dev"]
     environment:
       VAULT_BASE_URL: http://vault-api:7777
+      VAULT_REQUIRE_BASE_URL: "1"
       DOCKER_HOST: unix:///var/run/docker.sock
     depends_on:
       vault-api:
@@ -37,6 +38,7 @@ services:
     command: ["deno", "task", "test"]
     environment:
       VAULT_BASE_URL: http://vault-api:7777
+      VAULT_REQUIRE_BASE_URL: "1"
       DOCKER_HOST: unix:///var/run/docker.sock
     depends_on:
       vault-api:
