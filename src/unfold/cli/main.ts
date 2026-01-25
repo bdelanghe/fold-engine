@@ -12,11 +12,11 @@ type CommandDependencies = {
 const usage = `unfold <command>
 
 Commands:
-  validate     Validate vault notes
+  validate     Validate JSON-LD (Zod) + SHACL shapes
   cache        Cache and vendor Lume deps
-  build:site   Build site output
-  build        Cache, validate, and build site
-  dev          Start dev server
+  build:site   Build site output (legacy)
+  build        Cache and validate JSON-LD
+  dev          Start dev server (legacy)
   docs         Generate Unfold docs
 `;
 

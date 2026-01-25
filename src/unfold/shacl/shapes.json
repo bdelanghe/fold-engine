@@ -1,0 +1,48 @@
+{
+  "shapes": [
+    {
+      "id": "basis:PageShape",
+      "targetClass": "basis:Page",
+      "closed": true,
+      "ignoredProperties": ["@context"],
+      "properties": [
+        { "path": "@id", "minCount": 1, "maxCount": 1, "datatype": "xsd:anyURI" },
+        { "path": "title", "minCount": 1, "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "description", "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "dateCreated", "maxCount": 1, "datatype": "xsd:date" },
+        { "path": "dateModified", "maxCount": 1, "datatype": "xsd:date" },
+        { "path": "hasPart" },
+        { "path": "mentions" }
+      ]
+    },
+    {
+      "id": "basis:ReferenceShape",
+      "targetClass": "basis:Reference",
+      "closed": true,
+      "ignoredProperties": ["@context"],
+      "properties": [
+        { "path": "@id", "minCount": 1, "maxCount": 1, "datatype": "xsd:anyURI" },
+        { "path": "title", "minCount": 1, "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "url", "minCount": 1, "maxCount": 1, "datatype": "xsd:anyURI" },
+        { "path": "description", "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "author", "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "dateCreated", "maxCount": 1, "datatype": "xsd:date" },
+        { "path": "dateAccessed", "maxCount": 1, "datatype": "xsd:date" }
+      ]
+    },
+    {
+      "id": "basis:ConceptShape",
+      "targetClass": "skos:Concept",
+      "closed": true,
+      "ignoredProperties": ["@context"],
+      "properties": [
+        { "path": "@id", "minCount": 1, "maxCount": 1, "datatype": "xsd:anyURI" },
+        { "path": "label", "minCount": 1, "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "definition", "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "broader" },
+        { "path": "narrower" },
+        { "path": "related" }
+      ]
+    }
+  ]
+}

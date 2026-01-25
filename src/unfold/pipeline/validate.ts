@@ -1,21 +1,40 @@
-import { validateNotes } from "../inputs/frontmatter/validate.ts";
-import { validateVault } from "../inputs/vault/load_vault.ts";
 import { prepareVault } from "../inputs/vault/prepare_vault.ts";
+import { getVaultPath, loadVault } from "../inputs/jsonld/loader.ts";
+import { validateNodes } from "../inputs/jsonld/validator_zod.ts";
+import { loadShapes } from "../shacl/loader.ts";
+import { formatShaclReport, validateNodesWithShapes } from "../shacl/validator.ts";
 
 export const runValidate = async (): Promise<void> => {
   await prepareVault();
-  // Validate vault structure
-  const vaultErrors = await validateVault();
-  if (vaultErrors.length > 0) {
+  const vaultPath = getVaultPath();
+  const { nodes, errors } = await loadVault(vaultPath);
+  if (errors.length > 0) {
     const errorLines = [
-      "Vault validation failed:",
-      ...vaultErrors.map((error) => `  - ${error}`),
+      "JSON-LD load failed:",
+      ...errors.map((error) => `  - ${error.file}: ${error.message}`),
     ];
     const encoder = new TextEncoder();
     await Deno.stderr.write(encoder.encode(`${errorLines.join("\n")}\n`));
-    throw new Error("Vault validation failed");
+    throw new Error("JSON-LD load failed");
   }
 
-  // Validate note content
-  await validateNotes();
+  const schemaErrors = await validateNodes(nodes);
+  if (schemaErrors.length > 0) {
+    const errorLines = [
+      "JSON-LD schema validation failed:",
+      ...schemaErrors.map((error) => `  - ${error.file}: ${error.message}`),
+    ];
+    const encoder = new TextEncoder();
+    await Deno.stderr.write(encoder.encode(`${errorLines.join("\n")}\n`));
+    throw new Error("JSON-LD schema validation failed");
+  }
+
+  const shapes = await loadShapes();
+  const report = validateNodesWithShapes(nodes, shapes.shapes);
+  if (!report.ok) {
+    const errorLines = formatShaclReport(report);
+    const encoder = new TextEncoder();
+    await Deno.stderr.write(encoder.encode(`${errorLines.join("\n")}\n`));
+    throw new Error("SHACL validation failed");
+  }
 };

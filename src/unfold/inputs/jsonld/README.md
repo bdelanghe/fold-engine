@@ -10,14 +10,14 @@ The vault contains native JSON-LD objects (`.jsonld` files). This module:
 
 1. **Loads** all `.jsonld` files from the vault
 2. **Extracts** nodes (handling `@graph`, arrays, single objects)
-3. **Validates** structure using JSON Schema
-4. **Validates** semantics using JSON-LD requirements
+3. **Validates** structure using Zod schemas
+4. **Validates** graph semantics with SHACL-style shapes
 
 ### Complementary Validation
 
-**JSON Schema** provides:
+**Zod** provides:
 - Structural validation (required fields, types, formats)
-- Custom semantic annotations (`x-jsonld-*` keywords)
+- TypeScript type inference
 
 **JSON-LD** provides:
 - Identity (`@id` must be unique IRI)
@@ -78,15 +78,15 @@ if (errors.length > 0) {
 console.log(`Loaded ${nodes.length} nodes`);
 ```
 
-### Validate Nodes
+### Validate Nodes (Zod)
 
 ```typescript
-import { validateNodes } from "./validator.ts";
+import { validateNodes } from "./validator_zod.ts";
 
 const errors = await validateNodes(nodes);
 
 if (errors.length > 0) {
-  throw new Error(`Validation failed with ${errors.length} errors`);
+  throw new Error(`Zod validation failed with ${errors.length} errors`);
 }
 ```
 
@@ -153,8 +153,7 @@ Each schema:
 
 ## Next Steps
 
-This module provides the foundation. Future work:
-- Graph validation (link integrity, reachability)
-- Context generation from schemas
-- JSON-LD expansion/compaction
-- RDF triple extraction
+This module provides the foundation. Current core:
+- JSON-LD loading
+- Zod schema validation
+- SHACL shape validation (see `src/unfold/shacl/`)
