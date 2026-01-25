@@ -2,9 +2,10 @@
   "tasks": {
     "validate": "deno test -A src/tests/",
     "cache": "deno cache --vendor lume.config.ts",
-    "build:site": "deno task cache && deno run -A --vendor https://deno.land/x/lume/cli.ts",
+    "build:site": "deno task cache && deno run -A --vendor https://deno.land/x/lume/cli.ts --config=lume.config.ts --src=obsidian_vault --dest=dist --clean",
     "build": "deno task cache && deno task validate && deno task build:site",
-    "dev": "deno task cache && deno run -A --vendor https://deno.land/x/lume/cli.ts -s"
+    "dev": "deno task cache && deno run -A --vendor https://deno.land/x/lume/cli.ts --config=lume.config.ts --src=obsidian_vault -s --dest=dist",
+    "docs": "deno doc --html --output=dist/docs src/manifest/site_manifest.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1.0.17",
