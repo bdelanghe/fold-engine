@@ -13,7 +13,6 @@ import {
 } from "../exporters/external_links.ts";
 import { buildLlmsTxt } from "../exporters/llms.ts";
 import { buildMcpBundle } from "../exporters/mcp.ts";
-import wikilinks, { buildSitemapLinkMap } from "../inputs/markdown/wikilinks.ts";
 import { buildSiteManifest } from "../manifests/site_manifest.ts";
 import { normalizeSiteUrl } from "./site_url.ts";
 
@@ -63,23 +62,12 @@ const getVaultPath = (): string => {
 const getSiteDest = (): string =>
   Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
 
-const loadSitemapLinkMap = (vaultPath: string): Map<string, string> | null => {
-  try {
-    const sitemapPath = join(getWorkspaceRoot(), vaultPath, "sitemap.xml");
-    const content = Deno.readTextFileSync(sitemapPath);
-    return buildSitemapLinkMap(content);
-  } catch {
-    return null;
-  }
-};
-
 export const createSite = (): ReturnType<typeof lume> => {
   const siteUrl = getSiteUrl();
   const basePath = getSiteBasePath();
   const workspaceRoot = getWorkspaceRoot();
   const layoutPath = getLayoutPath();
   const vaultPath = getVaultPath();
-  const sitemapLinks = loadSitemapLinkMap(vaultPath);
   const normalizedWorkspaceRoot = workspaceRoot.replace(/\/$/, "");
   const srcPath = vaultPath.startsWith(`${normalizedWorkspaceRoot}/`)
     ? relative(normalizedWorkspaceRoot, vaultPath)
@@ -149,6 +137,13 @@ export const createSite = (): ReturnType<typeof lume> => {
 
   // Register the layout from external location
   site.remoteFile("_includes/layout.tmpl.ts", layoutPath);
+
+  // Register JSON-LD loader
+  const jsonLdLoaderPath = fromFileUrl(
+    new URL("../renderers/lume/jsonld_loader.ts", import.meta.url),
+  );
+  site.loadData([".jsonld"], jsonLdLoaderPath);
+
   site.data("site", { url: siteUrl, basePath });
   site.data("layout", "layout.tmpl.ts");
   site.use(vento());
@@ -156,15 +151,8 @@ export const createSite = (): ReturnType<typeof lume> => {
   site.use(jsonLd());
   site.use(sitemap());
   site.use(robots());
-  site.hooks.markdownIt((md: { use: (plugin: unknown) => unknown }) =>
-    md.use(
-      wikilinks({
-        prefix: basePath,
-        suffix: "/",
-        sitemap: sitemapLinks ?? undefined,
-      }),
-    )
-  );
+
+  // Process generated HTML pages
   site.process([".html"], async (pages) => {
     let pageList: Page[] = [];
     if (Array.isArray(pages)) {
