@@ -74,20 +74,25 @@ export const buildLlmsTxt = async (
   const siteUrl = options.siteUrl.replace(/\/$/, "");
   const generatedAt = options.generatedAt ?? new Date().toISOString();
 
-  const entries: Array<{ url: string; title: string; excerpt: string }> = [];
-  for (const page of pages) {
-    const url = resolveCanonical(page, siteUrl);
-    const title = normalizeText(
-      page.document?.querySelector("title")?.textContent,
-    );
-    if (!url) {
-      continue;
-    }
-    const excerpt = await readMarkdownExcerpt(page, 200);
-    entries.push({ url, title, excerpt });
-  }
+  const entries = await Promise.all(
+    pages.map(async (page) => {
+      const url = resolveCanonical(page, siteUrl);
+      const title = normalizeText(
+        page.document?.querySelector("title")?.textContent,
+      );
+      if (!url) {
+        return null;
+      }
+      const excerpt = await readMarkdownExcerpt(page, 200);
+      return { url, title, excerpt };
+    }),
+  );
+  const validEntries = entries.filter(
+    (entry): entry is { url: string; title: string; excerpt: string } =>
+      entry !== null,
+  );
 
-  entries.sort((a, b) => a.url.localeCompare(b.url));
+  validEntries.sort((a, b) => a.url.localeCompare(b.url));
 
   const uniqueUrls = new Set<string>();
   const lines = [
@@ -98,7 +103,7 @@ export const buildLlmsTxt = async (
     `allow: ${ensureTrailingSlash(siteUrl)}`,
   ];
 
-  for (const entry of entries) {
+  for (const entry of validEntries) {
     if (uniqueUrls.has(entry.url)) {
       continue;
     }
@@ -106,7 +111,7 @@ export const buildLlmsTxt = async (
     lines.push(`index: ${entry.url}`);
   }
 
-  for (const entry of entries) {
+  for (const entry of validEntries) {
     if (entry.title) {
       lines.push(`topic: ${entry.title} | ${entry.url}`);
     }

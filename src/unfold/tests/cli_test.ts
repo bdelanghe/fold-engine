@@ -30,8 +30,12 @@ const createRecorder = () => {
         calls.push("docs");
         return Promise.resolve();
       },
-      output: (text: string) => calls.push(`output:${text.split("\n")[0]}`),
-      error: (text: string) => calls.push(`error:${text.split("\n")[0]}`),
+      output: async (text: string) => {
+        calls.push(`output:${text.split("\n")[0]}`);
+      },
+      error: async (text: string) => {
+        calls.push(`error:${text.split("\n")[0]}`);
+      },
     },
   };
 };

@@ -5,8 +5,8 @@ type CommandDependencies = {
   cache: () => Promise<void>;
   dev: () => Promise<void>;
   docs: () => Promise<void>;
-  output: (text: string) => void;
-  error: (text: string) => void;
+  output: (text: string) => Promise<void>;
+  error: (text: string) => Promise<void>;
 };
 
 const usage = `unfold <command>
@@ -48,10 +48,10 @@ const runCommand = async (
     case "help":
     case "--help":
     case "-h":
-      deps.output(usage);
+      await deps.output(usage);
       return 0;
     default:
-      deps.error(`Unknown command: ${command}\n\n${usage}`);
+      await deps.error(`Unknown command: ${command}\n\n${usage}`);
       return 1;
   }
 };
@@ -74,23 +74,28 @@ const detectRunningUnfoldServer = async (port: number): Promise<boolean> => {
   const timeout = setTimeout(() => controller.abort(), 300);
   try {
     const response = await fetch(
-      `http://localhost:${port}/site.manifest.json`,
+      `http://localhost:${port}/healthz`,
       { signal: controller.signal },
     );
     if (!response.ok) {
       return false;
     }
-    const data = await response.json().catch(() => null);
-    return Boolean(
-      data &&
-        typeof data.generatedAt === "string" &&
-        Array.isArray(data.pages),
-    );
+    const text = await response.text().catch(() => "");
+    return text.trim() === "ok";
   } catch {
     return false;
   } finally {
     clearTimeout(timeout);
   }
+};
+
+const writeOutput = async (
+  stream: { write: (value: Uint8Array) => Promise<number> },
+  text: string,
+): Promise<void> => {
+  const encoder = new TextEncoder();
+  const normalized = text.endsWith("\n") ? text : `${text}\n`;
+  await stream.write(encoder.encode(normalized));
 };
 
 const createDefaultDependencies = async (): Promise<CommandDependencies> => {
@@ -111,6 +116,8 @@ const createDefaultDependencies = async (): Promise<CommandDependencies> => {
       ]);
     },
     dev: async () => {
+      const { prepareVault } = await import("../inputs/vault/prepare_vault.ts");
+      await prepareVault();
       const site = createSite();
       await site.build();
       const server = site.getServer();
@@ -148,8 +155,8 @@ const createDefaultDependencies = async (): Promise<CommandDependencies> => {
         "src/unfold",
       ]);
     },
-    output: (text: string) => console.log(text),
-    error: (text: string) => console.error(text),
+    output: (text: string) => writeOutput(Deno.stdout, text),
+    error: (text: string) => writeOutput(Deno.stderr, text),
   };
 };
 
@@ -163,6 +170,12 @@ export const run = async (
 };
 
 if (import.meta.main) {
-  const code = await run(Deno.args);
-  Deno.exit(code);
+  void run(Deno.args)
+    .then((code) => Deno.exit(code))
+    .catch((error) => {
+      const message = error instanceof Error ? error.message : String(error);
+      const encoder = new TextEncoder();
+      void Deno.stderr.write(encoder.encode(`${message}\n`));
+      Deno.exit(1);
+    });
 }

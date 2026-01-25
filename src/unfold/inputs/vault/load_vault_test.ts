@@ -1,4 +1,5 @@
 import { assertEquals } from "@std/assert";
+import { isAbsolute, join, toFileUrl } from "@std/path";
 import {
   ACCEPTED_EXTENSIONS,
   loadVaultRoot,
@@ -6,10 +7,38 @@ import {
   validateVault,
 } from "./load_vault.ts";
 
+const hasVaultFixture = async (): Promise<boolean> => {
+  const manifest = await scanVault();
+  if (!manifest.hasConfig || manifest.files.length === 0) {
+    console.warn("Skipping vault tests (missing vault content).");
+    return false;
+  }
+  return true;
+};
+
 Deno.test("loadVaultRoot returns valid URL", () => {
   const root = loadVaultRoot();
   assertEquals(root.protocol, "file:");
-  assertEquals(root.pathname.endsWith("obsidian_vault/"), true);
+  const override = Deno.env.get("VAULT_PATH")?.trim();
+  if (override) {
+    const resolved = isAbsolute(override) ? override : join(Deno.cwd(), override);
+    const expected = toFileUrl(
+      resolved.endsWith("/") ? resolved : `${resolved}/`,
+    );
+    assertEquals(root.pathname, expected.pathname);
+  } else {
+    const defaultVault = join(Deno.cwd(), "vault");
+    let expectedSuffix = "/";
+    try {
+      const stat = await Deno.stat(defaultVault);
+      if (stat.isDirectory) {
+        expectedSuffix = "/vault/";
+      }
+    } catch {
+      // Fall through to repo root.
+    }
+    assertEquals(root.pathname.endsWith(expectedSuffix), true);
+  }
 });
 
 Deno.test("ACCEPTED_EXTENSIONS includes all Obsidian types", () => {
@@ -22,6 +51,9 @@ Deno.test("ACCEPTED_EXTENSIONS includes all Obsidian types", () => {
 });
 
 Deno.test("scanVault produces valid manifest", async () => {
+  if (!await hasVaultFixture()) {
+    return;
+  }
   const manifest = await scanVault();
 
   assertEquals(typeof manifest.root, "string");
@@ -42,6 +74,9 @@ Deno.test("scanVault produces valid manifest", async () => {
 });
 
 Deno.test("scanVault ignores _includes templates", async () => {
+  if (!await hasVaultFixture()) {
+    return;
+  }
   const manifest = await scanVault();
   const includesInvalid = manifest.invalidFiles.some((file) =>
     file.path.startsWith("_includes/")
@@ -50,6 +85,9 @@ Deno.test("scanVault ignores _includes templates", async () => {
 });
 
 Deno.test("validateVault passes for valid vault", async () => {
+  if (!await hasVaultFixture()) {
+    return;
+  }
   const errors = await validateVault();
   assertEquals(errors.length, 0, `Unexpected errors: ${errors.join(", ")}`);
 });

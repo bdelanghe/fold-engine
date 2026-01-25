@@ -1,0 +1,108 @@
+services:
+  unfold:
+    image: local/unfold-dev:latest
+    pull_policy: never
+    working_dir: /workspaces/schema-nodes
+    command: ["deno", "task", "dev"]
+    environment:
+      VAULT_BASE_URL: http://vault-api:7777
+      VAULT_REQUIRE_BASE_URL: "1"
+      DOCKER_HOST: unix:///var/run/docker.sock
+    depends_on:
+      vault-api:
+        condition: service_healthy
+    volumes:
+      - .:/workspaces/schema-nodes
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "deno",
+          "eval",
+          "--quiet",
+          "const r = await fetch('http://127.0.0.1:3000/healthz'); if (!r.ok) Deno.exit(1);",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  unfold-test:
+    image: local/unfold-dev:latest
+    pull_policy: never
+    working_dir: /workspaces/schema-nodes
+    command: ["deno", "task", "test"]
+    environment:
+      VAULT_BASE_URL: http://vault-api:7777
+      VAULT_REQUIRE_BASE_URL: "1"
+      DOCKER_HOST: unix:///var/run/docker.sock
+    depends_on:
+      vault-api:
+        condition: service_healthy
+    volumes:
+      - .:/workspaces/schema-nodes
+      - /var/run/docker.sock:/var/run/docker.sock
+    profiles: ["test"]
+
+  vault:
+    image: alpine:3.19
+    working_dir: /data
+    command:
+      [
+        "sh",
+        "-c",
+        "set -eu; apk add --no-cache git openssh-client ca-certificates >/dev/null; if [ -z \"${VAULT_REPO}\" ]; then echo \"VAULT_REPO is not set; initializing empty repo\" >&2; if [ ! -d .git ]; then git init; fi; else if [ ! -d .git ]; then git init; git remote add origin \"${VAULT_REPO}\"; fi; if [ -n \"${VAULT_SHA:-}\" ]; then if ! git fetch --depth=1 origin \"${VAULT_SHA}\"; then echo \"VAULT_REPO fetch failed for VAULT_SHA; initializing empty repo\" >&2; rm -rf .git; git init; else git checkout --detach \"${VAULT_SHA}\"; fi; elif [ -n \"${VAULT_TAG:-}\" ]; then if ! git fetch --depth=1 origin \"refs/tags/${VAULT_TAG}\"; then echo \"VAULT_REPO fetch failed for VAULT_TAG; initializing empty repo\" >&2; rm -rf .git; git init; else git checkout --detach \"FETCH_HEAD\"; fi; else if ! git fetch origin \"${VAULT_BRANCH}\"; then echo \"VAULT_REPO fetch failed; initializing empty repo\" >&2; rm -rf .git; git init; else git reset --hard \"origin/${VAULT_BRANCH}\"; fi; fi; fi; date -u +\"%Y-%m-%dT%H:%M:%SZ\" > .vault-ready; tail -f /dev/null",
+      ]
+    environment:
+      VAULT_REPO: ${VAULT_REPO}
+      VAULT_BRANCH: ${VAULT_BRANCH:-main}
+      VAULT_SHA: ${VAULT_SHA:-}
+      VAULT_TAG: ${VAULT_TAG:-}
+      GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=accept-new"
+      SSH_AUTH_SOCK: /ssh-agent
+    volumes:
+      - vault-data:/data
+      - ${SSH_AUTH_SOCK}:/ssh-agent
+    healthcheck:
+      test:
+        ["CMD", "sh", "-c", "test -f /data/.vault-ready && test -d /data/.git"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+  vault-api:
+    image: local/unfold-dev:latest
+    pull_policy: never
+    working_dir: /workspaces/schema-nodes
+    command: ["deno", "task", "vault:api"]
+    environment:
+      VAULT_PATH: /vault
+      PORT: 7777
+      VAULT_BRANCH: ${VAULT_BRANCH:-main}
+      VAULT_SHA: ${VAULT_SHA:-}
+      VAULT_TAG: ${VAULT_TAG:-}
+    depends_on:
+      vault:
+        condition: service_healthy
+    volumes:
+      - .:/workspaces/schema-nodes
+      - vault-data:/vault:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "deno",
+          "eval",
+          "--quiet",
+          "const r = await fetch('http://127.0.0.1:7777/healthz'); if (!r.ok) Deno.exit(1);",
+        ]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+volumes:
+  vault-data:

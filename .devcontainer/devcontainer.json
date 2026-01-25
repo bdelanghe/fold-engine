@@ -1,15 +1,14 @@
 {
   "name": "fold-engine",
-  "image": "denoland/deno:latest",
-  "postCreateCommand": "deno --version",
-  "forwardPorts": [3000, 3001],
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "unfold",
+  "runServices": ["unfold"],
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "shutdownAction": "stopCompose",
+  "forwardPorts": [3000],
   "portsAttributes": {
     "3000": {
       "label": "Lume dev server",
-      "onAutoForward": "openBrowser"
-    },
-    "3001": {
-      "label": "Lume dev server (alt)",
       "onAutoForward": "openBrowser"
     }
   },

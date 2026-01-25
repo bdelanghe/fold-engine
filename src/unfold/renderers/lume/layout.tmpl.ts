@@ -1,3 +1,4 @@
+// deno-lint-ignore-file camelcase
 type EntryPoint = {
   url?: string;
   name?: string;
@@ -124,9 +125,9 @@ const buildJsonLd = (
 
     const graph = [webpage, article, website].map((node) =>
       Object.fromEntries(
-        Object.entries(node).filter(([, value]) =>
-          value !== "" && value != null
-        ),
+      Object.entries(node).filter(([, value]) =>
+        value !== "" && value !== null && value !== undefined
+      ),
       )
     );
 
@@ -195,7 +196,7 @@ const buildJsonLd = (
   );
 };
 
-export default (data: LayoutData) => {
+export default (data: LayoutData): string => {
   const title = data.title ?? "";
   const siteUrl = data.site?.url ?? "";
   const siteName = data.site?.name ?? data.site_name ?? "";
@@ -222,18 +223,19 @@ export default (data: LayoutData) => {
   const twitterCard = data.twitter_card ??
     (resolvedImage ? "summary_large_image" : "summary");
   const jsonld = buildJsonLd(data, metaDescription, resolvedImage);
+  const escapedPageUrl = pageUrl ? escapeAttribute(pageUrl) : "";
   const metaDescriptionMarkup = metaDescription
     ? `<meta name="description" content="${
       escapeAttribute(metaDescription)
     }" />`
     : "";
   const canonicalMarkup = pageUrl
-    ? `<link rel="canonical" href="${pageUrl}" />
-      <meta itemprop="url" content="${pageUrl}" />`
+    ? `<link rel="canonical" href="${escapedPageUrl}" />
+      <meta itemprop="url" content="${escapedPageUrl}" />`
     : "";
   const shareMarkup = pageUrl
     ? `<meta property="og:type" content="website" />
-      <meta property="og:url" content="${pageUrl}" />
+      <meta property="og:url" content="${escapedPageUrl}" />
       <meta property="og:title" content="${escapeAttribute(title)}" />
       ${
       metaDescription
@@ -302,8 +304,8 @@ export default (data: LayoutData) => {
     }`
     : "";
   const articleMetaMarkup = pageUrl
-    ? `<meta itemprop="mainEntityOfPage" content="${pageUrl}" />
-        <meta itemprop="url" content="${pageUrl}" />
+    ? `<meta itemprop="mainEntityOfPage" content="${escapedPageUrl}" />
+        <meta itemprop="url" content="${escapedPageUrl}" />
         <meta itemprop="author" content="${escapeAttribute(authorName)}" />
         ${
       authorUrl

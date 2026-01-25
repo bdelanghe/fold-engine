@@ -103,31 +103,38 @@ export const buildMcpBundle = async (
   site: McpSite,
 ): Promise<McpBundle> => {
   const siteUrl = site.url.replace(/\/$/, "");
-  const mapped: McpPage[] = [];
-  for (const page of pages) {
-    const url = resolveCanonical(page, siteUrl);
-    const title = normalizeText(
-      page.document?.querySelector("title")?.textContent,
-    );
-    const description = normalizeText(
-      page.document?.querySelector('meta[name="description"]')?.getAttribute(
-        "content",
-      ),
-    );
-    if (!url || !title) {
-      continue;
-    }
-    const excerpt = await readMarkdownExcerpt(page, 240);
-    mapped.push({
-      url,
-      title,
-      description: description || undefined,
-      excerpt,
-      headings: extractHeadings(page.document ?? null),
-    });
-  }
+  const mapped = await Promise.all(
+    pages.map(async (page): Promise<McpPage | null> => {
+      const url = resolveCanonical(page, siteUrl);
+      const title = normalizeText(
+        page.document?.querySelector("title")?.textContent,
+      );
+      const description = normalizeText(
+        page.document?.querySelector('meta[name="description"]')?.getAttribute(
+          "content",
+        ),
+      );
+      if (!url || !title) {
+        return null;
+      }
+      const excerpt = await readMarkdownExcerpt(page, 240);
+      const entry: McpPage = {
+        url,
+        title,
+        excerpt,
+        headings: extractHeadings(page.document ?? null),
+      };
+      if (description) {
+        entry.description = description;
+      }
+      return entry;
+    }),
+  );
+  const pagesWithContent = mapped.filter((page): page is McpPage =>
+    page !== null
+  );
 
-  mapped.sort((a, b) => a.url.localeCompare(b.url));
+  pagesWithContent.sort((a, b) => a.url.localeCompare(b.url));
 
   return {
     version: "v1",
@@ -136,6 +143,6 @@ export const buildMcpBundle = async (
       url: siteUrl,
       name: site.name,
     },
-    pages: mapped,
+    pages: pagesWithContent,
   };
 };

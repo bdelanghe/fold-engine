@@ -1,8 +1,25 @@
 import { walk } from "@std/fs";
-import { relative } from "@std/path";
+import { isAbsolute, join, relative, toFileUrl } from "@std/path";
 
-export const loadVaultRoot = (): URL =>
-  new URL("../../../../obsidian_vault/", import.meta.url);
+export const loadVaultRoot = (): URL => {
+  const override = Deno.env.get("VAULT_PATH")?.trim();
+  if (override) {
+    const resolved = isAbsolute(override)
+      ? override
+      : join(Deno.cwd(), override);
+    return toFileUrl(resolved.endsWith("/") ? resolved : `${resolved}/`);
+  }
+  const cwd = Deno.cwd().replace(/\/$/, "");
+  try {
+    const stat = Deno.statSync(join(cwd, "vault"));
+    if (stat.isDirectory) {
+      return toFileUrl(`${cwd}/vault/`);
+    }
+  } catch {
+    // Fall through to repo root.
+  }
+  return toFileUrl(`${cwd}/`);
+};
 
 /** Obsidian accepted file extensions by type */
 export const ACCEPTED_EXTENSIONS = {
@@ -47,6 +64,32 @@ const getFileType = (ext: string): FileType => {
   return "unknown";
 };
 
+const IGNORED_PREFIXES = [
+  ".cursor/",
+  ".devcontainer/",
+  ".git/",
+  ".github/",
+  ".unfold/",
+  ".vscode/",
+  "dist/",
+  "node_modules/",
+  "src/",
+  "src/unfold/vault_api/support/",
+  "vendor/",
+];
+
+const IGNORED_FILES = new Set([
+  ".cursorindexingignore",
+  ".dockerignore",
+  ".gitignore",
+  ".nojekyll",
+  "deno.json",
+  "deno.lock",
+  "docker-bake.hcl",
+  "docker-compose.yml",
+  "Dockerfile",
+]);
+
 /** Scan vault and produce a manifest */
 export const scanVault = async (vaultRoot?: URL): Promise<VaultManifest> => {
   const root = vaultRoot ?? loadVaultRoot();
@@ -55,12 +98,23 @@ export const scanVault = async (vaultRoot?: URL): Promise<VaultManifest> => {
   let hasConfig = false;
   const files: VaultFile[] = [];
   const invalidFiles: VaultFile[] = [];
+  const ignoredPrefixes = [...IGNORED_PREFIXES];
+
+  try {
+    await Deno.stat(root);
+  } catch {
+    return { root: rootPath, hasConfig: false, files, invalidFiles };
+  }
 
   try {
     await Deno.stat(new URL(".obsidian", root));
     hasConfig = true;
   } catch {
     hasConfig = false;
+  }
+
+  if (rootPath.replace(/\/$/, "").endsWith("/vault")) {
+    ignoredPrefixes.push("vault/");
   }
 
   for await (const entry of walk(root, { includeDirs: false })) {
@@ -71,6 +125,12 @@ export const scanVault = async (vaultRoot?: URL): Promise<VaultManifest> => {
       relPath.startsWith(".obsidian") ||
       relPath.startsWith(".") ||
       relPath.startsWith("_includes/")
+    ) {
+      continue;
+    }
+    if (
+      IGNORED_FILES.has(relPath) ||
+      ignoredPrefixes.some((prefix) => relPath.startsWith(prefix))
     ) {
       continue;
     }

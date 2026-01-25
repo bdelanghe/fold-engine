@@ -1,0 +1,11 @@
+---
+description: Deno task surface and CLI usage
+alwaysApply: true
+---
+
+# Deno Task Conventions
+
+- Public task surface: `dev`, `start`, `build`, `test`, `lint`, `fmt`, `check`, `ci`, `clean`.
+- `unfold:server` and `unfold:cli` are internal entrypoints.
+- Prefer `deno task ...` in docs, scripts, and CI.
+
