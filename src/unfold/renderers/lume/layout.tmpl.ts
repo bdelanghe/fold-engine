@@ -272,8 +272,6 @@ export default (data: LayoutData): string => {
     (resolvedImage ? "summary_large_image" : "summary");
   const jsonld = buildJsonLd(data, metaDescription, resolvedImage);
   const escapedPageUrl = pageUrl ? escapeAttribute(pageUrl) : "";
-  const listLabel = title ? `${title} list` : "List";
-  const contentWithListA11y = addListAccessibility(content, listLabel);
   const metaDescriptionMarkup = metaDescription
     ? `<meta name="description" content="${
       escapeAttribute(metaDescription)

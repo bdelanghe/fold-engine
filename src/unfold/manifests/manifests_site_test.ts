@@ -215,9 +215,6 @@ Deno.test("healthz file is generated", async () => {
     console.warn("Skipping healthz file check (missing permissions).");
     return;
   }
-  if (!await hasVaultContent()) {
-    return;
-  }
   const site = await loadSite();
   await site.build();
 

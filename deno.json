@@ -1,8 +1,7 @@
 {
   "tasks": {
-    "unfold:server": "deno run -A --lock=deno.lock src/unfold/server.ts",
-    "unfold:cli": "deno run -A --lock=deno.lock src/unfold/cli/main.ts",
-    "vault:api": "deno run -A --lock=deno.lock src/unfold/vault_api/server.ts",
+    "unfold:server": "deno run -A --no-lock=false --lock=deno.lock src/unfold/server.ts",
+    "unfold:cli": "deno run -A --no-lock=false --lock=deno.lock src/unfold/cli/main.ts",
     "dev": "deno task unfold:server",
     "start": "deno task dev",
     "preview": "deno task dev",
@@ -18,10 +17,8 @@
     "test": "deno test -A",
     "check": "deno task fmt:check && deno task lint && deno task test && deno task validate",
     "ci": "deno task check",
-    "check:emit": "deno run -A src/unfold/tools/watch_status.ts",
-    "check:watch": "deno run -A --watch src/unfold/tools/watch_status.ts",
-    "gh:pages": "gh run list --workflow=\"pages.yml\" -b \"$(git rev-parse --abbrev-ref HEAD)\"",
-    "gh:pages:watch": "watch -n 5 \"deno task gh:pages\"",
+    "check:emit": "deno run -A tools/watch_status.ts",
+    "check:watch": "deno run -A --watch tools/watch_status.ts",
     "clean": "rm -rf .unfold dist _site site/.lume"
   },
   "imports": {
