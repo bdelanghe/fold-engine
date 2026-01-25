@@ -2,6 +2,23 @@ import { assert, assertStringIncludes } from "@std/assert";
 import { join } from "@std/path";
 import { updateVaultSitemap } from "./vault_sitemap.ts";
 
+const writeWarning = (message: string): void => {
+  const encoder = new TextEncoder();
+  void Deno.stderr.write(encoder.encode(`${message}\n`));
+};
+
+const hasPermissions = async (
+  permissions: Deno.PermissionName[],
+): Promise<boolean> => {
+  for (const permission of permissions) {
+    const status = await Deno.permissions.query({ name: permission });
+    if (status.state !== "granted") {
+      return false;
+    }
+  }
+  return true;
+};
+
 const withEnv = async (
   next: Record<string, string>,
   run: () => Promise<void>,
@@ -25,6 +42,11 @@ const withEnv = async (
 };
 
 Deno.test("updateVaultSitemap rewrites legacy fold-engine paths", async () => {
+  const allowed = await hasPermissions(["env", "read", "write"]);
+  if (!allowed) {
+    writeWarning("Skipping vault sitemap test (missing permissions).");
+    return;
+  }
   const tempDir = await Deno.makeTempDir();
   const siteDir = join(tempDir, "site");
   const vaultDir = join(tempDir, "vault");

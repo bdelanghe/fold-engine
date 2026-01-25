@@ -98,12 +98,18 @@ const addListAccessibility = (
     ensureAttribute(attrs, "role", "listitem");
 
   return content
-    .replace(/<ul(\s[^>]*)?>/gi, (_match, attrs = "") =>
-      `<ul${enhanceListAttrs(attrs)}>`)
-    .replace(/<ol(\s[^>]*)?>/gi, (_match, attrs = "") =>
-      `<ol${enhanceListAttrs(attrs)}>`)
-    .replace(/<li(\s[^>]*)?>/gi, (_match, attrs = "") =>
-      `<li${enhanceItemAttrs(attrs)}>`);
+    .replace(
+      /<ul(\s[^>]*)?>/gi,
+      (_match, attrs = "") => `<ul${enhanceListAttrs(attrs)}>`,
+    )
+    .replace(
+      /<ol(\s[^>]*)?>/gi,
+      (_match, attrs = "") => `<ol${enhanceListAttrs(attrs)}>`,
+    )
+    .replace(
+      /<li(\s[^>]*)?>/gi,
+      (_match, attrs = "") => `<li${enhanceItemAttrs(attrs)}>`,
+    );
 };
 
 const buildJsonLd = (
@@ -167,9 +173,9 @@ const buildJsonLd = (
 
     const graph = [webpage, article, website].map((node) =>
       Object.fromEntries(
-      Object.entries(node).filter(([, value]) =>
-        value !== "" && value !== null && value !== undefined
-      ),
+        Object.entries(node).filter(([, value]) =>
+          value !== "" && value !== null && value !== undefined
+        ),
       )
     );
 

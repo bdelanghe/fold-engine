@@ -15,8 +15,7 @@ const shouldRequireBaseUrl = (): boolean => {
 
 const getWorkspaceRoot = (): string => Deno.realPathSync(Deno.cwd());
 
-const getCacheRoot = (): string =>
-  join(getWorkspaceRoot(), ".unfold", "vault");
+const getCacheRoot = (): string => join(getWorkspaceRoot(), ".unfold", "vault");
 
 const getIndexPath = (cacheRoot: string): string =>
   join(cacheRoot, ".vault-index.json");
@@ -57,6 +56,11 @@ const sha256Hex = async (data: Uint8Array): Promise<string> => {
     .join("");
 };
 
+const writeWarning = (message: string): void => {
+  const encoder = new TextEncoder();
+  void Deno.stderr.write(encoder.encode(`${message}\n`));
+};
+
 const downloadFile = async (
   baseUrl: string,
   relPath: string,
@@ -91,14 +95,16 @@ export const prepareVault = async (): Promise<void> => {
     index = await fetchIndex(baseUrl);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    console.warn(
+    writeWarning(
       `Vault API unavailable (${message}). Falling back to local vault.`,
     );
     return;
   }
 
   if (index.entries.length === 0) {
-    console.warn("Vault API returned no entries. Falling back to local vault.");
+    writeWarning(
+      "Vault API returned no entries. Falling back to local vault.",
+    );
     return;
   }
 
@@ -112,24 +118,29 @@ export const prepareVault = async (): Promise<void> => {
     (previousIndex?.entries ?? []).map((entry) => [entry.path, entry.sha256]),
   );
   const expectedPaths = new Set<string>();
+  const downloadTasks: Promise<void>[] = [];
 
   for (const entry of index.entries) {
     const relPath = sanitizeVaultPath(entry.path);
     expectedPaths.add(relPath);
     const targetPath = join(cacheRoot, relPath);
     const previousHash = previousHashes.get(relPath);
-    if (previousHash && previousHash === entry.sha256) {
-      try {
-        const stat = await Deno.stat(targetPath);
-        if (stat.isFile) {
-          continue;
+    downloadTasks.push((async () => {
+      if (previousHash && previousHash === entry.sha256) {
+        try {
+          const stat = await Deno.stat(targetPath);
+          if (stat.isFile) {
+            return;
+          }
+        } catch {
+          // Fall through to download if the file is missing.
         }
-      } catch {
-        // Fall through to download if the file is missing.
       }
-    }
-    await downloadFile(baseUrl, relPath, targetPath, entry.sha256);
+      await downloadFile(baseUrl, relPath, targetPath, entry.sha256);
+    })());
   }
+
+  await Promise.all(downloadTasks);
 
   for await (const entry of walk(cacheRoot, { includeDirs: false })) {
     const relPath = normalizeRelativePath(cacheRoot, entry.path);
