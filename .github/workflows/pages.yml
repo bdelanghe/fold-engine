@@ -53,6 +53,11 @@ jobs:
         env:
           SITE_URL: ${{ steps.site.outputs.site_url }}
 
+      - name: Validate AI exports
+        run: deno test -A src/unfold/tests/exporters_ai_test.ts
+        env:
+          SITE_URL: ${{ steps.site.outputs.site_url }}
+
       - name: Upload Pages artifact (dist/site)
         uses: actions/upload-pages-artifact@v3
         with:
