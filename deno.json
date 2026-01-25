@@ -20,6 +20,8 @@
     "ci": "deno task check",
     "check:emit": "deno run -A src/unfold/tools/watch_status.ts",
     "check:watch": "deno run -A --watch src/unfold/tools/watch_status.ts",
+    "gh:pages": "gh run list --workflow=\"pages.yml\" -b \"$(git rev-parse --abbrev-ref HEAD)\"",
+    "gh:pages:watch": "watch -n 5 \"deno task gh:pages\"",
     "clean": "rm -rf .unfold dist _site site/.lume"
   },
   "imports": {
