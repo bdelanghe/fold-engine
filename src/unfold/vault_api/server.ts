@@ -1,7 +1,7 @@
 import { walk } from "@std/fs";
 import { fromFileUrl, join, relative } from "@std/path";
 import { loadVaultRoot } from "../inputs/vault/load_vault.ts";
-import type { VaultIndex, VaultIndexEntry, VaultMeta } from "./contract.ts";
+import type { VaultIndex, VaultIndexEntry } from "./contract.ts";
 import { sanitizeVaultPath } from "./path.ts";
 
 const getVaultRootPath = (): string => fromFileUrl(loadVaultRoot());
@@ -19,38 +19,8 @@ const getVaultRef = (): VaultIndex["ref"] => {
   if (!sha && !tag && !branch) {
     return undefined;
   }
-  return {
-    sha: sha || undefined,
-    tag: tag || undefined,
-    branch: branch || undefined,
-  };
+  return { sha: sha || undefined, tag: tag || undefined, branch: branch || undefined };
 };
-
-const IGNORED_PREFIXES = [
-  ".cursor/",
-  ".devcontainer/",
-  ".git/",
-  ".github/",
-  ".unfold/",
-  ".vscode/",
-  "dist/",
-  "node_modules/",
-  "src/",
-  "src/unfold/vault_api/support/",
-  "vendor/",
-];
-
-const IGNORED_FILES = new Set([
-  ".cursorindexingignore",
-  ".dockerignore",
-  ".gitignore",
-  ".nojekyll",
-  "deno.json",
-  "deno.lock",
-  "docker-bake.hcl",
-  "docker-compose.yml",
-  "Dockerfile",
-]);
 
 const shouldSkipPath = (relPath: string): boolean => {
   if (!relPath) {
@@ -62,25 +32,14 @@ const shouldSkipPath = (relPath: string): boolean => {
   if (relPath.startsWith("_includes/")) {
     return true;
   }
-  if (
-    relPath.startsWith(".") && !relPath.startsWith(".obsidian/") &&
-    relPath !== ".obsidian"
-  ) {
-    return true;
-  }
-  if (
-    IGNORED_FILES.has(relPath) ||
-    IGNORED_PREFIXES.some((prefix) => relPath.startsWith(prefix))
-  ) {
+  if (relPath.startsWith(".") && !relPath.startsWith(".obsidian/") && relPath !== ".obsidian") {
     return true;
   }
   return false;
 };
 
 const getMediaType = (path: string): string => {
-  const ext = path.includes(".")
-    ? path.slice(path.lastIndexOf(".")).toLowerCase()
-    : "";
+  const ext = path.includes(".") ? path.slice(path.lastIndexOf(".")).toLowerCase() : "";
   switch (ext) {
     case ".md":
       return "text/markdown; charset=utf-8";
@@ -142,15 +101,6 @@ const sha256Hex = async (data: Uint8Array): Promise<string> => {
     .join("");
 };
 
-const datasetHash = async (entries: VaultIndexEntry[]): Promise<string> => {
-  const encoder = new TextEncoder();
-  const lines = entries
-    .map((entry) => `${entry.path}\t${entry.sha256}`)
-    .sort((a, b) => a.localeCompare(b))
-    .join("\n");
-  return await sha256Hex(encoder.encode(lines));
-};
-
 const buildIndex = async (): Promise<VaultIndex> => {
   const rootPath = getVaultRootPath();
   const entries: VaultIndexEntry[] = [];
@@ -171,12 +121,10 @@ const buildIndex = async (): Promise<VaultIndex> => {
   }
 
   entries.sort((a, b) => a.path.localeCompare(b.path));
-  const datasetSha256 = await datasetHash(entries);
 
   return {
     version: "v1",
     generatedAt: new Date().toISOString(),
-    datasetSha256,
     entries,
     ref: getVaultRef(),
   };
@@ -191,10 +139,7 @@ const respondJson = (value: unknown, status = 200): Response =>
     },
   });
 
-const handleFileRequest = async (
-  request: Request,
-  relPath: string,
-): Promise<Response> => {
+const handleFileRequest = async (request: Request, relPath: string): Promise<Response> => {
   if (shouldSkipPath(relPath)) {
     return new Response("Not found", { status: 404 });
   }
@@ -228,36 +173,12 @@ const handler = async (request: Request): Promise<Response> => {
   const url = new URL(request.url);
 
   if (url.pathname === "/healthz") {
-    return respondJson({ ok: true });
-  }
-
-  if (url.pathname === "/v1/meta") {
-    const index = await buildIndex();
-    const meta: VaultMeta = {
-      version: "v1",
-      generatedAt: index.generatedAt,
-      datasetSha256: index.datasetSha256,
-      entryCount: index.entries.length,
-      policyVersion: "v1",
-      ref: index.ref,
-    };
-    return respondJson(meta);
+    return new Response("ok\n");
   }
 
   if (url.pathname === "/v1/index") {
     const index = await buildIndex();
     return respondJson(index);
-  }
-
-  if (url.pathname === "/v1/file") {
-    const pathParam = url.searchParams.get("path") ?? "";
-    try {
-      const relPath = sanitizeVaultPath(pathParam);
-      return await handleFileRequest(request, relPath);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Invalid path";
-      return new Response(message, { status: 400 });
-    }
   }
 
   if (url.pathname.startsWith("/v1/files/")) {
