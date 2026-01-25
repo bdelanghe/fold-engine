@@ -6,7 +6,19 @@
       "closed": true,
       "ignoredProperties": ["@context"],
       "properties": [
-        { "path": "@id", "minCount": 1, "maxCount": 1, "datatype": "xsd:anyURI" },
+        {
+          "path": "@id",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI",
+          "pattern": "^https://.*/pages/"
+        },
+        {
+          "path": "@type",
+          "minCount": 1,
+          "maxCount": 1,
+          "in": ["basis:Page", "Page"]
+        },
         { "path": "title", "minCount": 1, "maxCount": 1, "datatype": "xsd:string" },
         { "path": "description", "maxCount": 1, "datatype": "xsd:string" },
         { "path": "dateCreated", "maxCount": 1, "datatype": "xsd:date" },
@@ -21,7 +33,19 @@
       "closed": true,
       "ignoredProperties": ["@context"],
       "properties": [
-        { "path": "@id", "minCount": 1, "maxCount": 1, "datatype": "xsd:anyURI" },
+        {
+          "path": "@id",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI",
+          "pattern": "^https://.*/refs/"
+        },
+        {
+          "path": "@type",
+          "minCount": 1,
+          "maxCount": 1,
+          "in": ["basis:Reference", "Reference"]
+        },
         { "path": "title", "minCount": 1, "maxCount": 1, "datatype": "xsd:string" },
         { "path": "url", "minCount": 1, "maxCount": 1, "datatype": "xsd:anyURI" },
         { "path": "description", "maxCount": 1, "datatype": "xsd:string" },
@@ -36,7 +60,18 @@
       "closed": true,
       "ignoredProperties": ["@context"],
       "properties": [
-        { "path": "@id", "minCount": 1, "maxCount": 1, "datatype": "xsd:anyURI" },
+        {
+          "path": "@id",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI",
+          "pattern": "^https://.*/vocab/"
+        },
+        {
+          "path": "@type",
+          "minCount": 1,
+          "in": ["rdfs:Class", "skos:Concept"]
+        },
         { "path": "label", "minCount": 1, "maxCount": 1, "datatype": "xsd:string" },
         { "path": "definition", "maxCount": 1, "datatype": "xsd:string" },
         { "path": "broader" },

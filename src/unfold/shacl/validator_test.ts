@@ -106,3 +106,54 @@ Deno.test("validateNodesWithShapes enforces in constraint", () => {
   assertEquals(report.ok, false);
   assertEquals(report.violations[0].path, "status");
 });
+
+Deno.test("validateNodesWithShapes enforces @id pattern", () => {
+  const shapes = parseShapes({
+    shapes: [
+      {
+        id: "basis:PageShape",
+        targetClass: "basis:Page",
+        properties: [
+          { path: "@id", minCount: 1, pattern: "^https://.*/pages/" },
+        ],
+      },
+    ],
+  });
+
+  const node: VaultNode = {
+    "@id": "https://example.org/refs/wrong",
+    "@type": "basis:Page",
+    "title": "Bad Page",
+  };
+
+  const report = validateNodesWithShapes([node], shapes.shapes);
+
+  assertEquals(report.ok, false);
+  assertEquals(report.violations[0].path, "@id");
+});
+
+Deno.test("validateNodesWithShapes enforces @type allowed values", () => {
+  const shapes = parseShapes({
+    shapes: [
+      {
+        id: "basis:ReferenceShape",
+        targetClass: "basis:Reference",
+        properties: [
+          { path: "@type", in: ["basis:Reference", "Reference"] },
+        ],
+      },
+    ],
+  });
+
+  const node: VaultNode = {
+    "@id": "https://example.org/refs/one",
+    "@type": ["basis:Reference", "basis:Page"],
+    "title": "Wrong Type",
+    "url": "https://example.org",
+  };
+
+  const report = validateNodesWithShapes([node], shapes.shapes);
+
+  assertEquals(report.ok, false);
+  assertEquals(report.violations[0].path, "@type");
+});

@@ -30,3 +30,9 @@ if (!report.ok) {
 - `in`
 - `class`
 - `closed` (with `ignoredProperties`)
+
+## Adding a new node type
+
+1. Add/extend the Zod schema in `src/unfold/schemas/zod/`.
+2. Add a matching shape entry in `src/unfold/shacl/shapes.json`.
+3. Add validation tests in `src/unfold/shacl/validator_test.ts` to cover new constraints.
