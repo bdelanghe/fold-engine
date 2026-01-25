@@ -7,6 +7,7 @@ alwaysApply: true
 
 - Unfold runs as a long-lived HTTP service on port 3000.
 - Compose service name is `unfold`; Compose is the runtime manager.
+- Test service name is `unfold-test` and runs `deno task test` under the `test` profile.
 - Health check is `GET /healthz`.
 - Bake is the canonical image build graph; Compose never builds images directly.
 
