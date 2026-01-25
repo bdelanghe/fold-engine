@@ -1,6 +1,7 @@
 import { prepareVault } from "../inputs/vault/prepare_vault.ts";
 import { getVaultPath, loadVault } from "../inputs/jsonld/loader.ts";
 import { validateLinkIntegrity } from "../inputs/jsonld/validator_links.ts";
+import { validateReachability } from "../inputs/jsonld/validator_reachability.ts";
 import { validateNodes } from "../inputs/jsonld/validator_zod.ts";
 import { loadShapes } from "../shacl/loader.ts";
 import {
@@ -59,5 +60,18 @@ export const runValidate = async (): Promise<void> => {
     const encoder = new TextEncoder();
     await Deno.stderr.write(encoder.encode(`${errorLines.join("\n")}\n`));
     throw new Error("Link integrity validation failed");
+  }
+
+  const reachabilityErrors = await validateReachability(nodes);
+  if (reachabilityErrors.length > 0) {
+    const errorLines = [
+      `Reachability validation failed (mode: ${mode}):`,
+      ...reachabilityErrors.map((error) =>
+        `  - ${error.file}: ${error.message}`
+      ),
+    ];
+    const encoder = new TextEncoder();
+    await Deno.stderr.write(encoder.encode(`${errorLines.join("\n")}\n`));
+    throw new Error("Reachability validation failed");
   }
 };
