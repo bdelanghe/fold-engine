@@ -95,6 +95,9 @@ export const createSite = (): ReturnType<typeof lume> => {
     "src/unfold/vault_api/support/",
     "vendor/",
   ];
+  if (srcPath.replace(/\/$/, "") === "vault") {
+    ignorePrefixes.push("vault/vault/");
+  }
   const ignoreFiles = new Set([
     ".cursorindexingignore",
     ".dockerignore",

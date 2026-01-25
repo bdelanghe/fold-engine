@@ -27,7 +27,17 @@ Deno.test("loadVaultRoot returns valid URL", () => {
     );
     assertEquals(root.pathname, expected.pathname);
   } else {
-    assertEquals(root.pathname.endsWith("obsidian_vault/"), true);
+    const defaultVault = join(Deno.cwd(), "vault");
+    let expectedSuffix = "/";
+    try {
+      const stat = await Deno.stat(defaultVault);
+      if (stat.isDirectory) {
+        expectedSuffix = "/vault/";
+      }
+    } catch {
+      // Fall through to repo root.
+    }
+    assertEquals(root.pathname.endsWith(expectedSuffix), true);
   }
 });
 

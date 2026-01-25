@@ -2,7 +2,7 @@
 
 This repository hosts the **Fold Engine** website.
 
-Content is authored in an Obsidian vault (`obsidian_vault/`) and compiled into
+Content is authored in an Obsidian vault (`vault/`) and compiled into
 `dist/` for GitHub Pages using the **Unfold** static compiler.
 
 Fold Engine contains the research notes, theory, and documentation. Unfold is
@@ -96,7 +96,7 @@ them explicitly, and let tooling validate the edges.
 
 ## Notes
 
-- All content lives in `obsidian_vault/` and is the single source of truth.
+- All content lives in `vault/` and is the single source of truth.
 - The **Unfold** compiler transforms the vault into the published Fold Engine
   site.
 - Unfold’s internals live under `src/unfold/` (see `src/unfold/README.md`).
@@ -105,7 +105,7 @@ them explicitly, and let tooling validate the edges.
 
 ## Repository Layout
 
-- `obsidian_vault/` — authored notes and knowledge graphs.
+- `vault/` — authored notes and knowledge graphs.
 - `src/unfold/` — schema-first static compiler.
 - `dist/` — generated publish artifacts (GitHub Pages target).
 - `schemas/` — canonical JSON Schemas used by Unfold.
