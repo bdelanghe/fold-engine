@@ -47,7 +47,8 @@ const hasRequiredPermissions = async (): Promise<boolean> => {
   return true;
 };
 
-const loadSite = async () => (await import("../unfold/site/site.ts")).createSite();
+const loadSite = async () =>
+  (await import("../unfold/site/site.ts")).createSite();
 
 const runBuild = async () => {
   const command = new Deno.Command(Deno.execPath(), {

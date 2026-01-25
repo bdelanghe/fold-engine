@@ -49,7 +49,9 @@ const readMarkdownExcerpt = async (page: Page, maxChars: number) => {
 
 const resolveCanonical = (page: Page, siteUrl: string): string => {
   const canonical =
-    page.document?.querySelector('link[rel="canonical"]')?.getAttribute("href") ??
+    page.document?.querySelector('link[rel="canonical"]')?.getAttribute(
+      "href",
+    ) ??
       "";
   if (canonical) {
     return canonical;
@@ -75,7 +77,9 @@ export const buildLlmsTxt = async (
   const entries: Array<{ url: string; title: string; excerpt: string }> = [];
   for (const page of pages) {
     const url = resolveCanonical(page, siteUrl);
-    const title = normalizeText(page.document?.querySelector("title")?.textContent);
+    const title = normalizeText(
+      page.document?.querySelector("title")?.textContent,
+    );
     if (!url) {
       continue;
     }
