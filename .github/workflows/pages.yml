@@ -22,6 +22,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Checkout vault content
+        uses: actions/checkout@v4
+        with:
+          repository: bdelanghe/unfold-obsidian-vault
+          path: vault
+
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
@@ -49,18 +55,21 @@ jobs:
         env:
           SITE_URL: ${{ steps.site.outputs.site_url }}
           SITE_OUTPUT_DIR: .unfold/site
+          VAULT_PATH: vault
 
       - name: Build site
         run: deno task build
         env:
           SITE_URL: ${{ steps.site.outputs.site_url }}
           SITE_OUTPUT_DIR: .unfold/site
+          VAULT_PATH: vault
 
       - name: Validate AI exports
         run: deno test -A src/unfold/tests/exporters_ai_test.ts
         env:
           SITE_URL: ${{ steps.site.outputs.site_url }}
           SITE_OUTPUT_DIR: .unfold/site
+          VAULT_PATH: vault
 
       - name: Upload Pages artifact (.unfold/site)
         uses: actions/upload-pages-artifact@v3
@@ -73,6 +82,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Checkout vault content
+        uses: actions/checkout@v4
+        with:
+          repository: bdelanghe/unfold-obsidian-vault
+          path: vault
+
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -83,7 +98,11 @@ jobs:
 
       - name: Start Unfold container
         run: |
-          docker run -d --rm -p 3000:3000 --name unfold-smoke unfold-dev-ci:latest
+          docker run -d --rm -p 3000:3000 \
+            -e VAULT_PATH=vault \
+            -v "$PWD/vault:/workspaces/schema-nodes/vault" \
+            --name unfold-smoke \
+            unfold-dev-ci:latest
           for i in $(seq 1 30); do
             curl -fsS http://localhost:3000/healthz >/dev/null 2>&1 && exit 0
             sleep 1

@@ -28,6 +28,15 @@ const getLayoutPath = () =>
 const getVaultPath = (): string => {
   const override = Deno.env.get("VAULT_PATH")?.trim();
   if (!override) {
+    const workspaceRoot = getWorkspaceRoot().replace(/\/$/, "");
+    try {
+      const stat = Deno.statSync(join(workspaceRoot, "vault"));
+      if (stat.isDirectory) {
+        return "vault";
+      }
+    } catch {
+      // Fall through to repo root.
+    }
     return ".";
   }
   if (isAbsolute(override)) {
