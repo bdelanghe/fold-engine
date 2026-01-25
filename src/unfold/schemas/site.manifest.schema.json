@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Site Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "generatedAt",
+    "pages"
+  ],
+  "properties": {
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "pages": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/page"
+      }
+    }
+  },
+  "$defs": {
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "title",
+        "h1",
+        "canonical",
+        "links",
+        "jsonLd",
+        "forbidden"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "h1": {
+          "type": "string",
+          "minLength": 1
+        },
+        "canonical": {
+          "type": "string",
+          "minLength": 1
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "jsonLd": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "type": "object" },
+              { "type": "array" },
+              { "type": "string" },
+              { "type": "number" },
+              { "type": "boolean" },
+              { "type": "null" }
+            ]
+          }
+        },
+        "forbidden": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "lumeLiveReload",
+            "lumeBar"
+          ],
+          "properties": {
+            "lumeLiveReload": { "type": "boolean" },
+            "lumeBar": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  }
+}

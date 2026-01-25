@@ -1,0 +1,24 @@
+{
+  "name": "fold-engine",
+  "image": "denoland/deno:latest",
+  "postCreateCommand": "deno --version",
+  "forwardPorts": [3000, 3001],
+  "portsAttributes": {
+    "3000": {
+      "label": "Lume dev server",
+      "onAutoForward": "openBrowser"
+    },
+    "3001": {
+      "label": "Lume dev server (alt)",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["denoland.vscode-deno"],
+      "settings": {
+        "deno.enable": true
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "siteUrl": "https://fold.example",
+  "buildMode": "production",
+  "requiredPaths": [
+    "/",
+    "/about/",
+    "/cognitive-folding/",
+    "/cognitive-jq/",
+    "/project-notes/",
+    "/publish-limitations/",
+    "/publishing/"
+  ],
+  "homepageRequiredLinks": [
+    "/cognitive-folding/",
+    "/cognitive-jq/",
+    "/publishing/",
+    "/publish-limitations/",
+    "/project-notes/"
+  ],
+  "jsonLdRequiredPaths": [
+    "/",
+    "/about/",
+    "/cognitive-folding/",
+    "/cognitive-jq/",
+    "/project-notes/",
+    "/publish-limitations/",
+    "/publishing/"
+  ]
+}

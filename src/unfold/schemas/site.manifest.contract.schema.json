@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["site", "pages"],
+  "properties": {
+    "site": {
+      "type": "object",
+      "required": ["url", "buildMode"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "buildMode": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "pages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "title",
+          "h1",
+          "links",
+          "hasJsonLd",
+          "jsonLdErrors",
+          "canonical",
+          "hasCharset",
+          "hasViewport",
+          "forbiddenMarkersFound"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "h1": {
+            "type": "string",
+            "minLength": 1
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hasJsonLd": {
+            "type": "boolean"
+          },
+          "jsonLdErrors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "canonical": {
+            "type": "string",
+            "minLength": 1
+          },
+          "hasCharset": {
+            "type": "boolean",
+            "const": true
+          },
+          "hasViewport": {
+            "type": "boolean",
+            "const": true
+          },
+          "forbiddenMarkersFound": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "type": "object",
+        "properties": {
+          "site": {
+            "type": "object",
+            "properties": {
+              "buildMode": {
+                "type": "string",
+                "const": "production"
+              }
+            },
+            "required": ["buildMode"]
+          }
+        },
+        "required": ["site"]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "pages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "forbiddenMarkersFound": {
+                  "type": "array",
+                  "maxItems": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
