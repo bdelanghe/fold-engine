@@ -26,13 +26,11 @@ const getSiteBasePath = () => {
   return pathname ? `${pathname}/` : "/";
 };
 
-const getWorkspaceRoot = (): string => {
-  const raw = Deno.env.get("WORKSPACE_ROOT")?.trim();
-  if (!raw) {
-    throw new Error("WORKSPACE_ROOT is required.");
-  }
-  return raw;
-};
+const getWorkspaceRoot = () =>
+  fromFileUrl(new URL("../../..", import.meta.url));
+
+const getLayoutPath = () =>
+  fromFileUrl(new URL("../renderers/lume/layout.tmpl.ts", import.meta.url));
 
 const getVaultPath = (): string => {
   const override = Deno.env.get("VAULT_PATH")?.trim();
