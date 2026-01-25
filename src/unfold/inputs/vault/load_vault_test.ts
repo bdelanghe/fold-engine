@@ -7,21 +7,50 @@ import {
   validateVault,
 } from "./load_vault.ts";
 
+const writeWarning = (message: string): void => {
+  const encoder = new TextEncoder();
+  void Deno.stderr.write(encoder.encode(`${message}\n`));
+};
+
+const hasPermissions = async (
+  permissions: Deno.PermissionName[],
+): Promise<boolean> => {
+  for (const permission of permissions) {
+    const status = await Deno.permissions.query({ name: permission });
+    if (status.state !== "granted") {
+      return false;
+    }
+  }
+  return true;
+};
+
 const hasVaultFixture = async (): Promise<boolean> => {
+  const allowed = await hasPermissions(["env", "read"]);
+  if (!allowed) {
+    writeWarning("Skipping vault tests (missing permissions).");
+    return false;
+  }
   const manifest = await scanVault();
   if (!manifest.hasConfig || manifest.files.length === 0) {
-    console.warn("Skipping vault tests (missing vault content).");
+    writeWarning("Skipping vault tests (missing vault content).");
     return false;
   }
   return true;
 };
 
-Deno.test("loadVaultRoot returns valid URL", () => {
+Deno.test("loadVaultRoot returns valid URL", async () => {
+  const allowed = await hasPermissions(["env", "read"]);
+  if (!allowed) {
+    writeWarning("Skipping loadVaultRoot test (missing permissions).");
+    return;
+  }
   const root = loadVaultRoot();
   assertEquals(root.protocol, "file:");
   const override = Deno.env.get("VAULT_PATH")?.trim();
   if (override) {
-    const resolved = isAbsolute(override) ? override : join(Deno.cwd(), override);
+    const resolved = isAbsolute(override)
+      ? override
+      : join(Deno.cwd(), override);
     const expected = toFileUrl(
       resolved.endsWith("/") ? resolved : `${resolved}/`,
     );

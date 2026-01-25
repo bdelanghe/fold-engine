@@ -22,24 +22,6 @@ const schemaOrgSchema = z
   })
   .strict();
 
-const schemaOrgSchema = z
-  .object({
-    pageType: z.string().min(1).optional(),
-    pageSubtypes: z.array(z.string().min(1)).optional(),
-    about: z
-      .array(
-        z
-          .object({
-            type: z.string().min(1),
-            id: z.string().url().optional(),
-            name: z.string().min(1).optional(),
-          })
-          .strict(),
-      )
-      .optional(),
-  })
-  .strict();
-
 const frontmatterSchema = z
   .object({
     title: z.string().min(1),
@@ -72,6 +54,10 @@ const jsonLdSchema = z
     ]),
   })
   .passthrough();
+const writeWarning = (message: string): void => {
+  const encoder = new TextEncoder();
+  void Deno.stderr.write(encoder.encode(`${message}\n`));
+};
 const getSiteUrl = () =>
   normalizeSiteUrl(Deno.env.get("SITE_URL") ?? "https://fold.example");
 
@@ -315,7 +301,7 @@ export const validateNotes = async (): Promise<void> => {
   try {
     await Deno.stat(sourceRoot);
   } catch {
-    console.warn("Skipping note validation (missing vault content).");
+    writeWarning("Skipping note validation (missing vault content).");
     return;
   }
   const errors: string[] = [];
