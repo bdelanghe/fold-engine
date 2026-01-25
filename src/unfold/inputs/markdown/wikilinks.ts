@@ -13,13 +13,19 @@ type WikiLinkToken = {
   };
 };
 
+type WikiLinkState = {
+  pos: number;
+  src: string;
+  push: (type: string, tag: string, nesting: number) => WikiLinkToken;
+};
+
 type MarkdownIt = {
   inline: {
     ruler: {
       before: (
         ruleName: string,
         name: string,
-        fn: (state: any, silent: boolean) => boolean,
+        fn: (state: WikiLinkState, silent: boolean) => boolean,
       ) => void;
     };
   };
@@ -31,31 +37,42 @@ type MarkdownIt = {
   };
 };
 
-export default function wikiLinks(options: WikiLinkOptions = {}) {
+const slugify = (value: string): string => {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+
+  const withoutExt = trimmed.replace(/\.md$/i, "");
+  return withoutExt
+    .toLowerCase()
+    .replace(/[^a-z0-9\s/-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/\/+/g, "/")
+    .replace(/(^-|-$)/g, "");
+};
+
+export const normalizeWikiTarget = (target: string): string =>
+  target
+    .split("/")
+    .map((segment) => slugify(segment))
+    .filter((segment) => segment.length > 0)
+    .join("/");
+
+export const buildWikiHref = (
+  target: string,
+  options: WikiLinkOptions = {},
+): string => {
   const prefix = options.prefix ?? "/";
   const suffix = options.suffix ?? "/";
+  const normalizedTarget = normalizeWikiTarget(target);
+  const encodedTarget = normalizedTarget
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+  return `${prefix}${encodedTarget}${suffix}`;
+};
 
-  const slugify = (value: string): string => {
-    const trimmed = value.trim();
-    if (!trimmed) return "";
-
-    const withoutExt = trimmed.replace(/\.md$/i, "");
-    return withoutExt
-      .toLowerCase()
-      .replace(/[^a-z0-9\s/-]/g, "")
-      .replace(/[\s_]+/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/\/+/g, "/")
-      .replace(/(^-|-$)/g, "");
-  };
-
-  const normalizeTarget = (target: string): string =>
-    target
-      .split("/")
-      .map((segment) => slugify(segment))
-      .filter((segment) => segment.length > 0)
-      .join("/");
-
+export default function wikiLinks(options: WikiLinkOptions = {}) {
   return (md: MarkdownIt) => {
     md.inline.ruler.before("emphasis", "wikilink", (state, silent) => {
       const start = state.pos;
@@ -90,8 +107,7 @@ export default function wikiLinks(options: WikiLinkOptions = {}) {
       const token = tokens[idx];
       const target = token.meta?.target ?? token.content;
       const label = token.content;
-      const normalizedTarget = normalizeTarget(target);
-      const href = `${prefix}${encodeURIComponent(normalizedTarget)}${suffix}`;
+      const href = buildWikiHref(target, options);
       const safeHref = md.utils.escapeHtml(href);
       const safeLabel = md.utils.escapeHtml(label);
 

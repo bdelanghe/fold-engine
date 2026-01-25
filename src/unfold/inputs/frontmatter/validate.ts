@@ -1,5 +1,7 @@
-import { extractYaml } from "jsr:@std/front-matter";
-import { z } from "npm:zod";
+import { extractYaml } from "@std/front-matter";
+import { basename } from "@std/path";
+import { z } from "zod";
+import { loadVaultRoot } from "../vault/load_vault.ts";
 
 const frontmatterSchema = z
   .object({
@@ -33,16 +35,15 @@ const jsonLdSchema = z
     ]),
   })
   .passthrough();
-const siteUrl = (Deno.env.get("SITE_URL") ?? "https://fold.example").replace(
-  /\/$/,
-  "",
-);
+const getSiteUrl = () =>
+  (Deno.env.get("SITE_URL") ?? "https://fold.example").replace(/\/$/, "");
 
 const buildVaultIndexJsonLd = (
   title: string,
   pageUrl: string,
   entrypoints: { name?: string; url?: string; role?: string }[],
 ) => {
+  const siteUrl = getSiteUrl();
   const entrypointUrls = entrypoints
     .map((entry) => (entry.url ? `${siteUrl}${entry.url}` : ""))
     .filter(Boolean);
@@ -138,8 +139,103 @@ const findFenceLanguages = (content: string): string[] => {
   return languages;
 };
 
+export const validateNoteContent = (
+  path: string,
+  content: string,
+): string[] => {
+  const errors: string[] = [];
+  let attrs: Record<string, unknown>;
+  let body: string | undefined;
+  try {
+    const extracted = extractYaml(content) as {
+      attrs: Record<string, unknown>;
+      body?: string;
+    };
+    attrs = extracted.attrs;
+    body = extracted.body;
+  } catch (error) {
+    errors.push(
+      `${path}\n- frontmatter: invalid (${(error as Error).message})`,
+    );
+    return errors;
+  }
+
+  const result = noteSchema.safeParse({
+    path,
+    frontmatter: attrs,
+    content: body ?? "",
+  });
+  if (!result.success) {
+    const formatted = result.error.issues
+      .map((issue) => `- ${issue.path.join(".") || "root"}: ${issue.message}`)
+      .join("\n");
+    errors.push(`${path}\n${formatted}`);
+    return errors;
+  }
+
+  const fenceLanguages = findFenceLanguages(result.data.content);
+  const invalidFenceLanguages = fenceLanguages.filter(
+    (language) => language.length === 0 || !allowedFenceLanguages.has(language),
+  );
+  if (invalidFenceLanguages.length > 0) {
+    const formatted = invalidFenceLanguages
+      .map((language) =>
+        `- fence language: ${language.length > 0 ? language : "(missing)"}`
+      )
+      .join("\n");
+    errors.push(`${path}\n${formatted}`);
+  }
+
+  const jsonld = result.data.frontmatter.jsonld;
+  let jsonldObject: Record<string, unknown> | null = null;
+  if (typeof jsonld === "string") {
+    if (jsonld === "vault_index") {
+      const siteUrl = getSiteUrl();
+      const pageUrl = result.data.frontmatter.url
+        ? `${siteUrl}${result.data.frontmatter.url}`
+        : "";
+      if (!pageUrl || !result.data.frontmatter.entrypoints) {
+        errors.push(
+          `${path}\n- jsonld: vault_index requires url and entrypoints`,
+        );
+        return errors;
+      }
+      jsonldObject = buildVaultIndexJsonLd(
+        result.data.frontmatter.title,
+        pageUrl,
+        result.data.frontmatter.entrypoints,
+      );
+    } else {
+      try {
+        jsonldObject = JSON.parse(jsonld);
+      } catch (error) {
+        errors.push(
+          `${path}\n- jsonld: invalid JSON (${(error as Error).message})`,
+        );
+        return errors;
+      }
+    }
+  } else {
+    jsonldObject = jsonld;
+  }
+
+  const jsonldResult = jsonLdSchema.safeParse(jsonldObject);
+  if (!jsonldResult.success) {
+    const formatted = jsonldResult.error.issues
+      .map((issue) =>
+        `- jsonld${issue.path.length > 0 ? "." : ""}${
+          issue.path.join(".")
+        }: ${issue.message}`
+      )
+      .join("\n");
+    errors.push(`${path}\n${formatted}`);
+  }
+
+  return errors;
+};
+
 const mdExtensions = new Set([".md", ".markdown"]);
-const sourceRoot = new URL("../../obsidian_vault/", import.meta.url);
+const sourceRoot = loadVaultRoot();
 
 async function* walk(dir: URL): AsyncGenerator<URL> {
   for await (const entry of Deno.readDir(dir)) {
@@ -158,80 +254,10 @@ export const validateNotes = async (): Promise<void> => {
   for await (const fileUrl of walk(sourceRoot)) {
     const path = fileUrl.pathname;
     if (!mdExtensions.has(path.slice(path.lastIndexOf(".")))) continue;
+    if (basename(path).startsWith(".")) continue;
 
     const content = await Deno.readTextFile(fileUrl);
-    const { attrs, body } = extractYaml(content);
-
-    const result = noteSchema.safeParse({
-      path,
-      frontmatter: attrs,
-      content: body ?? "",
-    });
-    if (!result.success) {
-      const formatted = result.error.issues
-        .map((issue) => `- ${issue.path.join(".") || "root"}: ${issue.message}`)
-        .join("\n");
-      errors.push(`${path}\n${formatted}`);
-      continue;
-    }
-
-    const fenceLanguages = findFenceLanguages(result.data.content);
-    const invalidFenceLanguages = fenceLanguages.filter(
-      (language) =>
-        language.length === 0 || !allowedFenceLanguages.has(language),
-    );
-    if (invalidFenceLanguages.length > 0) {
-      const formatted = invalidFenceLanguages
-        .map((language) =>
-          `- fence language: ${language.length > 0 ? language : "(missing)"}`
-        )
-        .join("\n");
-      errors.push(`${path}\n${formatted}`);
-    }
-
-    const jsonld = result.data.frontmatter.jsonld;
-    let jsonldObject: Record<string, unknown> | null = null;
-    if (typeof jsonld === "string") {
-      if (jsonld === "vault_index") {
-        const pageUrl = result.data.frontmatter.url
-          ? `${siteUrl}${result.data.frontmatter.url}`
-          : "";
-        if (!pageUrl || !result.data.frontmatter.entrypoints) {
-          errors.push(
-            `${path}\n- jsonld: vault_index requires url and entrypoints`,
-          );
-          continue;
-        }
-        jsonldObject = buildVaultIndexJsonLd(
-          result.data.frontmatter.title,
-          pageUrl,
-          result.data.frontmatter.entrypoints,
-        );
-      } else {
-        try {
-          jsonldObject = JSON.parse(jsonld);
-        } catch (error) {
-          errors.push(
-            `${path}\n- jsonld: invalid JSON (${(error as Error).message})`,
-          );
-          continue;
-        }
-      }
-    } else {
-      jsonldObject = jsonld;
-    }
-
-    const jsonldResult = jsonLdSchema.safeParse(jsonldObject);
-    if (!jsonldResult.success) {
-      const formatted = jsonldResult.error.issues
-        .map((issue) =>
-          `- jsonld${issue.path.length > 0 ? "." : ""}${
-            issue.path.join(".")
-          }: ${issue.message}`
-        )
-        .join("\n");
-      errors.push(`${path}\n${formatted}`);
-    }
+    errors.push(...validateNoteContent(path, content));
   }
 
   if (errors.length > 0) {

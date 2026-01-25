@@ -1,29 +1,32 @@
 # Unfold Architecture
 
-Purpose: Unfold treats each Markdown note as a typed record, compiles a
-deterministic static site, and emits machine-readable projections alongside
-HTML.
+Note: documentation is generated from Unfold sources via `deno task docs`. Do
+not edit this file by hand.
+
+Purpose: Unfold is a compiler that treats each Markdown note as a typed record,
+validates the vault, and emits deterministic static artifacts (HTML, JSON,
+manifests, and machine-readable projections).
 
 ## Overview
 
 The Obsidian vault is the single source of truth. Builds are a compiler-style
-pipeline that validates notes, produces a manifest, renders HTML, and emits
-JSON artifacts. Publishing is static and deterministic.
+pipeline that validates notes, produces a manifest, renders HTML, and emits JSON
+artifacts. Publishing is static and deterministic.
 
 ## Pipeline (logical)
 
 ```
 obsidian_vault/
   ↓
-frontmatter validation
-  ↓
-site manifest (JSON)
+validate frontmatter + JSON-LD
   ↓
 render notes → HTML
   ↓
+site manifest (JSON)
+  ↓
 dist/ (publish artifacts)
   ├─ HTML pages
-  ├─ manifest.json
+  ├─ site.manifest.json
   ├─ folded.json (future)
   └─ jsonld/ (future)
 ```
@@ -31,18 +34,22 @@ dist/ (publish artifacts)
 ## Phases and outputs
 
 Phase 1 — Static Site Foundation
+
 - Goal: deterministic HTML + manifest.
 - Artifacts: `dist/` HTML, minimal manifest JSON.
 
 Phase 2 — JSON Folding Engine
+
 - Goal: structured JSON projections with bounded queries.
 - Artifacts: folded JSON files, fold budgets, tests.
 
 Phase 3 — Machine-Readable Outputs
+
 - Goal: JSON-LD and knowledge graph exports.
 - Artifacts: JSON-LD bundles, site-level graph.
 
 Phase 4 — Tooling & Experiments
+
 - Goal: tooling experiments and distribution options.
 - Artifacts: visualization prototypes, alternate publish targets.
 
@@ -54,9 +61,9 @@ Phase 4 — Tooling & Experiments
 
 ## Build and publish
 
-- Build: `deno task build`
-- Dev: `deno task dev`
-- Docs/tests: `deno task docs`
+- Build: `deno task build` (runs `unfold build`)
+- Dev: `deno task dev` (runs `unfold dev`)
+- Docs: `deno task docs` (generates `dist/unfold/`)
 - Publish: deploy `dist/` only.
 
 ## Non-goals (for now)
