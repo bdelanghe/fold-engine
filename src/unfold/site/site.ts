@@ -10,9 +10,10 @@ import { buildLlmsTxt } from "../exporters/llms.ts";
 import { buildMcpBundle } from "../exporters/mcp.ts";
 import wikilinks from "../inputs/markdown/wikilinks.ts";
 import { buildSiteManifest } from "../manifests/site_manifest.ts";
+import { normalizeSiteUrl } from "./site_url.ts";
 
 const getSiteUrl = () =>
-  (Deno.env.get("SITE_URL") ?? "https://fold.example").replace(/\/$/, "");
+  normalizeSiteUrl(Deno.env.get("SITE_URL") ?? "https://fold.example");
 
 const getSiteBasePath = () => {
   const pathname = new URL(getSiteUrl()).pathname.replace(/\/$/, "");

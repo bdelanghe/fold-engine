@@ -1,4 +1,5 @@
 import type { Page } from "lume/core/file.ts";
+import { normalizeSiteUrl } from "../site/site_url.ts";
 
 type ManifestPage = {
   url: string;
@@ -130,7 +131,7 @@ type ManifestOptions = {
 };
 
 const defaultSiteUrl = () =>
-  (Deno.env.get("SITE_URL") ?? "https://fold.example").replace(/\/$/, "");
+  normalizeSiteUrl(Deno.env.get("SITE_URL") ?? "https://fold.example");
 
 const defaultBuildMode = () =>
   Deno.env.get("LUME_ENV") ?? Deno.env.get("BUILD_MODE") ?? "production";

@@ -2,6 +2,7 @@ import { extractYaml } from "@std/front-matter";
 import { basename, relative } from "@std/path";
 import { z } from "zod";
 import { loadVaultRoot } from "../vault/load_vault.ts";
+import { normalizeSiteUrl } from "../../site/site_url.ts";
 
 const schemaOrgSchema = z
   .object({
@@ -54,7 +55,7 @@ const jsonLdSchema = z
   })
   .passthrough();
 const getSiteUrl = () =>
-  (Deno.env.get("SITE_URL") ?? "https://fold.example").replace(/\/$/, "");
+  normalizeSiteUrl(Deno.env.get("SITE_URL") ?? "https://fold.example");
 
 const buildVaultIndexJsonLd = (
   title: string,
