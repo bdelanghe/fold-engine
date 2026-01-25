@@ -26,6 +26,32 @@ const getVaultRef = (): VaultIndex["ref"] => {
   };
 };
 
+const IGNORED_PREFIXES = [
+  ".cursor/",
+  ".devcontainer/",
+  ".git/",
+  ".github/",
+  ".unfold/",
+  ".vscode/",
+  "dist/",
+  "node_modules/",
+  "src/",
+  "src/unfold/vault_api/support/",
+  "vendor/",
+];
+
+const IGNORED_FILES = new Set([
+  ".cursorindexingignore",
+  ".dockerignore",
+  ".gitignore",
+  ".nojekyll",
+  "deno.json",
+  "deno.lock",
+  "docker-bake.hcl",
+  "docker-compose.yml",
+  "Dockerfile",
+]);
+
 const shouldSkipPath = (relPath: string): boolean => {
   if (!relPath) {
     return true;
@@ -37,6 +63,12 @@ const shouldSkipPath = (relPath: string): boolean => {
     return true;
   }
   if (relPath.startsWith(".") && !relPath.startsWith(".obsidian/") && relPath !== ".obsidian") {
+    return true;
+  }
+  if (
+    IGNORED_FILES.has(relPath) ||
+    IGNORED_PREFIXES.some((prefix) => relPath.startsWith(prefix))
+  ) {
     return true;
   }
   return false;

@@ -86,14 +86,27 @@ export const prepareVault = async (): Promise<void> => {
     return;
   }
 
+  let index: VaultIndex | null = null;
+  try {
+    index = await fetchIndex(baseUrl);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.warn(
+      `Vault API unavailable (${message}). Falling back to local vault.`,
+    );
+    return;
+  }
+
+  if (index.entries.length === 0) {
+    console.warn("Vault API returned no entries. Falling back to local vault.");
+    return;
+  }
+
   const cacheRoot = getCacheRoot();
   await Deno.mkdir(cacheRoot, { recursive: true });
   const indexPath = getIndexPath(cacheRoot);
 
-  const [index, previousIndex] = await Promise.all([
-    fetchIndex(baseUrl),
-    readIndex(indexPath),
-  ]);
+  const previousIndex = await readIndex(indexPath);
 
   const previousHashes = new Map(
     (previousIndex?.entries ?? []).map((entry) => [entry.path, entry.sha256]),
