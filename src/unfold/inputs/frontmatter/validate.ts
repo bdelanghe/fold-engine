@@ -2,6 +2,25 @@ import { extractYaml } from "@std/front-matter";
 import { basename, relative } from "@std/path";
 import { z } from "zod";
 import { loadVaultRoot } from "../vault/load_vault.ts";
+import { normalizeSiteUrl } from "../../site/site_url.ts";
+
+const schemaOrgSchema = z
+  .object({
+    pageType: z.string().min(1).optional(),
+    pageSubtypes: z.array(z.string().min(1)).optional(),
+    about: z
+      .array(
+        z
+          .object({
+            type: z.string().min(1),
+            id: z.string().url().optional(),
+            name: z.string().min(1).optional(),
+          })
+          .strict(),
+      )
+      .optional(),
+  })
+  .strict();
 
 const schemaOrgSchema = z
   .object({
@@ -54,7 +73,7 @@ const jsonLdSchema = z
   })
   .passthrough();
 const getSiteUrl = () =>
-  (Deno.env.get("SITE_URL") ?? "https://fold.example").replace(/\/$/, "");
+  normalizeSiteUrl(Deno.env.get("SITE_URL") ?? "https://fold.example");
 
 const buildVaultIndexJsonLd = (
   title: string,

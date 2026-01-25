@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import pathlib
 import xml.etree.ElementTree as ET
 
@@ -41,10 +42,11 @@ def write_markdown(entries: list[tuple[str, str]], output_path: pathlib.Path) ->
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate vault sitemap note.")
+    default_site_output = os.environ.get("SITE_OUTPUT_DIR", ".unfold/site")
     parser.add_argument(
         "--input",
         type=pathlib.Path,
-        default=pathlib.Path("data/sitemap.xml"),
+        default=pathlib.Path(default_site_output) / "sitemap.xml",
         help="Path to the sitemap XML.",
     )
     parser.add_argument(

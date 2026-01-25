@@ -36,13 +36,13 @@ jobs:
       - name: Compute site URL
         id: site
         run: |
-          OWNER="${{ github.repository_owner }}"
-          REPO="${{ github.event.repository.name }}"
-          if [ "${OWNER}.github.io" = "$REPO" ]; then
-            echo "site_url=https://${OWNER}.github.io" >> "$GITHUB_OUTPUT"
+          if [ -n "${SITE_URL:-}" ]; then
+            echo "site_url=${SITE_URL}" >> "$GITHUB_OUTPUT"
           else
-            echo "site_url=https://${OWNER}.github.io/${REPO}" >> "$GITHUB_OUTPUT"
+            echo "site_url=https://unfold.robertdelanghe.com" >> "$GITHUB_OUTPUT"
           fi
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
 
       - name: Cache Deno
         uses: actions/cache@v4

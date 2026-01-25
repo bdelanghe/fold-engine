@@ -66,7 +66,7 @@ services:
       SSH_AUTH_SOCK: /ssh-agent
     volumes:
       - vault-data:/data
-      - ${SSH_AUTH_SOCK}:/ssh-agent
+      - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
     healthcheck:
       test:
         ["CMD", "sh", "-c", "test -f /data/.vault-ready && test -d /data/.git"]
