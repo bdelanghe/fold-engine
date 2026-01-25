@@ -12,6 +12,7 @@ const NOT_ROOT = false;
 const DATASET_TYPES = new Set(["Dataset"]);
 const ROOT_TYPES = new Set(["Catalog", "basis:VaultIndex"]);
 const DRAFT_STATUSES = new Set(["draft", "private"]);
+export const ORPHAN_REACHABILITY_PREFIX = "Unreachable node detected:";
 
 type NodeReference = {
   id: string;
@@ -265,7 +266,7 @@ export async function validateReachability(
     const nodeId = asString(node["@id"]) ?? "<unknown>";
     return [
       new ValidationError(
-        `Unreachable node detected: ${nodeId}`,
+        `${ORPHAN_REACHABILITY_PREFIX} ${nodeId}`,
         node._source?.file || "unknown",
       ),
     ];

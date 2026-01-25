@@ -9,7 +9,7 @@ validation before any rendering or exports.
 Validation mode is controlled by `UNFOLD_VALIDATE_MODE`:
 
 - `dev` (default): authoring-friendly validation
-- `strict`: CI gate validation
+- `strict`: CI gate validation, including JSON Schema checks and validation artifacts in `dist/unfold/validation/`
 
 ## Structure
 

@@ -20,7 +20,7 @@ Commands:
   docs         Generate Unfold docs
 
 Env:
-  UNFOLD_VALIDATE_MODE=dev|strict   Validation mode (default: dev)
+  UNFOLD_VALIDATE_MODE=dev|strict   Validation mode (default: dev); strict writes artifacts to dist/unfold/validation
 `;
 
 const runCommand = async (

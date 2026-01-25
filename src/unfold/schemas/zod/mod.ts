@@ -7,10 +7,12 @@
 export * from "./page.ts";
 export * from "./reference.ts";
 export * from "./concept.ts";
+export * from "./webpage.ts";
 
 import { PageSchema } from "./page.ts";
 import { ReferenceSchema } from "./reference.ts";
 import { ConceptSchema } from "./concept.ts";
+import { WebPageSchema } from "./webpage.ts";
 
 /**
  * Schema registry mapping @type to Zod schema
@@ -22,6 +24,8 @@ export const SCHEMA_REGISTRY = {
   "Reference": ReferenceSchema,
   "rdfs:Class": ConceptSchema,
   "skos:Concept": ConceptSchema,
+  "schema:WebPage": WebPageSchema,
+  "WebPage": WebPageSchema,
 } as const;
 
 /**

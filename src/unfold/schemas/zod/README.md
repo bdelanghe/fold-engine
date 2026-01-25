@@ -64,6 +64,19 @@ const concept: Concept = {
 };
 ```
 
+### WebPage
+
+```typescript
+import { type WebPage, WebPageSchema } from "./webpage.ts";
+
+const page: WebPage = {
+  "@type": "schema:WebPage",
+  "@id": "https://example.org/pages/hello",
+  "title": "Hello World",
+  "description": "A schema.org WebPage profile",
+};
+```
+
 ## Schema Registry
 
 Get schema by @type:

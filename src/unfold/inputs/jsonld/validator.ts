@@ -3,8 +3,9 @@
  * Uses x-jsonld-* annotations to validate both structure and semantics
  */
 
-import Ajv from "ajv";
-import addFormats from "ajv-formats";
+import { Ajv, type ErrorObject } from "ajv";
+import addFormatsModule from "ajv-formats";
+import type { FormatsPlugin } from "ajv-formats";
 import { join } from "@std/path";
 import type { VaultNode } from "./types.ts";
 import { ValidationError } from "./types.ts";
@@ -19,6 +20,8 @@ const SCHEMA_MAP: Record<string, string> = {
   "Reference": "reference.schema.json",
   "rdfs:Class": "concept.schema.json",
   "skos:Concept": "concept.schema.json",
+  "schema:WebPage": "webpage.schema.json",
+  "WebPage": "webpage.schema.json",
 };
 
 /**
@@ -65,6 +68,7 @@ function createValidator(): Ajv {
     verbose: true,
     strict: false, // Allow x-jsonld-* custom keywords
   });
+  const addFormats = addFormatsModule as unknown as FormatsPlugin;
   addFormats(ajv);
   return ajv;
 }
@@ -93,15 +97,16 @@ export async function validateNode(node: VaultNode): Promise<void> {
   const valid = validate(node);
 
   if (!valid) {
-    const errors = validate.errors?.map((e) => ({
+    const errors = validate.errors?.map((e: ErrorObject) => ({
       path: e.instancePath,
       message: e.message,
       params: e.params,
     }));
 
+    const sourceFile = (node as VaultNode)._source?.file ?? "unknown";
     throw new ValidationError(
       `Schema validation failed for ${node["@id"]}`,
-      node._source?.file || "unknown",
+      sourceFile,
       errors,
     );
   }
