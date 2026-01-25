@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Obsidian Vault Manifest",
+  "description": "Schema for validating Obsidian vault structure",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "root",
+    "hasConfig",
+    "files"
+  ],
+  "properties": {
+    "root": {
+      "type": "string",
+      "description": "Absolute path to the vault root directory",
+      "minLength": 1
+    },
+    "hasConfig": {
+      "type": "boolean",
+      "description": "Whether .obsidian/ configuration folder exists"
+    },
+    "files": {
+      "type": "array",
+      "description": "All files in the vault (excluding .obsidian/)",
+      "items": {
+        "$ref": "#/$defs/vaultFile"
+      }
+    },
+    "invalidFiles": {
+      "type": "array",
+      "description": "Files with unsupported extensions",
+      "items": {
+        "$ref": "#/$defs/vaultFile"
+      }
+    }
+  },
+  "$defs": {
+    "vaultFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "type",
+        "extension"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Relative path from vault root",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "markdown",
+            "canvas",
+            "base",
+            "image",
+            "audio",
+            "video",
+            "pdf",
+            "unknown"
+          ],
+          "description": "Obsidian file type classification"
+        },
+        "extension": {
+          "type": "string",
+          "description": "File extension including dot"
+        }
+      }
+    },
+    "acceptedExtensions": {
+      "description": "Reference: accepted Obsidian file extensions",
+      "type": "object",
+      "properties": {
+        "markdown": { "const": [".md"] },
+        "canvas": { "const": [".canvas"] },
+        "base": { "const": [".base"] },
+        "image": {
+          "const": [
+            ".avif",
+            ".bmp",
+            ".gif",
+            ".jpeg",
+            ".jpg",
+            ".png",
+            ".svg",
+            ".webp"
+          ]
+        },
+        "audio": {
+          "const": [".flac", ".m4a", ".mp3", ".ogg", ".wav", ".webm", ".3gp"]
+        },
+        "video": { "const": [".mkv", ".mov", ".mp4", ".ogv", ".webm"] },
+        "pdf": { "const": [".pdf"] }
+      }
+    }
+  }
+}

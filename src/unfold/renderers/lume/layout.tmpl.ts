@@ -113,7 +113,6 @@ export default (data: LayoutData) => {
     ${jsonldMarkup}
   </head>
   <body>
-    <a href="#content">Skip to content</a>
     <main id="content">
       <article${articleLabel} itemprop="mainEntity" itemscope itemtype="https://schema.org/Article">
         ${headerMarkup}

@@ -92,7 +92,19 @@ const createDefaultDependencies = async (): Promise<CommandDependencies> => {
       const server = site.getServer();
       server.options.hostname = "0.0.0.0";
       server.options.port = 3000;
-      await server.start();
+      try {
+        await server.start();
+      } catch (error) {
+        if (error instanceof Deno.errors.AddrInUse) {
+          throw new Error(
+            `Dev server port ${server.options.port} is already in use. ` +
+              "Stop the other server or choose a different port.",
+          );
+        }
+        throw error;
+      }
+      // Keep the dev server running.
+      await new Promise(() => {});
     },
     docs: async () => {
       await runCommandProcess([

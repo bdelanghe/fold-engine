@@ -90,10 +90,13 @@
   "allOf": [
     {
       "if": {
+        "type": "object",
         "properties": {
           "site": {
+            "type": "object",
             "properties": {
               "buildMode": {
+                "type": "string",
                 "const": "production"
               }
             },
@@ -103,11 +106,15 @@
         "required": ["site"]
       },
       "then": {
+        "type": "object",
         "properties": {
           "pages": {
+            "type": "array",
             "items": {
+              "type": "object",
               "properties": {
                 "forbiddenMarkersFound": {
+                  "type": "array",
                   "maxItems": 0
                 }
               }
