@@ -41,6 +41,14 @@ Deno.test("scanVault produces valid manifest", async () => {
   }
 });
 
+Deno.test("scanVault ignores _includes templates", async () => {
+  const manifest = await scanVault();
+  const includesInvalid = manifest.invalidFiles.some((file) =>
+    file.path.startsWith("_includes/")
+  );
+  assertEquals(includesInvalid, false);
+});
+
 Deno.test("validateVault passes for valid vault", async () => {
   const errors = await validateVault();
   assertEquals(errors.length, 0, `Unexpected errors: ${errors.join(", ")}`);

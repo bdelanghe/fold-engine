@@ -66,8 +66,14 @@ export const scanVault = async (vaultRoot?: URL): Promise<VaultManifest> => {
   for await (const entry of walk(root, { includeDirs: false })) {
     const relPath = relative(rootPath, entry.path);
 
-    // Skip .obsidian config and hidden files
-    if (relPath.startsWith(".obsidian") || relPath.startsWith(".")) continue;
+    // Skip .obsidian config, hidden files, and Lume includes
+    if (
+      relPath.startsWith(".obsidian") ||
+      relPath.startsWith(".") ||
+      relPath.startsWith("_includes/")
+    ) {
+      continue;
+    }
 
     const ext = relPath.includes(".")
       ? relPath.slice(relPath.lastIndexOf("."))

@@ -11,6 +11,11 @@ import { buildSiteManifest } from "../manifests/site_manifest.ts";
 const getSiteUrl = () =>
   (Deno.env.get("SITE_URL") ?? "https://fold.example").replace(/\/$/, "");
 
+const getSiteBasePath = () => {
+  const pathname = new URL(getSiteUrl()).pathname.replace(/\/$/, "");
+  return pathname ? `${pathname}/` : "/";
+};
+
 const getWorkspaceRoot = () =>
   fromFileUrl(new URL("../../..", import.meta.url));
 
@@ -19,6 +24,7 @@ const getLayoutPath = () =>
 
 export const createSite = () => {
   const siteUrl = getSiteUrl();
+  const basePath = getSiteBasePath();
   const workspaceRoot = getWorkspaceRoot();
   const layoutPath = getLayoutPath();
 
@@ -31,6 +37,7 @@ export const createSite = () => {
 
   // Register the layout from external location
   site.remoteFile("_includes/layout.tmpl.ts", layoutPath);
+  site.data("site", { url: siteUrl, basePath });
   site.data("layout", "layout.tmpl.ts");
   site.use(vento());
   site.use(metas());
@@ -40,7 +47,7 @@ export const createSite = () => {
   site.hooks.markdownIt((md: { use: (plugin: unknown) => unknown }) =>
     md.use(
       wikilinks({
-        prefix: "/",
+        prefix: basePath,
         suffix: "/",
       }),
     )
