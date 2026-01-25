@@ -43,6 +43,11 @@ jobs:
           path: ~/.cache/deno
           key: deno-${{ runner.os }}-${{ hashFiles('deno.lock') }}
 
+      - name: Validate content
+        run: deno task validate
+        env:
+          SITE_URL: ${{ steps.site.outputs.site_url }}
+
       - name: Build site
         run: deno task build
         env:
