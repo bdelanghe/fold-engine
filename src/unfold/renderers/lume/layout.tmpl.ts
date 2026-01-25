@@ -64,6 +64,48 @@ const buildMetaDescription = (data: LayoutData, content: string): string => {
   return text ? text.slice(0, 160) : "";
 };
 
+const hasAttribute = (attrs: string, name: string): boolean =>
+  new RegExp(`\\s${name}\\s*=`, "i").test(attrs);
+
+const ensureAttribute = (
+  attrs: string,
+  name: string,
+  value: string,
+): string => {
+  if (hasAttribute(attrs, name)) {
+    return attrs;
+  }
+  return `${attrs} ${name}="${escapeAttribute(value)}"`;
+};
+
+const addListAccessibility = (
+  content: string,
+  listLabel: string,
+): string => {
+  const label = listLabel || "List";
+  const enhanceListAttrs = (attrs: string): string => {
+    let updated = ensureAttribute(attrs, "role", "list");
+    if (
+      !hasAttribute(updated, "aria-label") &&
+      !hasAttribute(updated, "aria-labelledby")
+    ) {
+      updated = ensureAttribute(updated, "aria-label", label);
+    }
+    return updated;
+  };
+
+  const enhanceItemAttrs = (attrs: string): string =>
+    ensureAttribute(attrs, "role", "listitem");
+
+  return content
+    .replace(/<ul(\s[^>]*)?>/gi, (_match, attrs = "") =>
+      `<ul${enhanceListAttrs(attrs)}>`)
+    .replace(/<ol(\s[^>]*)?>/gi, (_match, attrs = "") =>
+      `<ol${enhanceListAttrs(attrs)}>`)
+    .replace(/<li(\s[^>]*)?>/gi, (_match, attrs = "") =>
+      `<li${enhanceItemAttrs(attrs)}>`);
+};
+
 const buildJsonLd = (
   data: LayoutData,
   description: string,
@@ -224,6 +266,8 @@ export default (data: LayoutData): string => {
     (resolvedImage ? "summary_large_image" : "summary");
   const jsonld = buildJsonLd(data, metaDescription, resolvedImage);
   const escapedPageUrl = pageUrl ? escapeAttribute(pageUrl) : "";
+  const listLabel = title ? `${title} list` : "List";
+  const contentWithListA11y = addListAccessibility(content, listLabel);
   const metaDescriptionMarkup = metaDescription
     ? `<meta name="description" content="${
       escapeAttribute(metaDescription)
@@ -361,7 +405,7 @@ export default (data: LayoutData): string => {
       <article${articleLabel} itemprop="mainEntity" itemscope itemtype="https://schema.org/${articleType}">
         ${articleMetaMarkup}
         ${headerMarkup}
-        ${content}
+        ${contentWithListA11y}
       </article>
     </main>
   </body>

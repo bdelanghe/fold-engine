@@ -58,7 +58,7 @@ schema:
     - NoteDigitalDocument
   about:
     - type: SoftwareSourceCode
-      id: https://github.com/bdelanghe/fold-engine
+      id: https://github.com/bdelanghe/unfold
 jsonld: '{"@context":"https://schema.org/"}'
 ---
 
