@@ -81,6 +81,8 @@ services:
       VAULT_PATH: /vault
       PORT: 7777
       VAULT_BRANCH: ${VAULT_BRANCH:-main}
+      VAULT_SHA: ${VAULT_SHA:-}
+      VAULT_TAG: ${VAULT_TAG:-}
     depends_on:
       vault:
         condition: service_healthy
