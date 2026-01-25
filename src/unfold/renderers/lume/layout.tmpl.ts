@@ -52,7 +52,9 @@ const resolveUrl = (value: string, baseUrl: string): string => {
 };
 
 const buildMetaDescription = (data: LayoutData, content: string): string => {
-  const fromData = data.description ? normalizeWhitespace(data.description) : "";
+  const fromData = data.description
+    ? normalizeWhitespace(data.description)
+    : "";
   if (fromData) {
     return fromData.slice(0, 160);
   }
@@ -122,11 +124,17 @@ const buildJsonLd = (
 
     const graph = [webpage, article, website].map((node) =>
       Object.fromEntries(
-        Object.entries(node).filter(([, value]) => value !== "" && value != null),
-      ),
+        Object.entries(node).filter(([, value]) =>
+          value !== "" && value != null
+        ),
+      )
     );
 
-    return JSON.stringify({ "@context": "https://schema.org", "@graph": graph }, null, 2);
+    return JSON.stringify(
+      { "@context": "https://schema.org", "@graph": graph },
+      null,
+      2,
+    );
   }
 
   if (data.jsonld !== "vault_index") {
@@ -197,22 +205,27 @@ export default (data: LayoutData) => {
   const headerMarkup = hasContentH1 ? "" : `<header>
           <h1 id="page-title" itemprop="headline">${title}</h1>
         </header>`;
-  const articleAriaLabel = title ? ` aria-label="${escapeAttribute(title)}"` : "";
+  const articleAriaLabel = title
+    ? ` aria-label="${escapeAttribute(title)}"`
+    : "";
   const articleLabel = hasContentH1
     ? articleAriaLabel
     : ' aria-labelledby="page-title"';
   const metaDescription = buildMetaDescription(data, content);
-  const keywords =
-    Array.isArray(data.keywords) ? data.keywords.join(", ") : data.keywords ?? "";
+  const keywords = Array.isArray(data.keywords)
+    ? data.keywords.join(", ")
+    : data.keywords ?? "";
   const resolvedImage = data.image ? resolveUrl(data.image, siteUrl) : "";
   const authorName = data.author?.name ?? "";
   const authorUrl = data.author?.url ?? "";
   const articleType = data.article_type ?? "Article";
-  const twitterCard =
-    data.twitter_card ?? (resolvedImage ? "summary_large_image" : "summary");
+  const twitterCard = data.twitter_card ??
+    (resolvedImage ? "summary_large_image" : "summary");
   const jsonld = buildJsonLd(data, metaDescription, resolvedImage);
   const metaDescriptionMarkup = metaDescription
-    ? `<meta name="description" content="${escapeAttribute(metaDescription)}" />`
+    ? `<meta name="description" content="${
+      escapeAttribute(metaDescription)
+    }" />`
     : "";
   const canonicalMarkup = pageUrl
     ? `<link rel="canonical" href="${pageUrl}" />
@@ -222,25 +235,93 @@ export default (data: LayoutData) => {
     ? `<meta property="og:type" content="website" />
       <meta property="og:url" content="${pageUrl}" />
       <meta property="og:title" content="${escapeAttribute(title)}" />
-      ${metaDescription ? `<meta property="og:description" content="${escapeAttribute(metaDescription)}" />` : ""}
-      ${siteName ? `<meta property="og:site_name" content="${escapeAttribute(siteName)}" />` : ""}
-      ${resolvedImage ? `<meta property="og:image" content="${escapeAttribute(resolvedImage)}" />` : ""}
-      ${data.image_alt ? `<meta property="og:image:alt" content="${escapeAttribute(data.image_alt)}" />` : ""}
+      ${
+      metaDescription
+        ? `<meta property="og:description" content="${
+          escapeAttribute(metaDescription)
+        }" />`
+        : ""
+    }
+      ${
+      siteName
+        ? `<meta property="og:site_name" content="${
+          escapeAttribute(siteName)
+        }" />`
+        : ""
+    }
+      ${
+      resolvedImage
+        ? `<meta property="og:image" content="${
+          escapeAttribute(resolvedImage)
+        }" />`
+        : ""
+    }
+      ${
+      data.image_alt
+        ? `<meta property="og:image:alt" content="${
+          escapeAttribute(data.image_alt)
+        }" />`
+        : ""
+    }
       <meta name="twitter:card" content="${escapeAttribute(twitterCard)}" />
       <meta name="twitter:title" content="${escapeAttribute(title)}" />
-      ${metaDescription ? `<meta name="twitter:description" content="${escapeAttribute(metaDescription)}" />` : ""}
-      ${resolvedImage ? `<meta name="twitter:image" content="${escapeAttribute(resolvedImage)}" />` : ""}
-      ${data.image_alt ? `<meta name="twitter:image:alt" content="${escapeAttribute(data.image_alt)}" />` : ""}
-      ${data.twitter_site ? `<meta name="twitter:site" content="${escapeAttribute(data.twitter_site)}" />` : ""}
-      ${data.twitter_creator ? `<meta name="twitter:creator" content="${escapeAttribute(data.twitter_creator)}" />` : ""}`
+      ${
+      metaDescription
+        ? `<meta name="twitter:description" content="${
+          escapeAttribute(metaDescription)
+        }" />`
+        : ""
+    }
+      ${
+      resolvedImage
+        ? `<meta name="twitter:image" content="${
+          escapeAttribute(resolvedImage)
+        }" />`
+        : ""
+    }
+      ${
+      data.image_alt
+        ? `<meta name="twitter:image:alt" content="${
+          escapeAttribute(data.image_alt)
+        }" />`
+        : ""
+    }
+      ${
+      data.twitter_site
+        ? `<meta name="twitter:site" content="${
+          escapeAttribute(data.twitter_site)
+        }" />`
+        : ""
+    }
+      ${
+      data.twitter_creator
+        ? `<meta name="twitter:creator" content="${
+          escapeAttribute(data.twitter_creator)
+        }" />`
+        : ""
+    }`
     : "";
   const articleMetaMarkup = pageUrl
     ? `<meta itemprop="mainEntityOfPage" content="${pageUrl}" />
         <meta itemprop="url" content="${pageUrl}" />
         <meta itemprop="author" content="${escapeAttribute(authorName)}" />
-        ${authorUrl ? `<meta itemprop="sameAs" content="${escapeAttribute(authorUrl)}" />` : ""}
-        ${title ? `<meta itemprop="headline" content="${escapeAttribute(title)}" />` : ""}
-        ${metaDescription ? `<meta itemprop="description" content="${escapeAttribute(metaDescription)}" />` : ""}`
+        ${
+      authorUrl
+        ? `<meta itemprop="sameAs" content="${escapeAttribute(authorUrl)}" />`
+        : ""
+    }
+        ${
+      title
+        ? `<meta itemprop="headline" content="${escapeAttribute(title)}" />`
+        : ""
+    }
+        ${
+      metaDescription
+        ? `<meta itemprop="description" content="${
+          escapeAttribute(metaDescription)
+        }" />`
+        : ""
+    }`
     : "";
   const cogSchemaMarkup = data.cog_schema
     ? `<meta name="cog:schema" content="${data.cog_schema}" />`
@@ -256,8 +337,16 @@ export default (data: LayoutData) => {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>${title}</title>
     ${metaDescriptionMarkup}
-    ${keywords ? `<meta name="keywords" content="${escapeAttribute(keywords)}" />` : ""}
-    ${data.robots ? `<meta name="robots" content="${escapeAttribute(data.robots)}" />` : ""}
+    ${
+    keywords
+      ? `<meta name="keywords" content="${escapeAttribute(keywords)}" />`
+      : ""
+  }
+    ${
+    data.robots
+      ? `<meta name="robots" content="${escapeAttribute(data.robots)}" />`
+      : ""
+  }
     ${cogSchemaMarkup}
     <meta itemprop="inLanguage" content="en" />
     ${canonicalMarkup}
