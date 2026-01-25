@@ -69,6 +69,30 @@ const runCommandProcess = async (args: string[]): Promise<void> => {
   }
 };
 
+const detectRunningUnfoldServer = async (port: number): Promise<boolean> => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 300);
+  try {
+    const response = await fetch(
+      `http://localhost:${port}/site.manifest.json`,
+      { signal: controller.signal },
+    );
+    if (!response.ok) {
+      return false;
+    }
+    const data = await response.json().catch(() => null);
+    return Boolean(
+      data &&
+        typeof data.generatedAt === "string" &&
+        Array.isArray(data.pages),
+    );
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timeout);
+  }
+};
+
 const createDefaultDependencies = async (): Promise<CommandDependencies> => {
   const { runBuild } = await import("../pipeline/build.ts");
   const { runRender } = await import("../pipeline/render.ts");
@@ -91,14 +115,24 @@ const createDefaultDependencies = async (): Promise<CommandDependencies> => {
       await site.build();
       const server = site.getServer();
       server.options.hostname = "0.0.0.0";
-      server.options.port = 3000;
+      const port = 3000;
+      server.options.port = port;
+      const alreadyRunning = await detectRunningUnfoldServer(port);
+      if (alreadyRunning) {
+        throw new Error(
+          `Unfold dev server already running at http://localhost:${port}/`,
+        );
+      }
       try {
         await server.start();
       } catch (error) {
         if (error instanceof Deno.errors.AddrInUse) {
+          const unfoldRunning = await detectRunningUnfoldServer(port);
           throw new Error(
-            `Dev server port ${server.options.port} is already in use. ` +
-              "Stop the other server or choose a different port.",
+            unfoldRunning
+              ? `Unfold dev server already running at http://localhost:${port}/`
+              : `Dev server port ${port} is already in use. ` +
+                "Stop the other server or choose a different port.",
           );
         }
         throw error;
