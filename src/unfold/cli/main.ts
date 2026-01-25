@@ -116,6 +116,8 @@ const createDefaultDependencies = async (): Promise<CommandDependencies> => {
       ]);
     },
     dev: async () => {
+      const { prepareVault } = await import("../inputs/vault/prepare_vault.ts");
+      await prepareVault();
       const site = createSite();
       await site.build();
       const server = site.getServer();
