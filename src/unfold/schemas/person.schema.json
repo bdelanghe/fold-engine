@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.org/schemas/person.schema.json",
+  "title": "Person",
+  "description": "Schema.org Person profile for Unfold validation",
+  "type": "object",
+  "required": ["@context", "@type", "@id", "name"],
+  "properties": {
+    "@context": {
+      "description": "JSON-LD context",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" },
+        { "type": "array" }
+      ]
+    },
+    "@type": {
+      "description": "RDF type of the node",
+      "type": "string",
+      "x-jsonld-type": true,
+      "enum": ["schema:Person", "Person"]
+    },
+    "@id": {
+      "description": "Unique identifier (IRI) for this person",
+      "type": "string",
+      "format": "uri",
+      "x-jsonld-id": true
+    },
+    "name": {
+      "description": "Person name",
+      "type": "string",
+      "x-jsonld-term": "schema:name",
+      "minLength": 1
+    },
+    "description": {
+      "description": "Person description",
+      "type": "string",
+      "x-jsonld-term": "schema:description"
+    },
+    "url": {
+      "description": "Canonical URL",
+      "type": "string",
+      "format": "uri",
+      "x-jsonld-term": "schema:url"
+    },
+    "sameAs": {
+      "description": "Same-as URLs",
+      "type": "array",
+      "x-jsonld-term": "schema:sameAs",
+      "x-jsonld-container": "@set",
+      "items": { "type": "string", "format": "uri" }
+    },
+    "affiliation": {
+      "description": "Affiliations",
+      "x-jsonld-term": "schema:affiliation",
+      "x-jsonld-container": "@set",
+      "$ref": "#/definitions/urlOrNodeRefArray"
+    },
+    "worksFor": {
+      "description": "Organizations the person works for",
+      "x-jsonld-term": "schema:worksFor",
+      "x-jsonld-container": "@set",
+      "$ref": "#/definitions/urlOrNodeRefArray"
+    },
+    "knowsAbout": {
+      "description": "Topics the person knows about",
+      "x-jsonld-term": "schema:knowsAbout",
+      "x-jsonld-container": "@set",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ]
+    }
+  },
+  "definitions": {
+    "nodeRef": {
+      "type": "object",
+      "required": ["@id"],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "x-jsonld-id": true
+        }
+      }
+    },
+    "urlOrNodeRef": {
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "$ref": "#/definitions/nodeRef" }
+      ]
+    },
+    "urlOrNodeRefArray": {
+      "oneOf": [
+        { "$ref": "#/definitions/urlOrNodeRef" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/definitions/urlOrNodeRef" }
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

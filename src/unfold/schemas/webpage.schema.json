@@ -22,7 +22,24 @@
       "description": "RDF type of the node",
       "type": "string",
       "x-jsonld-type": true,
-      "enum": ["schema:WebPage", "WebPage"]
+      "enum": [
+        "schema:WebPage",
+        "WebPage",
+        "schema:ItemPage",
+        "ItemPage",
+        "schema:CollectionPage",
+        "CollectionPage",
+        "schema:AboutPage",
+        "AboutPage",
+        "schema:FAQPage",
+        "FAQPage",
+        "schema:QAPage",
+        "QAPage",
+        "schema:ProfilePage",
+        "ProfilePage",
+        "schema:SearchResultsPage",
+        "SearchResultsPage"
+      ]
     },
     "@id": {
       "description": "Unique identifier (IRI) for this page",

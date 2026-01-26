@@ -14,6 +14,7 @@ export * from "./creative_work.ts";
 export * from "./defined_term.ts";
 export * from "./defined_term_set.ts";
 export * from "./datatypes.ts";
+export * from "./person.ts";
 
 import { PageSchema } from "./page.ts";
 import { ReferenceSchema } from "./reference.ts";
@@ -24,6 +25,7 @@ import { WebPageElementSchema } from "./webpage_element.ts";
 import { CreativeWorkSchema } from "./creative_work.ts";
 import { DefinedTermSchema } from "./defined_term.ts";
 import { DefinedTermSetSchema } from "./defined_term_set.ts";
+import { PersonSchema } from "./person.ts";
 
 /**
  * Schema registry mapping @type to Zod schema
@@ -47,6 +49,8 @@ export const SCHEMA_REGISTRY = {
   "DefinedTerm": DefinedTermSchema,
   "schema:DefinedTermSet": DefinedTermSetSchema,
   "DefinedTermSet": DefinedTermSetSchema,
+  "schema:Person": PersonSchema,
+  "Person": PersonSchema,
 } as const;
 
 /**

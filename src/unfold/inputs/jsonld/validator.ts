@@ -32,6 +32,8 @@ const SCHEMA_MAP: Record<string, string> = {
   "DefinedTerm": "definedterm.schema.json",
   "schema:DefinedTermSet": "definedtermset.schema.json",
   "DefinedTermSet": "definedtermset.schema.json",
+  "schema:Person": "person.schema.json",
+  "Person": "person.schema.json",
 };
 
 /**

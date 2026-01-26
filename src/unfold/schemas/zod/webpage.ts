@@ -25,10 +25,29 @@ const TextOrUrlOrNodeRefListSchema = z.union([
   z.array(TextOrUrlOrNodeRefSchema),
 ]);
 
+const WEBPAGE_TYPES = [
+  "schema:WebPage",
+  "WebPage",
+  "schema:ItemPage",
+  "ItemPage",
+  "schema:CollectionPage",
+  "CollectionPage",
+  "schema:AboutPage",
+  "AboutPage",
+  "schema:FAQPage",
+  "FAQPage",
+  "schema:QAPage",
+  "QAPage",
+  "schema:ProfilePage",
+  "ProfilePage",
+  "schema:SearchResultsPage",
+  "SearchResultsPage",
+] as const;
+
 export const WebPageSchema = z.object({
   "@context": ContextSchema,
 
-  "@type": z.literal("schema:WebPage").or(z.literal("WebPage")),
+  "@type": z.enum(WEBPAGE_TYPES),
 
   "@id": UrlSchema.regex(/^https:\/\/.*\/pages\//),
 

@@ -2,27 +2,36 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://example.org/schemas/website.schema.json",
   "title": "WebSite",
-  "description": "Schema.org WebSite profile for Unfold validation",
+  "description": "Schema.org WebSite profile generated from release data",
   "type": "object",
-  "required": ["@context", "@type", "@id"],
-  "anyOf": [
-    { "required": ["title"] },
-    { "required": ["name"] }
+  "required": [
+    "@context",
+    "@type",
+    "@id"
   ],
   "properties": {
     "@context": {
       "description": "JSON-LD context",
       "oneOf": [
-        { "type": "string" },
-        { "type": "object" },
-        { "type": "array" }
+        {
+          "type": "string"
+        },
+        {
+          "type": "object"
+        },
+        {
+          "type": "array"
+        }
       ]
     },
     "@type": {
       "description": "RDF type of the node",
       "type": "string",
       "x-jsonld-type": true,
-      "enum": ["schema:WebSite", "WebSite"]
+      "enum": [
+        "schema:WebSite",
+        "WebSite"
+      ]
     },
     "@id": {
       "description": "Unique identifier (IRI) for this site",
@@ -30,78 +39,3108 @@
       "format": "uri",
       "x-jsonld-id": true
     },
-    "title": {
-      "description": "Site title",
-      "type": "string",
-      "x-jsonld-term": "schema:name",
-      "minLength": 1
-    },
-    "name": {
-      "description": "Site name",
-      "type": "string",
-      "x-jsonld-term": "schema:name",
-      "minLength": 1
-    },
-    "description": {
-      "description": "Site description",
-      "type": "string",
-      "x-jsonld-term": "schema:description"
-    },
-    "url": {
-      "description": "Canonical site URL",
-      "type": "string",
-      "format": "uri",
-      "x-jsonld-term": "schema:url"
-    },
-    "inLanguage": {
-      "description": "Primary language",
-      "type": "string",
-      "x-jsonld-term": "schema:inLanguage"
-    },
-    "sameAs": {
-      "description": "Same-as URLs",
-      "type": "array",
-      "x-jsonld-term": "schema:sameAs",
-      "x-jsonld-container": "@set",
-      "items": {
-        "type": "string",
-        "format": "uri"
-      }
-    },
-    "hasPart": {
-      "description": "Contained pages",
-      "type": "array",
-      "x-jsonld-term": "schema:hasPart",
-      "x-jsonld-container": "@set",
-      "items": {
-        "oneOf": [
-          { "type": "string", "format": "uri" },
-          { "$ref": "#/definitions/nodeRef" }
-        ]
-      }
-    },
-    "publisher": {
-      "description": "Publishing organization or person",
-      "x-jsonld-term": "schema:publisher",
+    "about": {
       "oneOf": [
-        { "type": "string", "format": "uri" },
-        { "$ref": "#/definitions/nodeRef" }
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The subject matter of an object."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The subject matter of an object."
+          }
+        }
       ]
     },
-    "potentialAction": {
-      "description": "Actions supported by the site",
-      "x-jsonld-term": "schema:potentialAction",
-      "x-jsonld-container": "@set",
+    "abstract": {
       "oneOf": [
-        { "type": "string", "format": "uri" },
-        { "$ref": "#/definitions/nodeRef" },
+        {
+          "type": "string",
+          "description": "An abstract is a short description that summarizes a <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a>."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "An abstract is a short description that summarizes a <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a>."
+          }
+        }
+      ]
+    },
+    "accessMode": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "The human sensory perceptual system or cognitive faculty through which a person may process or perceive information. Values should be drawn from the <a href=\"https://www.w3.org/2021/a11y-discov-vocab/latest/#accessMode-vocabulary\">approved vocabulary</a>."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "The human sensory perceptual system or cognitive faculty through which a person may process or perceive information. Values should be drawn from the <a href=\"https://www.w3.org/2021/a11y-discov-vocab/latest/#accessMode-vocabulary\">approved vocabulary</a>."
+          }
+        }
+      ]
+    },
+    "accessModeSufficient": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A list of single or combined accessModes that are sufficient to understand all the intellectual content of a resource. Values should be drawn from the <a href=\"https://www.w3.org/2021/a11y-discov-vocab/latest/#accessModeSufficient-vocabulary\">approved vocabulary</a>."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A list of single or combined accessModes that are sufficient to understand all the intellectual content of a resource. Values should be drawn from the <a href=\"https://www.w3.org/2021/a11y-discov-vocab/latest/#accessModeSufficient-vocabulary\">approved vocabulary</a>."
+          }
+        }
+      ]
+    },
+    "accessibilityAPI": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Indicates that the resource is compatible with the referenced accessibility API. Values should be drawn from the <a href=\"https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityAPI-vocabulary\">approved vocabulary</a>."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Indicates that the resource is compatible with the referenced accessibility API. Values should be drawn from the <a href=\"https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityAPI-vocabulary\">approved vocabulary</a>."
+          }
+        }
+      ]
+    },
+    "accessibilityControl": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Identifies input methods that are sufficient to fully control the described resource. Values should be drawn from the <a href=\"https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityControl-vocabulary\">approved vocabulary</a>."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Identifies input methods that are sufficient to fully control the described resource. Values should be drawn from the <a href=\"https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityControl-vocabulary\">approved vocabulary</a>."
+          }
+        }
+      ]
+    },
+    "accessibilityFeature": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Content features of the resource, such as accessible media, alternatives and supported enhancements for accessibility. Values should be drawn from the <a href=\"https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityFeature-vocabulary\">approved vocabulary</a>."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Content features of the resource, such as accessible media, alternatives and supported enhancements for accessibility. Values should be drawn from the <a href=\"https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityFeature-vocabulary\">approved vocabulary</a>."
+          }
+        }
+      ]
+    },
+    "accessibilityHazard": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "A characteristic of the described resource that is physiologically dangerous to some users. Related to WCAG 2.0 guideline 2.3. Values should be drawn from the <a href=\"https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityHazard-vocabulary\">approved vocabulary</a>."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "A characteristic of the described resource that is physiologically dangerous to some users. Related to WCAG 2.0 guideline 2.3. Values should be drawn from the <a href=\"https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityHazard-vocabulary\">approved vocabulary</a>."
+          }
+        }
+      ]
+    },
+    "accessibilitySummary": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "A human-readable summary of specific accessibility features or deficiencies, consistent with the other accessibility metadata but expressing subtleties such as \"short descriptions are present but long descriptions will be needed for non-visual users\" or \"short descriptions are present and no long descriptions are needed\"."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "A human-readable summary of specific accessibility features or deficiencies, consistent with the other accessibility metadata but expressing subtleties such as \"short descriptions are present but long descriptions will be needed for non-visual users\" or \"short descriptions are present and no long descriptions are needed\"."
+          }
+        }
+      ]
+    },
+    "accountablePerson": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Specifies the Person that is legally accountable for the CreativeWork."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Specifies the Person that is legally accountable for the CreativeWork."
+          }
+        }
+      ]
+    },
+    "acquireLicensePage": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "Indicates a page documenting how licenses can be purchased or otherwise acquired, for the current item."
+        },
         {
           "type": "array",
           "items": {
             "oneOf": [
-              { "type": "string", "format": "uri" },
-              { "$ref": "#/definitions/nodeRef" }
-            ]
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "Indicates a page documenting how licenses can be purchased or otherwise acquired, for the current item."
+          }
+        }
+      ]
+    },
+    "additionalType": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the\n    use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href=\"https://schema.org/docs/styleguide.html\">style guide</a>."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the\n    use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href=\"https://schema.org/docs/styleguide.html\">style guide</a>."
+          }
+        }
+      ]
+    },
+    "aggregateRating": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The overall rating, based on a collection of reviews or ratings, of the item."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The overall rating, based on a collection of reviews or ratings, of the item."
+          }
+        }
+      ]
+    },
+    "alternateName": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "An alias for the item."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "An alias for the item."
+          }
+        }
+      ]
+    },
+    "alternativeHeadline": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "A secondary title of the CreativeWork."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "A secondary title of the CreativeWork."
+          }
+        }
+      ]
+    },
+    "archivedAt": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Indicates a page or other link involved in archival of a <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a>. In the case of <a class=\"localLink\" href=\"/MediaReview\">MediaReview</a>, the items in a <a class=\"localLink\" href=\"/MediaReviewItem\">MediaReviewItem</a> may often become inaccessible, but be archived by archival, journalistic, activist, or law enforcement organizations. In such cases, the referenced page may not directly publish the content."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Indicates a page or other link involved in archival of a <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a>. In the case of <a class=\"localLink\" href=\"/MediaReview\">MediaReview</a>, the items in a <a class=\"localLink\" href=\"/MediaReviewItem\">MediaReviewItem</a> may often become inaccessible, but be archived by archival, journalistic, activist, or law enforcement organizations. In such cases, the referenced page may not directly publish the content."
+          }
+        }
+      ]
+    },
+    "assesses": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "The item being described is intended to assess the competency or learning outcome defined by the referenced term."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "The item being described is intended to assess the competency or learning outcome defined by the referenced term."
+          }
+        }
+      ]
+    },
+    "associatedMedia": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A media object that encodes this CreativeWork. This property is a synonym for encoding."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A media object that encodes this CreativeWork. This property is a synonym for encoding."
+          }
+        }
+      ]
+    },
+    "audience": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "An intended audience, i.e. a group for whom something was created."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "An intended audience, i.e. a group for whom something was created."
+          }
+        }
+      ]
+    },
+    "audio": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "An embedded audio object."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "An embedded audio object."
+          }
+        }
+      ]
+    },
+    "author": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The author of this content or rating. Please note that author is special in that HTML 5 provides a special mechanism for indicating authorship via the rel tag. That is equivalent to this and may be used interchangeably."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The author of this content or rating. Please note that author is special in that HTML 5 provides a special mechanism for indicating authorship via the rel tag. That is equivalent to this and may be used interchangeably."
+          }
+        }
+      ]
+    },
+    "award": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "An award won by or for this item."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "An award won by or for this item."
+          }
+        }
+      ]
+    },
+    "awards": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Awards won by or for this item."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Awards won by or for this item."
+          }
+        }
+      ]
+    },
+    "character": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Fictional person connected with a creative work."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Fictional person connected with a creative work."
+          }
+        }
+      ]
+    },
+    "citation": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "A citation or reference to another creative work, such as another publication, web page, scholarly article, etc."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "A citation or reference to another creative work, such as another publication, web page, scholarly article, etc."
+          }
+        }
+      ]
+    },
+    "comment": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Comments, typically from users."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Comments, typically from users."
+          }
+        }
+      ]
+    },
+    "commentCount": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "description": "The number of comments this CreativeWork (e.g. Article, Question or Answer) has received. This is most applicable to works published in Web sites with commenting system; additional comments may exist elsewhere."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "description": "The number of comments this CreativeWork (e.g. Article, Question or Answer) has received. This is most applicable to works published in Web sites with commenting system; additional comments may exist elsewhere."
+          }
+        }
+      ]
+    },
+    "conditionsOfAccess": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Conditions that affect the availability of, or method(s) of access to, an item. Typically used for real world items such as an <a class=\"localLink\" href=\"/ArchiveComponent\">ArchiveComponent</a> held by an <a class=\"localLink\" href=\"/ArchiveOrganization\">ArchiveOrganization</a>. This property is not suitable for use as a general Web access control mechanism. It is expressed only in natural language.<br/><br/>\n\nFor example \"Available by appointment from the Reading Room\" or \"Accessible only from logged-in accounts \"."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Conditions that affect the availability of, or method(s) of access to, an item. Typically used for real world items such as an <a class=\"localLink\" href=\"/ArchiveComponent\">ArchiveComponent</a> held by an <a class=\"localLink\" href=\"/ArchiveOrganization\">ArchiveOrganization</a>. This property is not suitable for use as a general Web access control mechanism. It is expressed only in natural language.<br/><br/>\n\nFor example \"Available by appointment from the Reading Room\" or \"Accessible only from logged-in accounts \"."
+          }
+        }
+      ]
+    },
+    "contentLocation": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The location depicted or described in the content. For example, the location in a photograph or painting."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The location depicted or described in the content. For example, the location in a photograph or painting."
+          }
+        }
+      ]
+    },
+    "contentRating": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "Official rating of a piece of content&#x2014;for example, 'MPAA PG-13'."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "Official rating of a piece of content&#x2014;for example, 'MPAA PG-13'."
+          }
+        }
+      ]
+    },
+    "contentReferenceTime": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "date-time",
+          "description": "The specific time described by a creative work, for works (e.g. articles, video objects etc.) that emphasise a particular moment within an Event."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The specific time described by a creative work, for works (e.g. articles, video objects etc.) that emphasise a particular moment within an Event."
+          }
+        }
+      ]
+    },
+    "contributor": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A secondary contributor to the CreativeWork or Event."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A secondary contributor to the CreativeWork or Event."
+          }
+        }
+      ]
+    },
+    "copyrightHolder": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The party holding the legal copyright to the CreativeWork."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The party holding the legal copyright to the CreativeWork."
+          }
+        }
+      ]
+    },
+    "copyrightNotice": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Text of a notice appropriate for describing the copyright aspects of this Creative Work, ideally indicating the owner of the copyright for the Work."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Text of a notice appropriate for describing the copyright aspects of this Creative Work, ideally indicating the owner of the copyright for the Work."
+          }
+        }
+      ]
+    },
+    "copyrightYear": {
+      "oneOf": [
+        {
+          "type": "number",
+          "description": "The year during which the claimed copyright for the CreativeWork was first asserted."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "description": "The year during which the claimed copyright for the CreativeWork was first asserted."
+          }
+        }
+      ]
+    },
+    "correction": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "Indicates a correction to a <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a>, either via a <a class=\"localLink\" href=\"/CorrectionComment\">CorrectionComment</a>, textually or in another document."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "Indicates a correction to a <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a>, either via a <a class=\"localLink\" href=\"/CorrectionComment\">CorrectionComment</a>, textually or in another document."
+          }
+        }
+      ]
+    },
+    "countryOfOrigin": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The country of origin of something, including products as well as creative  works such as movie and TV content.<br/><br/>\n\nIn the case of TV and movie, this would be the country of the principle offices of the production company or individual responsible for the movie. For other kinds of <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a> it is difficult to provide fully general guidance, and properties such as <a class=\"localLink\" href=\"/contentLocation\">contentLocation</a> and <a class=\"localLink\" href=\"/locationCreated\">locationCreated</a> may be more applicable.<br/><br/>\n\nIn the case of products, the country of origin of the product. The exact interpretation of this may vary by context and product type, and cannot be fully enumerated here."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The country of origin of something, including products as well as creative  works such as movie and TV content.<br/><br/>\n\nIn the case of TV and movie, this would be the country of the principle offices of the production company or individual responsible for the movie. For other kinds of <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a> it is difficult to provide fully general guidance, and properties such as <a class=\"localLink\" href=\"/contentLocation\">contentLocation</a> and <a class=\"localLink\" href=\"/locationCreated\">locationCreated</a> may be more applicable.<br/><br/>\n\nIn the case of products, the country of origin of the product. The exact interpretation of this may vary by context and product type, and cannot be fully enumerated here."
+          }
+        }
+      ]
+    },
+    "creativeWorkStatus": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "The status of a creative work in terms of its stage in a lifecycle. Example terms include Incomplete, Draft, Published, Obsolete. Some organizations define a set of terms for the stages of their publication lifecycle."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "The status of a creative work in terms of its stage in a lifecycle. Example terms include Incomplete, Draft, Published, Obsolete. Some organizations define a set of terms for the stages of their publication lifecycle."
+          }
+        }
+      ]
+    },
+    "creator": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The creator/author of this CreativeWork. This is the same as the Author property for CreativeWork."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The creator/author of this CreativeWork. This is the same as the Author property for CreativeWork."
+          }
+        }
+      ]
+    },
+    "creditText": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Text that can be used to credit person(s) and/or organization(s) associated with a published Creative Work."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Text that can be used to credit person(s) and/or organization(s) associated with a published Creative Work."
+          }
+        }
+      ]
+    },
+    "dateCreated": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "string",
+              "format": "date-time"
+            }
+          ],
+          "description": "The date on which the CreativeWork was created or the item was added to a DataFeed."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              }
+            ],
+            "description": "The date on which the CreativeWork was created or the item was added to a DataFeed."
+          }
+        }
+      ]
+    },
+    "dateModified": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "string",
+              "format": "date-time"
+            }
+          ],
+          "description": "The date on which the CreativeWork was most recently modified or when the item's entry was modified within a DataFeed."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              }
+            ],
+            "description": "The date on which the CreativeWork was most recently modified or when the item's entry was modified within a DataFeed."
+          }
+        }
+      ]
+    },
+    "datePublished": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "string",
+              "format": "date-time"
+            }
+          ],
+          "description": "Date of first publication or broadcast. For example the date a <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a> was broadcast or a <a class=\"localLink\" href=\"/Certification\">Certification</a> was issued."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              }
+            ],
+            "description": "Date of first publication or broadcast. For example the date a <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a> was broadcast or a <a class=\"localLink\" href=\"/Certification\">Certification</a> was issued."
+          }
+        }
+      ]
+    },
+    "description": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A description of the item."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A description of the item."
+          }
+        }
+      ]
+    },
+    "digitalSourceType": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Indicates an IPTCDigitalSourceEnumeration code indicating the nature of the digital source(s) for some <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a>."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Indicates an IPTCDigitalSourceEnumeration code indicating the nature of the digital source(s) for some <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a>."
+          }
+        }
+      ]
+    },
+    "disambiguatingDescription": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation."
+          }
+        }
+      ]
+    },
+    "discussionUrl": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri",
+          "description": "A link to the page containing the comments of the CreativeWork."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "description": "A link to the page containing the comments of the CreativeWork."
+          }
+        }
+      ]
+    },
+    "displayLocation": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The location at which an item can be viewed or experienced in-person."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The location at which an item can be viewed or experienced in-person."
+          }
+        }
+      ]
+    },
+    "editEIDR": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "An <a href=\"https://eidr.org/\">EIDR</a> (Entertainment Identifier Registry) <a class=\"localLink\" href=\"/identifier\">identifier</a> representing a specific edit / edition for a work of film or television.<br/><br/>\n\nFor example, the motion picture known as \"Ghostbusters\" whose <a class=\"localLink\" href=\"/titleEIDR\">titleEIDR</a> is \"10.5240/7EC7-228A-510A-053E-CBB8-J\" has several edits, e.g. \"10.5240/1F2A-E1C5-680A-14C6-E76B-I\" and \"10.5240/8A35-3BEE-6497-5D12-9E4F-3\".<br/><br/>\n\nSince schema.org types like <a class=\"localLink\" href=\"/Movie\">Movie</a> and <a class=\"localLink\" href=\"/TVEpisode\">TVEpisode</a> can be used for both works and their multiple expressions, it is possible to use <a class=\"localLink\" href=\"/titleEIDR\">titleEIDR</a> alone (for a general description), or alongside <a class=\"localLink\" href=\"/editEIDR\">editEIDR</a> for a more edit-specific description."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "An <a href=\"https://eidr.org/\">EIDR</a> (Entertainment Identifier Registry) <a class=\"localLink\" href=\"/identifier\">identifier</a> representing a specific edit / edition for a work of film or television.<br/><br/>\n\nFor example, the motion picture known as \"Ghostbusters\" whose <a class=\"localLink\" href=\"/titleEIDR\">titleEIDR</a> is \"10.5240/7EC7-228A-510A-053E-CBB8-J\" has several edits, e.g. \"10.5240/1F2A-E1C5-680A-14C6-E76B-I\" and \"10.5240/8A35-3BEE-6497-5D12-9E4F-3\".<br/><br/>\n\nSince schema.org types like <a class=\"localLink\" href=\"/Movie\">Movie</a> and <a class=\"localLink\" href=\"/TVEpisode\">TVEpisode</a> can be used for both works and their multiple expressions, it is possible to use <a class=\"localLink\" href=\"/titleEIDR\">titleEIDR</a> alone (for a general description), or alongside <a class=\"localLink\" href=\"/editEIDR\">editEIDR</a> for a more edit-specific description."
+          }
+        }
+      ]
+    },
+    "editor": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Specifies the Person who edited the CreativeWork."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Specifies the Person who edited the CreativeWork."
+          }
+        }
+      ]
+    },
+    "educationalAlignment": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "An alignment to an established educational framework.<br/><br/>\n\nThis property should not be used where the nature of the alignment can be described using a simple property, for example to express that a resource <a class=\"localLink\" href=\"/teaches\">teaches</a> or <a class=\"localLink\" href=\"/assesses\">assesses</a> a competency."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "An alignment to an established educational framework.<br/><br/>\n\nThis property should not be used where the nature of the alignment can be described using a simple property, for example to express that a resource <a class=\"localLink\" href=\"/teaches\">teaches</a> or <a class=\"localLink\" href=\"/assesses\">assesses</a> a competency."
+          }
+        }
+      ]
+    },
+    "educationalLevel": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "The level in terms of progression through an educational or training context. Examples of educational levels include 'beginner', 'intermediate' or 'advanced', and formal sets of level indicators."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "The level in terms of progression through an educational or training context. Examples of educational levels include 'beginner', 'intermediate' or 'advanced', and formal sets of level indicators."
+          }
+        }
+      ]
+    },
+    "educationalUse": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "The purpose of a work in the context of education; for example, 'assignment', 'group work'."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "The purpose of a work in the context of education; for example, 'assignment', 'group work'."
+          }
+        }
+      ]
+    },
+    "encoding": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A media object that encodes this CreativeWork. This property is a synonym for associatedMedia."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A media object that encodes this CreativeWork. This property is a synonym for associatedMedia."
+          }
+        }
+      ]
+    },
+    "encodingFormat": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "Media type typically expressed using a MIME format (see <a href=\"http://www.iana.org/assignments/media-types/media-types.xhtml\">IANA site</a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types\">MDN reference</a>), e.g. application/zip for a SoftwareApplication binary, audio/mpeg for .mp3 etc.<br/><br/>\n\nIn cases where a <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a> has several media type representations, <a class=\"localLink\" href=\"/encoding\">encoding</a> can be used to indicate each <a class=\"localLink\" href=\"/MediaObject\">MediaObject</a> alongside particular <a class=\"localLink\" href=\"/encodingFormat\">encodingFormat</a> information.<br/><br/>\n\nUnregistered or niche encoding and file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia/Wikidata entry."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "Media type typically expressed using a MIME format (see <a href=\"http://www.iana.org/assignments/media-types/media-types.xhtml\">IANA site</a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types\">MDN reference</a>), e.g. application/zip for a SoftwareApplication binary, audio/mpeg for .mp3 etc.<br/><br/>\n\nIn cases where a <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a> has several media type representations, <a class=\"localLink\" href=\"/encoding\">encoding</a> can be used to indicate each <a class=\"localLink\" href=\"/MediaObject\">MediaObject</a> alongside particular <a class=\"localLink\" href=\"/encodingFormat\">encodingFormat</a> information.<br/><br/>\n\nUnregistered or niche encoding and file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia/Wikidata entry."
+          }
+        }
+      ]
+    },
+    "encodings": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A media object that encodes this CreativeWork."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A media object that encodes this CreativeWork."
+          }
+        }
+      ]
+    },
+    "exampleOfWork": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A creative work that this work is an example/instance/realization/derivation of."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A creative work that this work is an example/instance/realization/derivation of."
+          }
+        }
+      ]
+    },
+    "expires": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "string",
+              "format": "date-time"
+            }
+          ],
+          "description": "Date the content expires and is no longer useful or available. For example a <a class=\"localLink\" href=\"/VideoObject\">VideoObject</a> or <a class=\"localLink\" href=\"/NewsArticle\">NewsArticle</a> whose availability or relevance is time-limited, a <a class=\"localLink\" href=\"/ClaimReview\">ClaimReview</a> fact check whose publisher wants to indicate that it may no longer be relevant (or helpful to highlight) after some date, or a <a class=\"localLink\" href=\"/Certification\">Certification</a> the validity has expired."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              }
+            ],
+            "description": "Date the content expires and is no longer useful or available. For example a <a class=\"localLink\" href=\"/VideoObject\">VideoObject</a> or <a class=\"localLink\" href=\"/NewsArticle\">NewsArticle</a> whose availability or relevance is time-limited, a <a class=\"localLink\" href=\"/ClaimReview\">ClaimReview</a> fact check whose publisher wants to indicate that it may no longer be relevant (or helpful to highlight) after some date, or a <a class=\"localLink\" href=\"/Certification\">Certification</a> the validity has expired."
+          }
+        }
+      ]
+    },
+    "fileFormat": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "Media type, typically MIME format (see <a href=\"http://www.iana.org/assignments/media-types/media-types.xhtml\">IANA site</a>) of the content, e.g. application/zip of a SoftwareApplication binary. In cases where a CreativeWork has several media type representations, 'encoding' can be used to indicate each MediaObject alongside particular fileFormat information. Unregistered or niche file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia entry."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "Media type, typically MIME format (see <a href=\"http://www.iana.org/assignments/media-types/media-types.xhtml\">IANA site</a>) of the content, e.g. application/zip of a SoftwareApplication binary. In cases where a CreativeWork has several media type representations, 'encoding' can be used to indicate each MediaObject alongside particular fileFormat information. Unregistered or niche file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia entry."
+          }
+        }
+      ]
+    },
+    "funder": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A person or organization that supports (sponsors) something through some kind of financial contribution."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A person or organization that supports (sponsors) something through some kind of financial contribution."
+          }
+        }
+      ]
+    },
+    "funding": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A <a class=\"localLink\" href=\"/Grant\">Grant</a> that directly or indirectly provide funding or sponsorship for this item. See also <a class=\"localLink\" href=\"/ownershipFundingInfo\">ownershipFundingInfo</a>."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A <a class=\"localLink\" href=\"/Grant\">Grant</a> that directly or indirectly provide funding or sponsorship for this item. See also <a class=\"localLink\" href=\"/ownershipFundingInfo\">ownershipFundingInfo</a>."
+          }
+        }
+      ]
+    },
+    "genre": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "Genre of the creative work, broadcast channel or group."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "Genre of the creative work, broadcast channel or group."
+          }
+        }
+      ]
+    },
+    "hasPart": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Indicates an item or CreativeWork that is part of this item, or CreativeWork (in some sense)."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Indicates an item or CreativeWork that is part of this item, or CreativeWork (in some sense)."
+          }
+        }
+      ]
+    },
+    "headline": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Headline of the article."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Headline of the article."
+          }
+        }
+      ]
+    },
+    "identifier": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "The identifier property represents any kind of identifier for any kind of <a class=\"localLink\" href=\"/Thing\">Thing</a>, such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See <a href=\"/docs/datamodel.html#identifierBg\">background notes</a> for more details."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "The identifier property represents any kind of identifier for any kind of <a class=\"localLink\" href=\"/Thing\">Thing</a>, such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See <a href=\"/docs/datamodel.html#identifierBg\">background notes</a> for more details."
+          }
+        }
+      ]
+    },
+    "image": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "An image of the item. This can be a <a class=\"localLink\" href=\"/URL\">URL</a> or a fully described <a class=\"localLink\" href=\"/ImageObject\">ImageObject</a>."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "An image of the item. This can be a <a class=\"localLink\" href=\"/URL\">URL</a> or a fully described <a class=\"localLink\" href=\"/ImageObject\">ImageObject</a>."
+          }
+        }
+      ]
+    },
+    "inLanguage": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "The language of the content or performance or used in an action. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"/availableLanguage\">availableLanguage</a>."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "The language of the content or performance or used in an action. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"/availableLanguage\">availableLanguage</a>."
+          }
+        }
+      ]
+    },
+    "interactionStatistic": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The number of interactions for the CreativeWork using the WebSite or SoftwareApplication. The most specific child type of InteractionCounter should be used."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The number of interactions for the CreativeWork using the WebSite or SoftwareApplication. The most specific child type of InteractionCounter should be used."
+          }
+        }
+      ]
+    },
+    "interactivityType": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "The predominant mode of learning supported by the learning resource. Acceptable values are 'active', 'expositive', or 'mixed'."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "The predominant mode of learning supported by the learning resource. Acceptable values are 'active', 'expositive', or 'mixed'."
+          }
+        }
+      ]
+    },
+    "interpretedAsClaim": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Used to indicate a specific claim contained, implied, translated or refined from the content of a <a class=\"localLink\" href=\"/MediaObject\">MediaObject</a> or other <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a>. The interpreting party can be indicated using <a class=\"localLink\" href=\"/claimInterpreter\">claimInterpreter</a>."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Used to indicate a specific claim contained, implied, translated or refined from the content of a <a class=\"localLink\" href=\"/MediaObject\">MediaObject</a> or other <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a>. The interpreting party can be indicated using <a class=\"localLink\" href=\"/claimInterpreter\">claimInterpreter</a>."
+          }
+        }
+      ]
+    },
+    "isAccessibleForFree": {
+      "oneOf": [
+        {
+          "type": "boolean",
+          "description": "A flag to signal that the item, event, or place is accessible for free."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "boolean",
+            "description": "A flag to signal that the item, event, or place is accessible for free."
+          }
+        }
+      ]
+    },
+    "isBasedOn": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "A resource from which this work is derived or from which it is a modification or adaptation."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "A resource from which this work is derived or from which it is a modification or adaptation."
+          }
+        }
+      ]
+    },
+    "isBasedOnUrl": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "A resource that was used in the creation of this resource. This term can be repeated for multiple sources. For example, http://example.com/great-multiplication-intro.html."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "A resource that was used in the creation of this resource. This term can be repeated for multiple sources. For example, http://example.com/great-multiplication-intro.html."
+          }
+        }
+      ]
+    },
+    "isFamilyFriendly": {
+      "oneOf": [
+        {
+          "type": "boolean",
+          "description": "Indicates whether this content is family friendly."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "boolean",
+            "description": "Indicates whether this content is family friendly."
+          }
+        }
+      ]
+    },
+    "isPartOf": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "Indicates an item or CreativeWork that this item, or CreativeWork (in some sense), is part of."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "Indicates an item or CreativeWork that this item, or CreativeWork (in some sense), is part of."
+          }
+        }
+      ]
+    },
+    "issn": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "The International Standard Serial Number (ISSN) that identifies this serial publication. You can repeat this property to identify different formats of, or the linking ISSN (ISSN-L) for, this serial publication."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "The International Standard Serial Number (ISSN) that identifies this serial publication. You can repeat this property to identify different formats of, or the linking ISSN (ISSN-L) for, this serial publication."
+          }
+        }
+      ]
+    },
+    "keywords": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "Keywords or tags used to describe some item. Multiple textual entries in a keywords list are typically delimited by commas, or by repeating the property."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "Keywords or tags used to describe some item. Multiple textual entries in a keywords list are typically delimited by commas, or by repeating the property."
+          }
+        }
+      ]
+    },
+    "learningResourceType": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "The predominant type or kind characterizing the learning resource. For example, 'presentation', 'handout'."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "The predominant type or kind characterizing the learning resource. For example, 'presentation', 'handout'."
+          }
+        }
+      ]
+    },
+    "license": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "A license document that applies to this content, typically indicated by URL."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "A license document that applies to this content, typically indicated by URL."
+          }
+        }
+      ]
+    },
+    "locationCreated": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The location where the CreativeWork was created, which may not be the same as the location depicted in the CreativeWork."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The location where the CreativeWork was created, which may not be the same as the location depicted in the CreativeWork."
+          }
+        }
+      ]
+    },
+    "mainEntity": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Indicates the primary entity described in some page or other CreativeWork."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Indicates the primary entity described in some page or other CreativeWork."
+          }
+        }
+      ]
+    },
+    "mainEntityOfPage": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See <a href=\"/docs/datamodel.html#mainEntityBackground\">background notes</a> for details."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See <a href=\"/docs/datamodel.html#mainEntityBackground\">background notes</a> for details."
+          }
+        }
+      ]
+    },
+    "maintainer": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A maintainer of a <a class=\"localLink\" href=\"/Dataset\">Dataset</a>, software package (<a class=\"localLink\" href=\"/SoftwareApplication\">SoftwareApplication</a>), or other <a class=\"localLink\" href=\"/Project\">Project</a>. A maintainer is a <a class=\"localLink\" href=\"/Person\">Person</a> or <a class=\"localLink\" href=\"/Organization\">Organization</a> that manages contributions to, and/or publication of, some (typically complex) artifact. It is common for distributions of software and data to be based on \"upstream\" sources. When <a class=\"localLink\" href=\"/maintainer\">maintainer</a> is applied to a specific version of something e.g. a particular version or packaging of a <a class=\"localLink\" href=\"/Dataset\">Dataset</a>, it is always  possible that the upstream source has a different maintainer. The <a class=\"localLink\" href=\"/isBasedOn\">isBasedOn</a> property can be used to indicate such relationships between datasets to make the different maintenance roles clear. Similarly in the case of software, a package may have dedicated maintainers working on integration into software distributions such as Ubuntu, as well as upstream maintainers of the underlying work."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A maintainer of a <a class=\"localLink\" href=\"/Dataset\">Dataset</a>, software package (<a class=\"localLink\" href=\"/SoftwareApplication\">SoftwareApplication</a>), or other <a class=\"localLink\" href=\"/Project\">Project</a>. A maintainer is a <a class=\"localLink\" href=\"/Person\">Person</a> or <a class=\"localLink\" href=\"/Organization\">Organization</a> that manages contributions to, and/or publication of, some (typically complex) artifact. It is common for distributions of software and data to be based on \"upstream\" sources. When <a class=\"localLink\" href=\"/maintainer\">maintainer</a> is applied to a specific version of something e.g. a particular version or packaging of a <a class=\"localLink\" href=\"/Dataset\">Dataset</a>, it is always  possible that the upstream source has a different maintainer. The <a class=\"localLink\" href=\"/isBasedOn\">isBasedOn</a> property can be used to indicate such relationships between datasets to make the different maintenance roles clear. Similarly in the case of software, a package may have dedicated maintainers working on integration into software distributions such as Ubuntu, as well as upstream maintainers of the underlying work."
+          }
+        }
+      ]
+    },
+    "material": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "A material that something is made from, e.g. leather, wool, cotton, paper."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "A material that something is made from, e.g. leather, wool, cotton, paper."
+          }
+        }
+      ]
+    },
+    "materialExtent": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "The quantity of the materials being described or an expression of the physical space they occupy."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "The quantity of the materials being described or an expression of the physical space they occupy."
+          }
+        }
+      ]
+    },
+    "mentions": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Indicates that the CreativeWork contains a reference to, but is not necessarily about a concept."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Indicates that the CreativeWork contains a reference to, but is not necessarily about a concept."
+          }
+        }
+      ]
+    },
+    "name": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "The name of the item."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "The name of the item."
+          }
+        }
+      ]
+    },
+    "offers": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event. Use <a class=\"localLink\" href=\"/businessFunction\">businessFunction</a> to indicate the kind of transaction offered, i.e. sell, lease, etc. This property can also be used to describe a <a class=\"localLink\" href=\"/Demand\">Demand</a>. While this property is listed as expected on a number of common types, it can be used in others. In that case, using a second type, such as Product or a subtype of Product, can clarify the nature of the offer."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event. Use <a class=\"localLink\" href=\"/businessFunction\">businessFunction</a> to indicate the kind of transaction offered, i.e. sell, lease, etc. This property can also be used to describe a <a class=\"localLink\" href=\"/Demand\">Demand</a>. While this property is listed as expected on a number of common types, it can be used in others. In that case, using a second type, such as Product or a subtype of Product, can clarify the nature of the offer."
+          }
+        }
+      ]
+    },
+    "owner": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A person or organization who owns this Thing."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A person or organization who owns this Thing."
+          }
+        }
+      ]
+    },
+    "pattern": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "A pattern that something has, for example 'polka dot', 'striped', 'Canadian flag'. Values are typically expressed as text, although links to controlled value schemes are also supported."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "A pattern that something has, for example 'polka dot', 'striped', 'Canadian flag'. Values are typically expressed as text, although links to controlled value schemes are also supported."
+          }
+        }
+      ]
+    },
+    "position": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "The position of an item in a series or sequence of items."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "The position of an item in a series or sequence of items."
+          }
+        }
+      ]
+    },
+    "potentialAction": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role."
+          }
+        }
+      ]
+    },
+    "producer": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The person or organization who produced the work (e.g. music album, movie, TV/radio series etc.)."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The person or organization who produced the work (e.g. music album, movie, TV/radio series etc.)."
+          }
+        }
+      ]
+    },
+    "provider": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller."
+          }
+        }
+      ]
+    },
+    "publication": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A publication event associated with the item."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A publication event associated with the item."
+          }
+        }
+      ]
+    },
+    "publisher": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The publisher of the article in question."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The publisher of the article in question."
+          }
+        }
+      ]
+    },
+    "publisherImprint": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The publishing division which published the comic."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The publishing division which published the comic."
+          }
+        }
+      ]
+    },
+    "publishingPrinciples": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "The publishingPrinciples property indicates (typically via <a class=\"localLink\" href=\"/URL\">URL</a>) a document describing the editorial principles of an <a class=\"localLink\" href=\"/Organization\">Organization</a> (or individual, e.g. a <a class=\"localLink\" href=\"/Person\">Person</a> writing a blog) that relate to their activities as a publisher, e.g. ethics or diversity policies. When applied to a <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a> (e.g. <a class=\"localLink\" href=\"/NewsArticle\">NewsArticle</a>) the principles are those of the party primarily responsible for the creation of the <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a>.<br/><br/>\n\nWhile such policies are most typically expressed in natural language, sometimes related information (e.g. indicating a <a class=\"localLink\" href=\"/funder\">funder</a>) can be expressed using schema.org terminology."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "The publishingPrinciples property indicates (typically via <a class=\"localLink\" href=\"/URL\">URL</a>) a document describing the editorial principles of an <a class=\"localLink\" href=\"/Organization\">Organization</a> (or individual, e.g. a <a class=\"localLink\" href=\"/Person\">Person</a> writing a blog) that relate to their activities as a publisher, e.g. ethics or diversity policies. When applied to a <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a> (e.g. <a class=\"localLink\" href=\"/NewsArticle\">NewsArticle</a>) the principles are those of the party primarily responsible for the creation of the <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a>.<br/><br/>\n\nWhile such policies are most typically expressed in natural language, sometimes related information (e.g. indicating a <a class=\"localLink\" href=\"/funder\">funder</a>) can be expressed using schema.org terminology."
+          }
+        }
+      ]
+    },
+    "recordedAt": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The Event where the CreativeWork was recorded. The CreativeWork may capture all or part of the event."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The Event where the CreativeWork was recorded. The CreativeWork may capture all or part of the event."
+          }
+        }
+      ]
+    },
+    "releasedEvent": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The place and time the release was issued, expressed as a PublicationEvent."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The place and time the release was issued, expressed as a PublicationEvent."
+          }
+        }
+      ]
+    },
+    "review": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A review of the item."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A review of the item."
+          }
+        }
+      ]
+    },
+    "reviews": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Review of the item."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Review of the item."
+          }
+        }
+      ]
+    },
+    "sameAs": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website."
+          }
+        }
+      ]
+    },
+    "schemaVersion": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "Indicates (by URL or string) a particular version of a schema used in some CreativeWork. This property was created primarily to\n    indicate the use of a specific schema.org release, e.g. <code>10.0</code> as a simple string, or more explicitly via URL, <code>https://schema.org/docs/releases.html#v10.0</code>. There may be situations in which other schemas might usefully be referenced this way, e.g. <code>http://dublincore.org/specifications/dublin-core/dces/1999-07-02/</code> but this has not been carefully explored in the community."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "Indicates (by URL or string) a particular version of a schema used in some CreativeWork. This property was created primarily to\n    indicate the use of a specific schema.org release, e.g. <code>10.0</code> as a simple string, or more explicitly via URL, <code>https://schema.org/docs/releases.html#v10.0</code>. There may be situations in which other schemas might usefully be referenced this way, e.g. <code>http://dublincore.org/specifications/dublin-core/dces/1999-07-02/</code> but this has not been carefully explored in the community."
+          }
+        }
+      ]
+    },
+    "sdDatePublished": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "date",
+          "description": "Indicates the date on which the current structured data was generated / published. Typically used alongside <a class=\"localLink\" href=\"/sdPublisher\">sdPublisher</a>."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "date",
+            "description": "Indicates the date on which the current structured data was generated / published. Typically used alongside <a class=\"localLink\" href=\"/sdPublisher\">sdPublisher</a>."
+          }
+        }
+      ]
+    },
+    "sdLicense": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "A license document that applies to this structured data, typically indicated by URL."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "A license document that applies to this structured data, typically indicated by URL."
+          }
+        }
+      ]
+    },
+    "sdPublisher": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Indicates the party responsible for generating and publishing the current structured data markup, typically in cases where the structured data is derived automatically from existing published content but published on a different site. For example, student projects and open data initiatives often re-publish existing content with more explicitly structured metadata. The\n<a class=\"localLink\" href=\"/sdPublisher\">sdPublisher</a> property helps make such practices more explicit."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Indicates the party responsible for generating and publishing the current structured data markup, typically in cases where the structured data is derived automatically from existing published content but published on a different site. For example, student projects and open data initiatives often re-publish existing content with more explicitly structured metadata. The\n<a class=\"localLink\" href=\"/sdPublisher\">sdPublisher</a> property helps make such practices more explicit."
+          }
+        }
+      ]
+    },
+    "size": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "A standardized size of a product or creative work, specified either through a simple textual string (for example 'XL', '32Wx34L'), a  QuantitativeValue with a unitCode, or a comprehensive and structured <a class=\"localLink\" href=\"/SizeSpecification\">SizeSpecification</a>; in other cases, the <a class=\"localLink\" href=\"/width\">width</a>, <a class=\"localLink\" href=\"/height\">height</a>, <a class=\"localLink\" href=\"/depth\">depth</a> and <a class=\"localLink\" href=\"/weight\">weight</a> properties may be more applicable."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "A standardized size of a product or creative work, specified either through a simple textual string (for example 'XL', '32Wx34L'), a  QuantitativeValue with a unitCode, or a comprehensive and structured <a class=\"localLink\" href=\"/SizeSpecification\">SizeSpecification</a>; in other cases, the <a class=\"localLink\" href=\"/width\">width</a>, <a class=\"localLink\" href=\"/height\">height</a>, <a class=\"localLink\" href=\"/depth\">depth</a> and <a class=\"localLink\" href=\"/weight\">weight</a> properties may be more applicable."
+          }
+        }
+      ]
+    },
+    "sourceOrganization": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The Organization on whose behalf the creator was working."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The Organization on whose behalf the creator was working."
+          }
+        }
+      ]
+    },
+    "spatial": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The \"spatial\" property can be used in cases when more specific properties\n(e.g. <a class=\"localLink\" href=\"/locationCreated\">locationCreated</a>, <a class=\"localLink\" href=\"/spatialCoverage\">spatialCoverage</a>, <a class=\"localLink\" href=\"/contentLocation\">contentLocation</a>) are not known to be appropriate."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The \"spatial\" property can be used in cases when more specific properties\n(e.g. <a class=\"localLink\" href=\"/locationCreated\">locationCreated</a>, <a class=\"localLink\" href=\"/spatialCoverage\">spatialCoverage</a>, <a class=\"localLink\" href=\"/contentLocation\">contentLocation</a>) are not known to be appropriate."
+          }
+        }
+      ]
+    },
+    "spatialCoverage": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The spatialCoverage of a CreativeWork indicates the place(s) which are the focus of the content. It is a subproperty of\n      contentLocation intended primarily for more technical and detailed materials. For example with a Dataset, it indicates\n      areas that the dataset describes: a dataset of New York weather would have spatialCoverage which was the place: the state of New York."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The spatialCoverage of a CreativeWork indicates the place(s) which are the focus of the content. It is a subproperty of\n      contentLocation intended primarily for more technical and detailed materials. For example with a Dataset, it indicates\n      areas that the dataset describes: a dataset of New York weather would have spatialCoverage which was the place: the state of New York."
+          }
+        }
+      ]
+    },
+    "sponsor": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A person or organization that supports a thing through a pledge, promise, or financial contribution. E.g. a sponsor of a Medical Study or a corporate sponsor of an event."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A person or organization that supports a thing through a pledge, promise, or financial contribution. E.g. a sponsor of a Medical Study or a corporate sponsor of an event."
+          }
+        }
+      ]
+    },
+    "subjectOf": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A CreativeWork or Event about this Thing."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A CreativeWork or Event about this Thing."
+          }
+        }
+      ]
+    },
+    "teaches": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "The item being described is intended to help a person learn the competency or learning outcome defined by the referenced term."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "The item being described is intended to help a person learn the competency or learning outcome defined by the referenced term."
+          }
+        }
+      ]
+    },
+    "temporal": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "The \"temporal\" property can be used in cases where more specific properties\n(e.g. <a class=\"localLink\" href=\"/temporalCoverage\">temporalCoverage</a>, <a class=\"localLink\" href=\"/dateCreated\">dateCreated</a>, <a class=\"localLink\" href=\"/dateModified\">dateModified</a>, <a class=\"localLink\" href=\"/datePublished\">datePublished</a>) are not known to be appropriate."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "The \"temporal\" property can be used in cases where more specific properties\n(e.g. <a class=\"localLink\" href=\"/temporalCoverage\">temporalCoverage</a>, <a class=\"localLink\" href=\"/dateCreated\">dateCreated</a>, <a class=\"localLink\" href=\"/dateModified\">dateModified</a>, <a class=\"localLink\" href=\"/datePublished\">datePublished</a>) are not known to be appropriate."
+          }
+        }
+      ]
+    },
+    "temporalCoverage": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "The temporalCoverage of a CreativeWork indicates the period that the content applies to, i.e. that it describes, either as a DateTime or as a textual string indicating a time period in <a href=\"https://en.wikipedia.org/wiki/ISO_8601#Time_intervals\">ISO 8601 time interval format</a>. In\n      the case of a Dataset it will typically indicate the relevant time period in a precise notation (e.g. for a 2011 census dataset, the year 2011 would be written \"2011/2012\"). Other forms of content, e.g. ScholarlyArticle, Book, TVSeries or TVEpisode, may indicate their temporalCoverage in broader terms - textually or via well-known URL.\n      Written works such as books may sometimes have precise temporal coverage too, e.g. a work set in 1939 - 1945 can be indicated in ISO 8601 interval format format via \"1939/1945\".<br/><br/>\n\nOpen-ended date ranges can be written with \"..\" in place of the end date. For example, \"2015-11/..\" indicates a range beginning in November 2015 and with no specified final date. This is tentative and might be updated in future when ISO 8601 is officially updated."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "The temporalCoverage of a CreativeWork indicates the period that the content applies to, i.e. that it describes, either as a DateTime or as a textual string indicating a time period in <a href=\"https://en.wikipedia.org/wiki/ISO_8601#Time_intervals\">ISO 8601 time interval format</a>. In\n      the case of a Dataset it will typically indicate the relevant time period in a precise notation (e.g. for a 2011 census dataset, the year 2011 would be written \"2011/2012\"). Other forms of content, e.g. ScholarlyArticle, Book, TVSeries or TVEpisode, may indicate their temporalCoverage in broader terms - textually or via well-known URL.\n      Written works such as books may sometimes have precise temporal coverage too, e.g. a work set in 1939 - 1945 can be indicated in ISO 8601 interval format format via \"1939/1945\".<br/><br/>\n\nOpen-ended date ranges can be written with \"..\" in place of the end date. For example, \"2015-11/..\" indicates a range beginning in November 2015 and with no specified final date. This is tentative and might be updated in future when ISO 8601 is officially updated."
+          }
+        }
+      ]
+    },
+    "text": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "The textual content of this CreativeWork."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "The textual content of this CreativeWork."
+          }
+        }
+      ]
+    },
+    "thumbnail": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Thumbnail image for an image or video."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Thumbnail image for an image or video."
+          }
+        }
+      ]
+    },
+    "thumbnailUrl": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri",
+          "description": "A thumbnail image relevant to the Thing."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "description": "A thumbnail image relevant to the Thing."
+          }
+        }
+      ]
+    },
+    "timeRequired": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Approximate or typical time it usually takes to work with or through the content of this work for the typical or target audience."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Approximate or typical time it usually takes to work with or through the content of this work for the typical or target audience."
+          }
+        }
+      ]
+    },
+    "translationOfWork": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "The work that this work has been translated from. E.g. 物种起源 is a translationOf “On the Origin of Species”."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "The work that this work has been translated from. E.g. 物种起源 is a translationOf “On the Origin of Species”."
+          }
+        }
+      ]
+    },
+    "translator": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Organization or person who adapts a creative work to different languages, regional differences and technical requirements of a target market, or that translates during some event."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Organization or person who adapts a creative work to different languages, regional differences and technical requirements of a target market, or that translates during some event."
+          }
+        }
+      ]
+    },
+    "typicalAgeRange": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "The typical expected age range, e.g. '7-9', '11-'."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "The typical expected age range, e.g. '7-9', '11-'."
+          }
+        }
+      ]
+    },
+    "url": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the item."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL of the item."
+          }
+        }
+      ]
+    },
+    "usageInfo": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            },
+            {
+              "type": "string",
+              "format": "uri"
+            }
+          ],
+          "description": "The schema.org <a class=\"localLink\" href=\"/usageInfo\">usageInfo</a> property indicates further information about a <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a>. This property is applicable both to works that are freely available and to those that require payment or other transactions. It can reference additional information, e.g. community expectations on preferred linking and citation conventions, as well as purchasing details. For something that can be commercially licensed, usageInfo can provide detailed, resource-specific information about licensing options.<br/><br/>\n\nThis property can be used alongside the license property which indicates license(s) applicable to some piece of content. The usageInfo property can provide information about other licensing options, e.g. acquiring commercial usage rights for an image that is also available under non-commercial creative commons licenses."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              },
+              {
+                "type": "string",
+                "format": "uri"
+              }
+            ],
+            "description": "The schema.org <a class=\"localLink\" href=\"/usageInfo\">usageInfo</a> property indicates further information about a <a class=\"localLink\" href=\"/CreativeWork\">CreativeWork</a>. This property is applicable both to works that are freely available and to those that require payment or other transactions. It can reference additional information, e.g. community expectations on preferred linking and citation conventions, as well as purchasing details. For something that can be commercially licensed, usageInfo can provide detailed, resource-specific information about licensing options.<br/><br/>\n\nThis property can be used alongside the license property which indicates license(s) applicable to some piece of content. The usageInfo property can provide information about other licensing options, e.g. acquiring commercial usage rights for an image that is also available under non-commercial creative commons licenses."
+          }
+        }
+      ]
+    },
+    "version": {
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "The version of the CreativeWork embodied by a specified resource."
+        },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "The version of the CreativeWork embodied by a specified resource."
+          }
+        }
+      ]
+    },
+    "video": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "An embedded video object."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "An embedded video object."
+          }
+        }
+      ]
+    },
+    "wordCount": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "description": "The number of words in the text of the CreativeWork such as an Article, Book, etc."
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "description": "The number of words in the text of the CreativeWork such as an Article, Book, etc."
+          }
+        }
+      ]
+    },
+    "workExample": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "Example/instance/realization/derivation of the concept of this creative work. E.g. the paperback edition, first edition, or e-book."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "Example/instance/realization/derivation of the concept of this creative work. E.g. the paperback edition, first edition, or e-book."
+          }
+        }
+      ]
+    },
+    "workTranslation": {
+      "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/urlOrNodeRef"
+            }
+          ],
+          "description": "A work that is a translation of the content of this work. E.g. 西遊記 has an English workTranslation “Journey to the West”, a German workTranslation “Monkeys Pilgerfahrt” and a Vietnamese  translation Tây du ký bình khảo."
+        },
+        {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/urlOrNodeRef"
+              }
+            ],
+            "description": "A work that is a translation of the content of this work. E.g. 西遊記 has an English workTranslation “Journey to the West”, a German workTranslation “Monkeys Pilgerfahrt” and a Vietnamese  translation Tây du ký bình khảo."
           }
         }
       ]
@@ -110,7 +3149,9 @@
   "definitions": {
     "nodeRef": {
       "type": "object",
-      "required": ["@id"],
+      "required": [
+        "@id"
+      ],
       "properties": {
         "@id": {
           "type": "string",
@@ -118,6 +3159,17 @@
           "x-jsonld-id": true
         }
       }
+    },
+    "urlOrNodeRef": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri"
+        },
+        {
+          "$ref": "#/definitions/nodeRef"
+        }
+      ]
     }
   },
   "additionalProperties": false

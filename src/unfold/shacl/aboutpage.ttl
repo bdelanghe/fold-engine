@@ -1,0 +1,83 @@
+@prefix sh:     <http://www.w3.org/ns/shacl#> .
+@prefix schema: <https://schema.org/> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+schema:AboutPageShape
+  a sh:NodeShape ;
+  sh:targetClass schema:AboutPage ;
+  sh:closed true ;
+  sh:ignoredProperties ( rdf:type ) ;
+
+  sh:property [
+    sh:path schema:name ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+
+  sh:property [
+    sh:path schema:url ;
+    sh:nodeKind sh:IRI ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+
+  sh:property [
+    sh:path schema:isPartOf ;
+    sh:class schema:WebSite ;
+    sh:nodeKind sh:IRI ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+
+  sh:property [
+    sh:path schema:description ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+  ] ;
+
+  sh:property [
+    sh:path schema:inLanguage ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+  ] ;
+
+  sh:property [
+    sh:path schema:dateModified ;
+    sh:datatype xsd:dateTime ;
+    sh:maxCount 1 ;
+  ] .
+
+schema:WebSiteShape
+  a sh:NodeShape ;
+  sh:targetClass schema:WebSite ;
+  sh:closed true ;
+  sh:ignoredProperties ( rdf:type ) ;
+
+  sh:property [
+    sh:path schema:name ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+
+  sh:property [
+    sh:path schema:url ;
+    sh:nodeKind sh:IRI ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+
+  sh:property [
+    sh:path schema:hasPart ;
+    sh:nodeKind sh:IRI ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+
+  sh:property [
+    sh:path schema:description ;
+    sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+  ] .

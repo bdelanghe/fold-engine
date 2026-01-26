@@ -23,7 +23,7 @@ export const SectionSchema = z.object({
  */
 export const NodeRefSchema = z.object({
   "@id": UrlType,
-});
+}).strict();
 
 /**
  * Page schema

@@ -98,6 +98,83 @@
         { "path": "narrower" },
         { "path": "related" }
       ]
+    },
+    {
+      "id": "schema:WebSiteShape",
+      "targetClass": "schema:WebSite",
+      "closed": true,
+      "ignoredProperties": ["@context"],
+      "properties": [
+        {
+          "path": "@id",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI"
+        },
+        {
+          "path": "@type",
+          "minCount": 1,
+          "in": ["schema:WebSite", "WebSite"]
+        },
+        {
+          "path": "name",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:string"
+        },
+        { "path": "description", "maxCount": 1, "datatype": "xsd:string" },
+        {
+          "path": "url",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI"
+        }
+        ,
+        {
+          "path": "hasPart",
+          "minCount": 1,
+          "maxCount": 1
+        }
+      ]
+    },
+    {
+      "id": "schema:AboutPageShape",
+      "targetClass": "schema:AboutPage",
+      "closed": true,
+      "ignoredProperties": ["@context"],
+      "properties": [
+        {
+          "path": "@id",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI"
+        },
+        {
+          "path": "@type",
+          "minCount": 1,
+          "in": ["schema:AboutPage", "AboutPage"]
+        },
+        {
+          "path": "name",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:string"
+        },
+        {
+          "path": "url",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI"
+        },
+        {
+          "path": "isPartOf",
+          "minCount": 1,
+          "maxCount": 1
+        },
+        { "path": "description", "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "inLanguage", "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "dateModified", "maxCount": 1, "datatype": "xsd:dateTime" }
+      ]
     }
   ]
 }

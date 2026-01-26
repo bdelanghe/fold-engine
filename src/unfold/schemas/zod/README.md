@@ -144,6 +144,18 @@ const termSet: DefinedTermSet = {
 };
 ```
 
+### Person
+
+```typescript
+import { type Person, PersonSchema } from "./person.ts";
+
+const person: Person = {
+  "@type": "schema:Person",
+  "@id": "https://example.org/people/alex",
+  "name": "Alex Example",
+};
+```
+
 ## Schema Registry
 
 Get schema by @type:
