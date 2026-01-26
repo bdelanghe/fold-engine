@@ -1,0 +1,16 @@
+{
+  "@context": "../../../schemas/schema-org/releases/29.4/schemaorgcontext.jsonld",
+  "@type": "schema:WebPage",
+  "@id": "https://example.org/pages/hello",
+  "name": "Hello WebPage",
+  "description": "A minimal WebPage fixture for Lume rendering.",
+  "dateModified": "2026-01-25T00:00:00Z",
+  "hasPart": [
+    {
+      "@id": "https://example.org/pages/hello#intro",
+      "@type": "schema:WebPageElement",
+      "name": "Introduction",
+      "text": "This is the introduction section."
+    }
+  ]
+}

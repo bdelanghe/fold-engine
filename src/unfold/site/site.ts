@@ -139,8 +139,8 @@ export const createSite = (): ReturnType<typeof lume> => {
   // Register the layout from external location
   site.remoteFile("_includes/layout.tmpl.ts", layoutPath);
 
-  // Register JSON-LD loader
-  site.loadData([".jsonld"], jsonLdLoader());
+  // Register JSON-LD loader for page generation
+  site.loadPages([".jsonld"], jsonLdLoader());
 
   site.data("site", { url: siteUrl, basePath });
   site.data("layout", "layout.tmpl.ts");
