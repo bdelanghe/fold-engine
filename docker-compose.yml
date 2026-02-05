@@ -2,18 +2,17 @@ services:
   unfold:
     image: local/unfold-dev:latest
     pull_policy: never
-    working_dir: /workspace
+    working_dir: /workspaces/schema-nodes
     command: ["deno", "task", "dev"]
     environment:
       VAULT_BASE_URL: http://vault-api:7777
       VAULT_REQUIRE_BASE_URL: "1"
       DOCKER_HOST: unix:///var/run/docker.sock
-      SITE_URL: http://localhost:3000
     depends_on:
       vault-api:
         condition: service_healthy
     volumes:
-      - .:/workspace
+      - .:/workspaces/schema-nodes
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "3000:3000"
@@ -35,19 +34,17 @@ services:
   unfold-test:
     image: local/unfold-dev:latest
     pull_policy: never
-    working_dir: /workspace
-    command: ["deno", "test", "-A", "--allow-env=SITE_URL"]
+    working_dir: /workspaces/schema-nodes
+    command: ["deno", "task", "test"]
     environment:
       VAULT_BASE_URL: http://vault-api:7777
       VAULT_REQUIRE_BASE_URL: "1"
       DOCKER_HOST: unix:///var/run/docker.sock
-      SITE_URL: http://localhost:3000
-      DENO_FLAGS: --allow-read --allow-env=SITE_URL
     depends_on:
       vault-api:
         condition: service_healthy
     volumes:
-      - .:/workspace
+      - .:/workspaces/schema-nodes
       - /var/run/docker.sock:/var/run/docker.sock
     profiles: ["test"]
 
@@ -80,7 +77,7 @@ services:
   vault-api:
     image: local/unfold-dev:latest
     pull_policy: never
-    working_dir: /workspace
+    working_dir: /workspaces/schema-nodes
     command: ["deno", "task", "vault:api"]
     environment:
       VAULT_PATH: /vault
@@ -92,7 +89,7 @@ services:
       vault:
         condition: service_healthy
     volumes:
-      - .:/workspace
+      - .:/workspaces/schema-nodes
       - vault-data:/vault:ro
     healthcheck:
       test:

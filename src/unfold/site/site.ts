@@ -1,6 +1,6 @@
 import lume from "lume/mod.ts";
 import type { Page } from "lume/core/file.ts";
-import { dirname, join, relative } from "@std/path";
+import { dirname, fromFileUrl, isAbsolute, join, relative } from "@std/path";
 import jsonLd from "lume/plugins/json_ld.ts";
 import metas from "lume/plugins/metas.ts";
 import robots from "lume/plugins/robots.ts";
@@ -26,68 +26,38 @@ const getSiteBasePath = () => {
   return pathname ? `${pathname}/` : "/";
 };
 
-const getWorkspaceRoot = (): string => {
-  const raw = Deno.env.get("WORKSPACE_ROOT")?.trim();
-  if (!raw) {
-    throw new Error("WORKSPACE_ROOT is required.");
-  }
-  return raw;
-};
+const getWorkspaceRoot = () =>
+  fromFileUrl(new URL("../../..", import.meta.url));
+
+const getLayoutPath = () =>
+  fromFileUrl(new URL("../renderers/lume/layout.tmpl.ts", import.meta.url));
 
 const getVaultPath = (): string => {
-  const workspaceRoot = getWorkspaceRoot().replace(/\/$/, "");
-  const vaultPath = vaultConfig.vaultPath;
-  if (vaultPath.startsWith(`${workspaceRoot}/`)) {
-    return relative(workspaceRoot, vaultPath);
-  }
-  return vaultPath;
-};
-
-const getSiteDest = (): string => {
-  const raw = Deno.env.get("SITE_OUTPUT_DIR")?.trim();
-  if (!raw) {
-    throw new Error("SITE_OUTPUT_DIR is required.");
-  }
-  return raw;
-};
-
-type SiteDest = {
-  dest: (path: string) => string;
-};
-
-const normalizePages = (pages: Page[] | Iterable<Page>): Page[] => {
-  if (Array.isArray(pages)) {
-    return pages;
-  }
-  try {
-    return Array.from(pages);
-  } catch (error) {
-    throw new Error("Pages are not iterable.", { cause: error });
-  }
-};
-
-const writeJsonldPages = async (
-  site: SiteDest,
-  pages: Page[],
-): Promise<void> => {
-  const writes = pages.map((page) => {
-    const pageUrl = typeof page.data.url === "string" ? page.data.url : "/";
-    const jsonldUrl = pageUrl.replace(/\/$/, "") + ".jsonld";
-    const jsonldPath = site.dest(jsonldUrl);
-    const jsonld = page.data.jsonld;
-    if (!jsonld) {
-      throw new Error(`Missing jsonld data for page: ${pageUrl}`);
+  const override = Deno.env.get("VAULT_PATH")?.trim();
+  if (!override) {
+    const workspaceRoot = getWorkspaceRoot().replace(/\/$/, "");
+    try {
+      const stat = Deno.statSync(join(workspaceRoot, "vault"));
+      if (stat.isDirectory) {
+        return "vault";
+      }
+    } catch {
+      // Fall through to repo root.
     }
-    return (async () => {
-      await Deno.mkdir(dirname(jsonldPath), { recursive: true });
-      await Deno.writeTextFile(
-        jsonldPath,
-        JSON.stringify(jsonld, null, 2),
-      );
-    })();
-  });
-  await Promise.all(writes);
+    return ".";
+  }
+  if (isAbsolute(override)) {
+    const workspaceRoot = getWorkspaceRoot().replace(/\/$/, "");
+    if (override.startsWith(`${workspaceRoot}/`)) {
+      return relative(workspaceRoot, override);
+    }
+    return override;
+  }
+  return override;
 };
+
+const getSiteDest = (): string =>
+  Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
 
 export const createSite = (): ReturnType<typeof lume> => {
   const siteUrl = getSiteUrl();
@@ -110,9 +80,59 @@ export const createSite = (): ReturnType<typeof lume> => {
     },
   });
 
-  // Register JSON-LD loader for page generation
-  // The loader itself filters out @context/ and schemas/ files
-  site.loadPages([".jsonld"], jsonLdLoader());
+  const ignorePrefixes = [
+    ".cursor/",
+    ".devcontainer/",
+    ".git/",
+    ".github/",
+    ".unfold/",
+    ".vscode/",
+    "dist/",
+    "node_modules/",
+    "src/",
+    "src/unfold/vault_api/support/",
+    "vendor/",
+  ];
+  if (srcPath.replace(/\/$/, "") === "vault") {
+    ignorePrefixes.push("vault/vault/");
+  }
+  const ignoreFiles = new Set([
+    ".cursorindexingignore",
+    ".dockerignore",
+    ".gitignore",
+    ".nojekyll",
+    "deno.json",
+    "deno.lock",
+    "docker-bake.hcl",
+    "docker-compose.yml",
+    "Dockerfile",
+  ]);
+  const normalizePath = (value: string) => value.replaceAll("\\", "/");
+  const stripWorkspace = (value: string) => {
+    const normalized = normalizePath(value);
+    if (normalized.startsWith(`${workspaceRoot}/`)) {
+      return normalized.slice(workspaceRoot.length + 1);
+    }
+    if (normalized.startsWith(workspaceRoot)) {
+      return normalized.slice(workspaceRoot.length).replace(/^\/+/, "");
+    }
+    return normalized.replace(/^\/+/, "");
+  };
+  const ignoreFilter = (path: string) => {
+    const relativePath = stripWorkspace(path);
+    return (
+      ignoreFiles.has(relativePath) ||
+      ignorePrefixes.some((prefix) => relativePath.startsWith(prefix))
+    );
+  };
+  const ignore = (
+    site as {
+      ignore?: (...paths: (string | ((path: string) => boolean))[]) => void;
+    }
+  ).ignore;
+  if (typeof ignore === "function") {
+    ignore.call(site, ignoreFilter);
+  }
 
   site.data("site", { url: siteUrl, basePath });
   site.use(vento());
@@ -142,16 +162,34 @@ export const createSite = (): ReturnType<typeof lume> => {
     const mcpBundle = await buildMcpBundle(pageList, { url: siteUrl });
     await Deno.writeTextFile(mcpPath, JSON.stringify(mcpBundle, null, 2));
 
-    const externalLinks = collectExternalLinks(pageList, { siteUrl });
-    const externalXmlPath = site.dest("external-links.xml");
-    const externalXml = buildExternalLinksXml(externalLinks, { siteUrl });
-    await Deno.writeTextFile(externalXmlPath, externalXml);
-
-    const externalHtmlPath = site.dest("external-links/index.html");
-    await Deno.mkdir(dirname(externalHtmlPath), { recursive: true });
-    const externalHtml = buildExternalLinksHtml(externalLinks, { siteUrl });
-    await Deno.writeTextFile(externalHtmlPath, externalHtml);
-
+    const hasRootPage = pageList.some((page) => page.data.url === "/");
+    if (!hasRootPage) {
+      const sortedPages = [...pageList].sort((a, b) =>
+        a.data.url.localeCompare(b.data.url)
+      );
+      const fallbackTarget = sortedPages[0]?.data.url ?? basePath;
+      const indexPath = site.dest("index.html");
+      try {
+        await Deno.stat(indexPath);
+      } catch {
+        const target = fallbackTarget.startsWith("/") ? fallbackTarget : "/";
+        const html = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="0; url=${target}">
+    <title>Fold Engine</title>
+    <link rel="canonical" href="${target}">
+  </head>
+  <body>
+    <p>Index not built. Continue to <a href="${target}">${target}</a>.</p>
+  </body>
+</html>
+`;
+        await Deno.writeTextFile(indexPath, html);
+      }
+    }
   });
 
   return site;

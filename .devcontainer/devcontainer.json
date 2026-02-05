@@ -3,7 +3,7 @@
   "dockerComposeFile": ["../docker-compose.yml"],
   "service": "unfold",
   "runServices": ["unfold"],
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "shutdownAction": "stopCompose",
   "forwardPorts": [3000],
   "portsAttributes": {
