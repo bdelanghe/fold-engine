@@ -84,6 +84,14 @@ export default (data: LayoutData) => {
   const siteUrl = data.site?.url ?? "";
   const pageUrl = data.url ? `${siteUrl}${data.url}` : "";
   const jsonld = buildJsonLd(data);
+  const content = data.content ?? "";
+  const hasContentH1 = /<h1[\s>]/i.test(content);
+  const headerMarkup = hasContentH1
+    ? ""
+    : `<header>
+          <h1 id="page-title" itemprop="headline">${title}</h1>
+        </header>`;
+  const articleLabel = hasContentH1 ? "" : ' aria-labelledby="page-title"';
   const canonicalMarkup = pageUrl
     ? `<link rel="canonical" href="${pageUrl}" />
       <meta itemprop="url" content="${pageUrl}" />`
@@ -109,11 +117,9 @@ export default (data: LayoutData) => {
   <body>
     <a href="#content">Skip to content</a>
     <main id="content">
-      <article aria-labelledby="page-title" itemprop="mainEntity" itemscope itemtype="https://schema.org/Article">
-        <header>
-          <h1 id="page-title" itemprop="headline">${title}</h1>
-        </header>
-        ${data.content ?? ""}
+      <article${articleLabel} itemprop="mainEntity" itemscope itemtype="https://schema.org/Article">
+        ${headerMarkup}
+        ${content}
       </article>
     </main>
   </body>

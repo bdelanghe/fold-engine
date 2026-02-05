@@ -32,8 +32,29 @@ type MarkdownIt = {
 };
 
 export default function wikiLinks(options: WikiLinkOptions = {}) {
-  const prefix = options.prefix ?? "/notes/";
+  const prefix = options.prefix ?? "/";
   const suffix = options.suffix ?? "/";
+
+  const slugify = (value: string): string => {
+    const trimmed = value.trim();
+    if (!trimmed) return "";
+
+    const withoutExt = trimmed.replace(/\.md$/i, "");
+    return withoutExt
+      .toLowerCase()
+      .replace(/[^a-z0-9\s/-]/g, "")
+      .replace(/[\s_]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/\/+/g, "/")
+      .replace(/(^-|-$)/g, "");
+  };
+
+  const normalizeTarget = (target: string): string =>
+    target
+      .split("/")
+      .map((segment) => slugify(segment))
+      .filter((segment) => segment.length > 0)
+      .join("/");
 
   return (md: MarkdownIt) => {
     md.inline.ruler.before("emphasis", "wikilink", (state, silent) => {
@@ -69,7 +90,8 @@ export default function wikiLinks(options: WikiLinkOptions = {}) {
       const token = tokens[idx];
       const target = token.meta?.target ?? token.content;
       const label = token.content;
-      const href = `${prefix}${encodeURIComponent(target)}${suffix}`;
+      const normalizedTarget = normalizeTarget(target);
+      const href = `${prefix}${encodeURIComponent(normalizedTarget)}${suffix}`;
       const safeHref = md.utils.escapeHtml(href);
       const safeLabel = md.utils.escapeHtml(label);
 

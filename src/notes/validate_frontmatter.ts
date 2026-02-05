@@ -116,18 +116,30 @@ const allowedFenceLanguages = new Set([
   "yml",
 ]);
 
-const fencePattern = /^```([^\s`]*)/gm;
+const fencePattern = /^```([^\s`]*)/;
 
 const findFenceLanguages = (content: string): string[] => {
   const languages: string[] = [];
-  for (const match of content.matchAll(fencePattern)) {
-    languages.push(match[1] ?? "");
+  let inFence = false;
+
+  for (const line of content.split(/\r?\n/)) {
+    const match = line.match(fencePattern);
+    if (!match) continue;
+
+    const language = match[1] ?? "";
+    if (!inFence) {
+      languages.push(language);
+      inFence = true;
+      continue;
+    }
+    inFence = false;
   }
+
   return languages;
 };
 
 const mdExtensions = new Set([".md", ".markdown"]);
-const sourceRoot = new URL("../notes/", import.meta.url);
+const sourceRoot = new URL("../../obsidian_vault/", import.meta.url);
 
 async function* walk(dir: URL): AsyncGenerator<URL> {
   for await (const entry of Deno.readDir(dir)) {
