@@ -3,7 +3,7 @@ import jsonldLoader from "./jsonld_loader.ts";
 
 Deno.test("jsonldLoader - loads page data from JSON-LD", async () => {
   const loader = jsonldLoader();
-  const data = await loader("vault/pages/hello.jsonld");
+  const data = await loader("example-vault/pages/hello.jsonld");
 
   assertExists(data);
   assertEquals(data.title, "Hello World");
@@ -14,14 +14,14 @@ Deno.test("jsonldLoader - loads page data from JSON-LD", async () => {
 
 Deno.test("jsonldLoader - extracts URL from @id", async () => {
   const loader = jsonldLoader();
-  const data = await loader("vault/pages/cognitive-folding.jsonld");
+  const data = await loader("example-vault/pages/cognitive-folding.jsonld");
 
   assertEquals(data.url, "/pages/cognitive-folding");
 });
 
 Deno.test("jsonldLoader - handles @graph documents", async () => {
   const loader = jsonldLoader();
-  const data = await loader("vault/vocab/basis.jsonld");
+  const data = await loader("example-vault/vocab/basis.jsonld");
 
   assertExists(data);
   // Should pick first node from @graph
@@ -31,7 +31,7 @@ Deno.test("jsonldLoader - handles @graph documents", async () => {
 
 Deno.test("jsonldLoader - extracts content from hasPart", async () => {
   const loader = jsonldLoader();
-  const data = await loader("vault/pages/hello.jsonld");
+  const data = await loader("example-vault/pages/hello.jsonld");
 
   assertExists(data.content);
   // Should have sections from hasPart

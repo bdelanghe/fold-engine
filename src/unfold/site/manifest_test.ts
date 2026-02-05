@@ -29,6 +29,7 @@ type SiteManifestForTest = {
     title: string;
     h1: string;
     canonical: string;
+    cid: string;
   }>;
 };
 
@@ -99,7 +100,30 @@ Deno.test("site manifest contract", async () => {
   }
   await runBuild();
   const siteDir = getSiteDir();
-  const manifest = await generateSiteManifest({ siteDir });
+
+  const typedExpectations = expectations as Expectations;
+  const siteUrl = typedExpectations.siteUrl;
+  const buildMode = typedExpectations.buildMode;
+  const requiredPaths = typedExpectations.requiredPaths ?? [];
+  const homepageRequiredLinks = typedExpectations.homepageRequiredLinks ?? [];
+  const jsonLdRequiredPaths = typedExpectations.jsonLdRequiredPaths ?? [];
+  const resolvedSiteUrl = siteUrl ?? Deno.env.get("SITE_URL")?.trim();
+  const resolvedBuildMode = buildMode ?? Deno.env.get("LUME_ENV") ??
+    Deno.env.get("BUILD_MODE");
+
+  if (!resolvedSiteUrl) {
+    throw new Error("SITE_URL is required for site manifest tests.");
+  }
+
+  if (!resolvedBuildMode) {
+    throw new Error("BUILD_MODE or LUME_ENV is required for site manifest tests.");
+  }
+
+  const manifest = await generateSiteManifest({
+    siteDir,
+    siteUrl: resolvedSiteUrl,
+    buildMode: resolvedBuildMode,
+  });
 
   await Deno.writeTextFile(
     `${siteDir.replace(/\/$/, "")}/site.manifest.json`,
@@ -115,26 +139,15 @@ Deno.test("site manifest contract", async () => {
     );
   }
 
-  const typedExpectations = expectations as Expectations;
-  const siteUrl = typedExpectations.siteUrl;
-  const buildMode = typedExpectations.buildMode;
-  const requiredPaths = typedExpectations.requiredPaths ?? [];
-  const homepageRequiredLinks = typedExpectations.homepageRequiredLinks ?? [];
-  const jsonLdRequiredPaths = typedExpectations.jsonLdRequiredPaths ?? [];
-
-  if (siteUrl) {
-    assertEquals(manifest.site.url, siteUrl);
-  }
-
-  if (buildMode) {
-    assertEquals(manifest.site.buildMode, buildMode);
-  }
+  assertEquals(manifest.site.url, resolvedSiteUrl);
+  assertEquals(manifest.site.buildMode, resolvedBuildMode);
 
   const paths = new Set(manifest.pages.map((page) => page.path));
   assertPathsPresent(paths, requiredPaths);
 
   for (const page of manifest.pages) {
     assertLinksResolve(paths, page.links);
+    assert(page.cid.length > 0, `Missing page CID for ${page.path}`);
     assertEquals(
       page.canonical,
       `${manifest.site.url}${page.path}`,
@@ -148,7 +161,9 @@ Deno.test("site manifest contract", async () => {
 
   if (homepageRequiredLinks.length > 0) {
     const home = manifest.pages.find((page) => page.path === "/");
-    assert(home, "Homepage manifest entry missing");
+    if (!home) {
+      throw new Error("Homepage manifest entry missing");
+    }
     for (const link of homepageRequiredLinks) {
       assert(
         home.links.includes(link),
@@ -159,9 +174,41 @@ Deno.test("site manifest contract", async () => {
 
   for (const path of jsonLdRequiredPaths) {
     const page = manifest.pages.find((entry) => entry.path === path);
-    assert(page, `Missing JSON-LD required page: ${path}`);
-    assert(page.hasJsonLd, `Missing JSON-LD on ${path}`);
+    if (!page) {
+      throw new Error(`Missing JSON-LD required page: ${path}`);
+    }
+    if (!page.hasJsonLd) {
+      throw new Error(`Missing JSON-LD on ${path}`);
+    }
   }
+});
+
+Deno.test("site manifest builds from vault JSON-LD graph", async () => {
+  if (!await hasRequiredPermissions()) {
+    console.warn("Skipping vault graph manifest (missing permissions).");
+    return;
+  }
+
+  try {
+    await Deno.stat("vault");
+  } catch {
+    console.warn("Skipping vault graph manifest (missing vault directory).");
+    return;
+  }
+
+  const manifest = await generateSiteManifest({
+    source: "vaultGraph",
+    vaultPath: "vault",
+    buildMode: "test",
+  });
+
+  assertEquals(manifest.site.url, "https://example.org");
+  const paths = new Set(manifest.pages.map((page) => page.path));
+  assert(paths.has("/"));
+  assert(paths.has("/pages/hello/"));
+  const home = manifest.pages.find((page) => page.path === "/");
+  assert(home);
+  assert(home.links.includes("/pages/hello/"));
 });
 
 const readJson = async (path: string) =>
@@ -207,6 +254,9 @@ Deno.test("site manifest matches schema and invariants", async () => {
     }
     if (!page.canonical) {
       throw new Error(`Missing canonical link on ${page.url}`);
+    }
+    if (!page.cid) {
+      throw new Error(`Missing CID on ${page.url}`);
     }
   }
 });

@@ -60,9 +60,9 @@ Deno.test("loadVaultRoot returns valid URL", async () => {
     let expectedSuffix = "/";
     try {
       const stat = await Deno.stat(defaultVault);
-      if (stat.isDirectory) {
-        expectedSuffix = "/vault/";
-      }
+    if (stat.isDirectory) {
+      expectedSuffix = "/example-vault/";
+    }
     } catch {
       // Fall through to repo root.
     }

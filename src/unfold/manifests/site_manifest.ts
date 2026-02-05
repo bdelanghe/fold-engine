@@ -1,5 +1,4 @@
 import type { Page } from "lume/core/file.ts";
-import { normalizeSiteUrl } from "../site/site_url.ts";
 
 type ManifestPage = {
   url: string;
@@ -8,6 +7,7 @@ type ManifestPage = {
   canonical: string;
   links: string[];
   jsonLd: unknown[];
+  cid: string;
   forbidden: {
     lumeLiveReload: boolean;
     lumeBar: boolean;
@@ -63,8 +63,30 @@ const readJsonLd = (value: string): unknown => {
   }
 };
 
-export const buildSiteManifest = (pages: Page[]): SiteManifest => {
-  const manifestPages: ManifestPage[] = pages.map((page) => {
+const hashSha256Hex = async (value: string): Promise<string> => {
+  const data = new TextEncoder().encode(value);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+};
+
+const buildCid = async (value: string): Promise<string> =>
+  `sha256:${await hashSha256Hex(value)}`;
+
+const getPageHtml = (page: Page): string => {
+  const documentHtml = page.document?.documentElement?.outerHTML;
+  if (typeof documentHtml === "string") {
+    return documentHtml;
+  }
+  return typeof page.content === "string" ? page.content : "";
+};
+
+export const buildSiteManifest = async (
+  pages: Page[],
+): Promise<SiteManifest> => {
+  const manifestPages: ManifestPage[] = await Promise.all(pages.map(
+    async (page) => {
     const document = page.document;
     const title = normalizeText(document.querySelector("title")?.textContent);
     const h1 = normalizeText(document.querySelector("h1")?.textContent);
@@ -85,6 +107,7 @@ export const buildSiteManifest = (pages: Page[]): SiteManifest => {
         document.querySelector("script#lume-live-reload") !== null,
       lumeBar: document.querySelector("lume-bar") !== null,
     };
+    const cid = await buildCid(getPageHtml(page));
 
     return {
       url: page.data.url,
@@ -93,9 +116,10 @@ export const buildSiteManifest = (pages: Page[]): SiteManifest => {
       canonical,
       links,
       jsonLd,
+      cid,
       forbidden,
     };
-  });
+  }));
 
   return {
     generatedAt: new Date().toISOString(),
@@ -111,6 +135,7 @@ type ContractManifestPage = {
   hasJsonLd: boolean;
   jsonLdErrors: string[];
   canonical: string;
+  cid: string;
   hasCharset: boolean;
   hasViewport: boolean;
   forbiddenMarkersFound: string[];
@@ -131,7 +156,7 @@ type ManifestOptions = {
 };
 
 const defaultSiteUrl = () =>
-  normalizeSiteUrl(Deno.env.get("SITE_URL") ?? "https://fold.example");
+  Deno.env.get("SITE_URL")?.trim() ?? "https://fold.example";
 
 const defaultBuildMode = () =>
   Deno.env.get("LUME_ENV") ?? Deno.env.get("BUILD_MODE") ?? "production";
@@ -301,6 +326,7 @@ export const generateSiteManifest = async (
       );
       const canonical = getCanonicalUrl(doc, siteUrl);
       const { hasJsonLd, jsonLdErrors } = extractJsonLd(doc);
+      const cid = await buildCid(html);
 
       return {
         path,
@@ -310,6 +336,7 @@ export const generateSiteManifest = async (
         hasJsonLd,
         jsonLdErrors,
         canonical,
+        cid,
         hasCharset,
         hasViewport,
         forbiddenMarkersFound: detectForbiddenMarkers(html),

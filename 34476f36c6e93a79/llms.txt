@@ -1,0 +1,6 @@
+# llms.txt
+# site: https://example.org
+# generated: 2026-01-26T02:36:17.218Z
+
+allow: https://example.org/
+index: https://example.org/

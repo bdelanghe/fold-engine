@@ -1,0 +1,34 @@
+{
+  "@context": [
+    "../../schemas/schema-org/releases/29.4/schemaorgcontext.jsonld",
+    {
+      "basis": "https://example.org/vocab/basis#",
+      "id": "@id",
+      "type": "@type",
+      "title": "schema:name",
+      "description": "schema:description",
+      "dateCreated": {
+        "@id": "schema:dateCreated",
+        "@type": "xsd:date"
+      },
+      "dateModified": {
+        "@id": "schema:dateModified",
+        "@type": "xsd:date"
+      },
+      "hasPart": {
+        "@id": "schema:hasPart",
+        "@type": "@id"
+      },
+      "isPartOf": {
+        "@id": "schema:isPartOf",
+        "@type": "@id"
+      },
+      "content": "schema:text",
+      "url": {
+        "@id": "schema:url",
+        "@type": "@id"
+      },
+      "author": "schema:author"
+    }
+  ]
+}

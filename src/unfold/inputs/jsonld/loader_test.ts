@@ -66,7 +66,7 @@ Deno.test("extractNodes - ignores objects without @id", () => {
 });
 
 Deno.test("loadJsonLdFile - loads hello.jsonld", async () => {
-  const nodes = await loadJsonLdFile("vault/pages/hello.jsonld");
+  const nodes = await loadJsonLdFile("example-vault/pages/hello.jsonld");
 
   assertExists(nodes);
   assertEquals(nodes.length, 1);
@@ -75,7 +75,7 @@ Deno.test("loadJsonLdFile - loads hello.jsonld", async () => {
 });
 
 Deno.test("loadJsonLdFile - loads vocab with @graph", async () => {
-  const nodes = await loadJsonLdFile("vault/vocab/basis.jsonld");
+  const nodes = await loadJsonLdFile("example-vault/vocab/basis.jsonld");
 
   assertExists(nodes);
   assertEquals(nodes.length, 3); // Fold, Unfold, Transform
@@ -85,7 +85,7 @@ Deno.test("loadJsonLdFile - loads vocab with @graph", async () => {
 });
 
 Deno.test("loadVault - loads all files from vault", async () => {
-  const { nodes, errors } = await loadVault("vault");
+  const { nodes, errors } = await loadVault("example-vault");
 
   // Should have loaded all nodes from all files
   assertExists(nodes);

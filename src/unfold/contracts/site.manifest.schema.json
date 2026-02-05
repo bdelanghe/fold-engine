@@ -33,7 +33,8 @@
           "canonical",
           "hasCharset",
           "hasViewport",
-          "forbiddenMarkersFound"
+          "forbiddenMarkersFound",
+          "cid"
         ],
         "properties": {
           "path": {
@@ -64,6 +65,10 @@
             }
           },
           "canonical": {
+            "type": "string",
+            "minLength": 1
+          },
+          "cid": {
             "type": "string",
             "minLength": 1
           },

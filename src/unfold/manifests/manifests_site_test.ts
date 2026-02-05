@@ -2,7 +2,7 @@ import { Ajv } from "ajv";
 import addFormatsModule from "ajv-formats";
 import type { FormatsPlugin } from "ajv-formats";
 import { assert, assertEquals } from "@std/assert";
-import { generateSiteManifest } from "../manifests/site_manifest.ts";
+import { generateSiteManifest } from "./site_manifest.ts";
 import expectations from "../contracts/site.manifest.expectations.json" with {
   type: "json",
 };

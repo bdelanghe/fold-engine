@@ -157,14 +157,22 @@ function extractContent(node: JsonLdNode): string {
     return content;
   }
 
-  // Check for hasPart sections
+  // Check for hasPart sections (skip reference-only items)
   if (Array.isArray(node.hasPart)) {
     const sections = node.hasPart
       .map((part) => {
         if (typeof part === "object" && part !== null) {
-          const sectionTitle = extractTitle(part as JsonLdNode);
-          const sectionContent = extractContent(part as JsonLdNode);
-          return `<section>\n<h2>${sectionTitle}</h2>\n${sectionContent}\n</section>`;
+          const partNode = part as JsonLdNode;
+          // Skip reference-only items (only have @id, no actual content)
+          const keys = Object.keys(partNode).filter(k => k !== "@id");
+          if (keys.length === 0) {
+            return ""; // Just a reference, skip it
+          }
+          const sectionTitle = extractTitle(partNode);
+          const sectionContent = extractContent(partNode);
+          if (sectionContent) {
+            return `<section>\n<h2>${sectionTitle}</h2>\n${sectionContent}\n</section>`;
+          }
         }
         return "";
       })
@@ -211,13 +219,25 @@ export default function (): LoaderFunction {
     // TODO(@bdelanghe): Handle multi-node documents (sections, embeds)
     const mainNode = nodes[0];
     if (!mainNode) {
-      throw new Error(`No nodes with @id found in ${path}`);
+      // Skip files without content nodes (like @context definitions)
+      // This is logged as a warning by Lume
+      return {} as PageData; // Return empty page data to skip this file
     }
 
     const data = extractPageData(mainNode);
 
     // Store all nodes for potential use
     data.allNodes = nodes;
+
+    // Transform @context to absolute schema.org for browser use
+    if (typeof parsed === "object" && parsed !== null) {
+      const jsonldForBrowser = { ...parsed };
+      // Replace relative @context with schema.org
+      if (jsonldForBrowser["@context"]) {
+        jsonldForBrowser["@context"] = "https://schema.org";
+      }
+      data.jsonld = jsonldForBrowser;
+    }
 
     return data;
   };

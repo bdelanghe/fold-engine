@@ -4,7 +4,6 @@
  */
 
 import { walk } from "@std/fs/walk";
-import { join } from "@std/path";
 import type {
   JsonLdDocument,
   JsonLdNode,
@@ -12,6 +11,7 @@ import type {
   VaultNode,
 } from "./types.ts";
 import { ValidationError } from "./types.ts";
+import { vaultConfig } from "../vault/vault_config.ts";
 
 /**
  * Extract nodes from a JSON-LD document
@@ -130,5 +130,9 @@ export async function loadVault(vaultPath: string): Promise<LoadResult> {
  * Get vault path from environment or default
  */
 export function getVaultPath(): string {
-  return Deno.env.get("VAULT_PATH") || join(Deno.cwd(), "vault");
+  const override = Deno.env.get("VAULT_PATH");
+  if (override && override.trim().length > 0) {
+    return override;
+  }
+  return vaultConfig.vaultPath;
 }

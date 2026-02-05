@@ -1,24 +1,9 @@
 import { walk } from "@std/fs";
-import { isAbsolute, join, relative, toFileUrl } from "@std/path";
+import { relative } from "@std/path";
+import { vaultConfig, DEFAULT_VAULT_DIRS } from "./vault_config.ts";
 
 export const loadVaultRoot = (): URL => {
-  const override = Deno.env.get("VAULT_PATH")?.trim();
-  if (override) {
-    const resolved = isAbsolute(override)
-      ? override
-      : join(Deno.cwd(), override);
-    return toFileUrl(resolved.endsWith("/") ? resolved : `${resolved}/`);
-  }
-  const cwd = Deno.cwd().replace(/\/$/, "");
-  try {
-    const stat = Deno.statSync(join(cwd, "vault"));
-    if (stat.isDirectory) {
-      return toFileUrl(`${cwd}/vault/`);
-    }
-  } catch {
-    // Fall through to repo root.
-  }
-  return toFileUrl(`${cwd}/`);
+  return vaultConfig.vaultUrl;
 };
 
 /** Obsidian accepted file extensions by type */
@@ -113,8 +98,12 @@ export const scanVault = async (vaultRoot?: URL): Promise<VaultManifest> => {
     hasConfig = false;
   }
 
-  if (rootPath.replace(/\/$/, "").endsWith("/vault")) {
-    ignoredPrefixes.push("vault/");
+  const normalizedRoot = rootPath.replace(/\/$/, "");
+  for (const candidate of DEFAULT_VAULT_DIRS) {
+    if (normalizedRoot.endsWith(`/${candidate}`)) {
+      ignoredPrefixes.push(`${candidate}/`);
+      break;
+    }
   }
 
   for await (const entry of walk(root, { includeDirs: false })) {

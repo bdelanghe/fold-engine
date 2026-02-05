@@ -1,0 +1,26 @@
+{
+  "kind": "WebSite",
+  "id": "https://example.org",
+  "url": "https://example.org",
+  "name": "Unfold Vault",
+  "description": "Schema-first vault publishing surface for deterministic JSON-LD.",
+  "inLanguage": "en",
+  "sameAs": [
+    "https://github.com/bdelanghe/fold-engine"
+  ],
+  "publisher": "https://example.org/people/bdelanghe",
+  "hasPart": [
+    {
+      "kind": "WebPage",
+      "id": "https://example.org/pages/hello",
+      "url": "https://example.org/pages/hello",
+      "name": "Hello World"
+    },
+    {
+      "kind": "WebPage",
+      "id": "https://example.org/pages/cognitive-folding",
+      "url": "https://example.org/pages/cognitive-folding",
+      "name": "Cognitive Folding"
+    }
+  ]
+}

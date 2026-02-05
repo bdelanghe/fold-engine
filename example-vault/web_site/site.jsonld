@@ -1,0 +1,23 @@
+{
+  "@context": "../../schemas/schema-org/releases/29.4/schemaorgcontext.jsonld",
+  "@type": "schema:WebSite",
+  "@id": "https://example.org",
+  "name": "Unfold Vault",
+  "description": "Schema-first vault publishing surface for deterministic JSON-LD.",
+  "url": "https://example.org",
+  "inLanguage": "en",
+  "sameAs": [
+    "https://github.com/bdelanghe/fold-engine"
+  ],
+  "publisher": "https://example.org/people/bdelanghe",
+  "hasPart": [
+    {
+      "@id": "https://example.org/pages/hello"
+    }
+  ],
+  "potentialAction": [
+    {
+      "@id": "https://example.org/search"
+    }
+  ]
+}

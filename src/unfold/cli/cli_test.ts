@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { run } from "../cli/main.ts";
+import { run } from "./main.ts";
 
 const createRecorder = () => {
   const calls: string[] = [];

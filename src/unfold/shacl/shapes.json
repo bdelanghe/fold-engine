@@ -128,13 +128,89 @@
           "minCount": 1,
           "maxCount": 1,
           "datatype": "xsd:anyURI"
-        }
-        ,
+        },
         {
-          "path": "hasPart",
+          "path": "inLanguage",
           "minCount": 1,
-          "maxCount": 1
-        }
+          "maxCount": 1,
+          "datatype": "xsd:string",
+          "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+        },
+        { "path": "sameAs", "datatype": "xsd:anyURI" },
+        { "path": "publisher", "maxCount": 1, "datatype": "xsd:anyURI" },
+        { "path": "hasPart" }
+      ]
+    },
+    {
+      "id": "schema:WebPageShape",
+      "targetClass": "schema:WebPage",
+      "closed": true,
+      "ignoredProperties": ["@context"],
+      "properties": [
+        {
+          "path": "@id",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI"
+        },
+        {
+          "path": "@type",
+          "minCount": 1,
+          "in": ["schema:WebPage", "WebPage"]
+        },
+        {
+          "path": "name",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:string"
+        },
+        {
+          "path": "url",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI"
+        },
+        { "path": "description", "maxCount": 1, "datatype": "xsd:string" },
+        {
+          "path": "inLanguage",
+          "maxCount": 1,
+          "datatype": "xsd:string",
+          "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+        },
+        {
+          "path": "dateCreated",
+          "maxCount": 1,
+          "datatype": "xsd:date"
+        },
+        {
+          "path": "dateModified",
+          "maxCount": 1,
+          "datatype": "xsd:date"
+        },
+        { "path": "isPartOf", "maxCount": 1 },
+        { "path": "hasPart" },
+        { "path": "text", "maxCount": 1, "datatype": "xsd:string" }
+      ]
+    },
+    {
+      "id": "schema:WebPageElementShape",
+      "targetClass": "schema:WebPageElement",
+      "closed": true,
+      "ignoredProperties": ["@context"],
+      "properties": [
+        {
+          "path": "@id",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI"
+        },
+        {
+          "path": "@type",
+          "minCount": 1,
+          "in": ["schema:WebPageElement", "WebPageElement"]
+        },
+        { "path": "name", "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "text", "maxCount": 1, "datatype": "xsd:string" }
       ]
     },
     {

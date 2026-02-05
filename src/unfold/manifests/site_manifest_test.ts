@@ -23,7 +23,7 @@ Deno.test("buildSiteManifest extracts basic fields", async () => {
     document,
   } as Parameters<typeof buildSiteManifest>[0][number];
 
-  const manifest = buildSiteManifest([page]);
+  const manifest = await buildSiteManifest([page]);
   const entry = manifest.pages[0];
 
   assertEquals(entry.url, "/page/");

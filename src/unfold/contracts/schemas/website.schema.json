@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://unfold.example/schemas/website-v1.schema.json",
+  "title": "Unfold WebSite Contract v1",
+  "description": "Canonical JSON shape for WebSite (source-of-truth before JSON-LD projection)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "id", "url", "name", "inLanguage"],
+  "properties": {
+    "kind": {
+      "const": "WebSite",
+      "description": "Discriminator for WebSite type"
+    },
+    "id": {
+      "type": "string",
+      "format": "uri",
+      "description": "Unique identifier (@id in JSON-LD)"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Canonical URL of the website"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Name of the website"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the website"
+    },
+    "inLanguage": {
+      "type": "string",
+      "minLength": 2,
+      "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+      "description": "Primary language (e.g., 'en', 'en-US')"
+    },
+    "sameAs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      },
+      "description": "Related URLs (GitHub, social media, etc.)"
+    },
+    "publisher": {
+      "type": "string",
+      "format": "uri",
+      "description": "Publisher identifier"
+    },
+    "hasPart": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/webPageRef"
+      },
+      "description": "Pages that are part of this website"
+    }
+  },
+  "$defs": {
+    "webPageRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "url", "name"],
+      "properties": {
+        "kind": {
+          "const": "WebPage",
+          "description": "Discriminator for WebPage type"
+        },
+        "id": {
+          "type": "string",
+          "format": "uri"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

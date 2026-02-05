@@ -124,6 +124,50 @@ deno task validate
 docker compose run --rm unfold deno task validate
 ```
 
+## Authoritative Reading
+
+### Schema.org vocabulary
+
+- Main site: https://schema.org
+- WebSite: https://schema.org/WebSite
+- WebPage: https://schema.org/WebPage
+- Full property reference: https://schema.org/docs/full.html
+
+### JSON-LD
+
+- Spec hub: https://json-ld.org
+- Primer: https://www.w3.org/TR/json-ld11-primer/
+- Full spec: https://www.w3.org/TR/json-ld11/
+- Context processing: https://www.w3.org/TR/json-ld11/#the-context
+
+### RDF fundamentals
+
+- Concepts: https://www.w3.org/TR/rdf11-concepts/
+- Primer: https://www.w3.org/TR/rdf11-primer/
+
+### SHACL
+
+- Recommendation: https://www.w3.org/TR/shacl/
+- Examples: https://www.w3.org/TR/shacl/#examples
+- SHACL-AF: https://www.w3.org/TR/shacl-af/
+
+### ShEx
+
+- Homepage: https://shex.io
+- Primer: https://shex.io/shex-primer/
+- Spec: https://shex.io/shex-semantics/
+
+### Structured data for websites
+
+- Google structured data: https://developers.google.com/search/docs/appearance/structured-data
+- Site names: https://developers.google.com/search/docs/appearance/site-names
+
+### Accessibility and semantic HTML
+
+- MDN semantic HTML: https://developer.mozilla.org/en-US/docs/Glossary/Semantics#semantics_in_html
+- ARIA landmarks: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/landmark_role
+- WCAG 2.2: https://www.w3.org/TR/WCAG22/
+
 ## Why vault/ is not in git
 
 The vault contains your actual knowledge graph content, which:
