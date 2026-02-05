@@ -62,7 +62,10 @@ const shouldSkipPath = (relPath: string): boolean => {
   if (relPath.startsWith("_includes/")) {
     return true;
   }
-  if (relPath.startsWith(".") && !relPath.startsWith(".obsidian/") && relPath !== ".obsidian") {
+  if (
+    relPath.startsWith(".") && !relPath.startsWith(".obsidian/") &&
+    relPath !== ".obsidian"
+  ) {
     return true;
   }
   if (
@@ -75,7 +78,9 @@ const shouldSkipPath = (relPath: string): boolean => {
 };
 
 const getMediaType = (path: string): string => {
-  const ext = path.includes(".") ? path.slice(path.lastIndexOf(".")).toLowerCase() : "";
+  const ext = path.includes(".")
+    ? path.slice(path.lastIndexOf(".")).toLowerCase()
+    : "";
   switch (ext) {
     case ".md":
       return "text/markdown; charset=utf-8";
@@ -186,7 +191,10 @@ const respondJson = (value: unknown, status = 200): Response =>
     },
   });
 
-const handleFileRequest = async (request: Request, relPath: string): Promise<Response> => {
+const handleFileRequest = async (
+  request: Request,
+  relPath: string,
+): Promise<Response> => {
   if (shouldSkipPath(relPath)) {
     return new Response("Not found", { status: 404 });
   }

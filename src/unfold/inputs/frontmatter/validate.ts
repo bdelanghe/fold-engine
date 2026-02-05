@@ -300,7 +300,7 @@ export const validateNotes = async (): Promise<void> => {
   try {
     await Deno.stat(sourceRoot);
   } catch {
-    console.warn("Skipping note validation (missing vault content).");
+    writeWarning("Skipping note validation (missing vault content).");
     return;
   }
   const errors: string[] = [];
