@@ -19,6 +19,38 @@ import { siteBuildConfig } from "./site_build_config.ts";
 import { vaultConfig } from "../inputs/vault/vault_config.ts";
 const DEFAULT_WATCH_DEBOUNCE_MS = 5000;
 
+const normalizePages = (pages: Page[] | Iterable<Page>): Page[] =>
+  Array.isArray(pages) ? pages : Array.from(pages);
+
+const normalizeJsonldPath = (url: string): string => {
+  const noFragment = url.split("#")[0] ?? url;
+  const noQuery = noFragment.split("?")[0] ?? noFragment;
+  const trimmed = noQuery.replace(/^\/+/, "").replace(/\/$/, "");
+  if (!trimmed) {
+    return "index";
+  }
+  return trimmed.endsWith(".html") ? trimmed.slice(0, -5) : trimmed;
+};
+
+const writeJsonldPages = async (
+  site: ReturnType<typeof lume>,
+  pages: Page[],
+): Promise<void> => {
+  for (const page of pages) {
+    const url = page.data?.url;
+    const rawJsonld = page.data?.jsonld;
+    if (typeof url !== "string" || !rawJsonld) {
+      continue;
+    }
+    const relPath = normalizeJsonldPath(url);
+    const outputPath = site.dest(join("jsonld", `${relPath}.jsonld`));
+    await Deno.mkdir(dirname(outputPath), { recursive: true });
+    const jsonld =
+      typeof rawJsonld === "string" ? JSON.parse(rawJsonld) : rawJsonld;
+    await Deno.writeTextFile(outputPath, JSON.stringify(jsonld, null, 2));
+  }
+};
+
 const getSiteUrl = (): string => siteBuildConfig.siteUrl;
 
 const getSiteBasePath = () => {
@@ -36,15 +68,11 @@ const getVaultPath = (): string => {
   const override = Deno.env.get("VAULT_PATH")?.trim();
   if (!override) {
     const workspaceRoot = getWorkspaceRoot().replace(/\/$/, "");
-    try {
-      const stat = Deno.statSync(join(workspaceRoot, "vault"));
-      if (stat.isDirectory) {
-        return "vault";
-      }
-    } catch {
-      // Fall through to repo root.
+    const resolved = vaultConfig.vaultPath;
+    if (isAbsolute(resolved) && resolved.startsWith(`${workspaceRoot}/`)) {
+      return relative(workspaceRoot, resolved);
     }
-    return ".";
+    return resolved;
   }
   if (isAbsolute(override)) {
     const workspaceRoot = getWorkspaceRoot().replace(/\/$/, "");
@@ -64,11 +92,21 @@ export const createSite = (): ReturnType<typeof lume> => {
   const basePath = getSiteBasePath();
   const workspaceRoot = getWorkspaceRoot();
   const vaultPath = getVaultPath();
+  const layoutPath = getLayoutPath();
   const normalizedWorkspaceRoot = workspaceRoot.replace(/\/$/, "");
   const srcPath = vaultPath.startsWith(`${normalizedWorkspaceRoot}/`)
     ? relative(normalizedWorkspaceRoot, vaultPath)
     : vaultPath;
   const destPath = getSiteDest();
+  const srcRoot = isAbsolute(srcPath) ? srcPath : join(workspaceRoot, srcPath);
+  const includesDir = join(srcRoot, "_includes");
+  const layoutTarget = join(includesDir, "layout.tmpl.ts");
+  try {
+    Deno.statSync(layoutTarget);
+  } catch {
+    Deno.mkdirSync(includesDir, { recursive: true });
+    Deno.copyFileSync(layoutPath, layoutTarget);
+  }
 
   const site = lume({
     cwd: workspaceRoot,
@@ -79,6 +117,8 @@ export const createSite = (): ReturnType<typeof lume> => {
       debounce: DEFAULT_WATCH_DEBOUNCE_MS,
     },
   });
+  site.loadPages([".jsonld"], jsonLdLoader());
+  site.data("layout", "layout.tmpl.ts");
 
   const ignorePrefixes = [
     ".cursor/",

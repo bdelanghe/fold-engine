@@ -108,11 +108,15 @@ export const buildMcpBundle = async (
       const url = resolveCanonical(page, siteUrl);
       const title = normalizeText(
         page.document?.querySelector("title")?.textContent,
+      ) || normalizeText(
+        typeof page.data?.title === "string" ? page.data.title : "",
       );
       const description = normalizeText(
         page.document?.querySelector('meta[name="description"]')?.getAttribute(
           "content",
         ),
+      ) || normalizeText(
+        typeof page.data?.description === "string" ? page.data.description : "",
       );
       if (!url || !title) {
         return null;
