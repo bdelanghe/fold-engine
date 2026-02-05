@@ -59,9 +59,6 @@ const getVaultPath = (): string => {
 const getSiteDest = (): string =>
   Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
 
-const getSiteDest = (): string =>
-  Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
-
 export const createSite = (): ReturnType<typeof lume> => {
   const siteUrl = getSiteUrl();
   const basePath = getSiteBasePath();
