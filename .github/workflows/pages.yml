@@ -99,6 +99,7 @@ jobs:
       - name: Start Unfold container
         run: |
           docker run -d --rm -p 3000:3000 \
+            -e SITE_URL=http://localhost:3000 \
             -e VAULT_PATH=vault \
             -v "$PWD/vault:/workspaces/schema-nodes/vault" \
             --name unfold-smoke \
