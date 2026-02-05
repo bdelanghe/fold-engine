@@ -43,6 +43,17 @@ Open questions
 - What schema versioning strategy do we want?
 - Build tool decision: use jaq for JSON folding.
 
+Build stack
+- Deno for runtime and tasks.
+- Lume for static site generation.
+- @std/front-matter for parsing note metadata.
+- Zod for schema validation of frontmatter.
+
+Obsidian vault
+- Treat the repo root as the vault.
+- Create new notes under `notes/`.
+- Supported formats include Markdown and other Obsidian file types.
+
 Notes: IPFS ecosystem vs ontology systems
 - Most IPFS tools are transport/persistence layers; they do not define domain models.
 - IPFS itself is schema-agnostic: content-addressed bytes first.
