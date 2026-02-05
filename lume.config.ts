@@ -1,24 +1,25 @@
 import lume from "lume/mod.ts";
+import { fromFileUrl } from "@std/path";
 import jsonLd from "lume/plugins/json_ld.ts";
 import metas from "lume/plugins/metas.ts";
 import robots from "lume/plugins/robots.ts";
 import sitemap from "lume/plugins/sitemap.ts";
 import vento from "lume/plugins/vento.ts";
-import wikilinks from "./src/markdown/wikilinks.ts";
-import { buildSiteManifest } from "./src/manifest/site_manifest.ts";
+import wikilinks from "./src/unfold/inputs/markdown/wikilinks.ts";
+import { buildSiteManifest } from "./src/unfold/manifests/site_manifest.ts";
 
 const siteUrl = (Deno.env.get("SITE_URL") ?? "https://fold.example").replace(
   /\/$/,
   "",
 );
 
-const siteRoot = new URL(".", import.meta.url).pathname;
+const siteRoot = fromFileUrl(new URL(".", import.meta.url));
 
 const site = lume({
   cwd: siteRoot,
   src: "obsidian_vault",
   dest: "dist/site",
-  includes: "src/includes",
+  includes: "_includes",
   location: new URL(siteUrl),
 });
 

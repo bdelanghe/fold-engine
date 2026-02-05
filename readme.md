@@ -1,64 +1,47 @@
-# Unfold
+# Fold Engine
 
-Unfold is a schema-first static compiler that projects Obsidian vaults into validated HTML, JSON, and machine-bounded cognitive surfaces.
+This repository hosts the **Fold Engine** website.
 
-Purpose
+Content is authored in an Obsidian vault (`obsidian_vault/`) and compiled into
+`dist/` for GitHub Pages using the **Unfold** static compiler.
 
-- Treat each Markdown note as a typed record (frontmatter-first).
-- Serve the same content both as a GitHub Pages site and as an Obsidian vault.
-- Enable JSON/JSON-LD projections for machine reasoning.
+Fold Engine contains the research notes, theory, and documentation. Unfold is
+the toolchain that validates and publishes them.
 
-Decisions (current)
+---
 
-- Vault root is `obsidian_vault/` and is the single source of truth.
-- Lume builds directly from `obsidian_vault/` into `dist/`.
-- Frontmatter is YAML-only for now.
-- Build uses Deno tasks with Lume and a frontmatter validator.
-- Notes render without custom layouts for now (keep it simple until build is
-  stable).
+## Philosophy
 
-Build
+Fold Engine treats knowledge as a set of bounded, composable folds rather than
+an unbounded graph. The vault captures local structure and invariants; Unfold
+enforces them so published artifacts stay coherent.
 
-- `deno task build`
-- `deno task dev`
-- `deno task docs`
+The goal is clarity under constraint: make concepts small enough to hold, link
+them explicitly, and let tooling validate the edges.
 
-Notes
+---
 
-- Project planning, definitions, and long-form notes live in `obsidian_vault/`.
-- See `obsidian_vault/project-notes.md` for the detailed context moved from this
-  README.
+## Build
 
-TODO
+- `deno task build` — full site compile into `dist/`.
+- `deno task dev` — watch mode with incremental rebuilds.
+- `deno task docs` — regenerate architectural and schema documentation.
 
-Phase 1 — Static Site Foundation
+---
 
-- Finalize Lume + Deno build pipeline.
-- Confirm Obsidian vault → `dist/` publishing flow is deterministic.
-- Enforce frontmatter validation on every note.
-- Produce a minimal site manifest artifact.
-- Deploy to GitHub Pages and verify clean rebuilds from scratch.
-- Document build and publish steps in the README.
+## Notes
 
-Phase 2 — JSON Folding Engine
+- All content lives in `obsidian_vault/` and is the single source of truth.
+- The **Unfold** compiler transforms the vault into the published Fold Engine
+  site.
+- Unfold’s internals live under `src/unfold/` (see `src/unfold/README.md`).
 
-- Define the canonical “fold” JSON schema.
-- Integrate `jaq` for bounded JSON projections.
-- Allow notes to reference input JSON and jq/jaq queries in frontmatter.
-- Emit folded JSON artifacts alongside HTML pages.
-- Track token/size budgets per fold.
-- Add tests for folding correctness and schema conformance.
+---
 
-Phase 3 — Machine-Readable Outputs
+## Repository Layout
 
-- Generate JSON-LD projections from validated notes.
-- Produce MCP-friendly bounded-context bundles.
-- Export a site-level knowledge graph.
-- Version fold schemas and manifests.
-
-Phase 4 — Tooling & Experiments
-
-- Prototype interactive fold visualizations in-browser.
-- Explore Rust/WASM helpers for JSON processing.
-- Add IPFS publish pipeline.
-- Measure and record build determinism and artifact hashes.
+- `obsidian_vault/` — authored notes and knowledge graphs.
+- `src/unfold/` — schema-first static compiler.
+- `dist/` — generated publish artifacts (GitHub Pages target).
+- `schemas/` — canonical JSON Schemas used by Unfold.
+- `contracts/` — golden fixtures and invariants.

@@ -173,7 +173,7 @@ const detectForbiddenMarkers = (html: string): string[] => {
 export const generateSiteManifest = async (
   options: ManifestOptions = {},
 ): Promise<SiteManifest> => {
-  const siteDir = options.siteDir ?? "_site";
+  const siteDir = options.siteDir ?? "dist/site";
   const siteUrl = (options.siteUrl ?? defaultSiteUrl()).replace(/\/$/, "");
   const buildMode = options.buildMode ?? defaultBuildMode();
   const htmlFiles = await collectHtmlFiles(siteDir);
