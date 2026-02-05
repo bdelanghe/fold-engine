@@ -13,7 +13,7 @@ const frontmatterSchema = z
   .passthrough();
 
 const mdExtensions = new Set([".md", ".markdown"]);
-const sourceRoot = new URL("../src/", import.meta.url);
+const sourceRoot = new URL("../notes/", import.meta.url);
 
 async function* walk(dir: URL): AsyncGenerator<URL> {
   for await (const entry of Deno.readDir(dir)) {

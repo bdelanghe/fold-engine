@@ -1,5 +1,5 @@
 ---
-title: Cognitive JQ
+title: cognitive-jq
 tags:
   - jq
   - jaq
@@ -7,9 +7,10 @@ tags:
   - json
 schema: fold-v1
 fold: bounded-tree
+layout: layout.njk
 ---
 
-# Cognitive JQ
+# cognitive-jq
 
 First project: use jaq to generate bounded folds from unknown JSON.
 

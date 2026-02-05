@@ -1,4 +1,4 @@
-Fold Engine — GitHub Pages + Obsidian Vault
+fold-engine-github-pages-obsidian-vault
 
 Purpose
 - Treat each Markdown note as a typed record (frontmatter-first).
@@ -49,10 +49,11 @@ Build stack
 - @std/front-matter for parsing note metadata.
 - Zod for schema validation of frontmatter.
 
-Obsidian vault
-- Vault root is `notes/`.
+Obsidian vault + GitHub Pages alignment
+- Vault root is `notes/` and is the single source of truth.
+- Lume builds directly from `notes/`.
 - Create new notes directly inside `notes/`.
-- Supported formats include Markdown and other Obsidian file types.
+- Keep content within Obsidian Publish limitations for compatibility.
 
 Notes: IPFS ecosystem vs ontology systems
 - Most IPFS tools are transport/persistence layers; they do not define domain models.

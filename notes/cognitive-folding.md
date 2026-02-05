@@ -1,5 +1,5 @@
 ---
-title: Cognitive Folding
+title: cognitive-folding
 tags:
   - cognitive
   - adhd
@@ -7,9 +7,10 @@ tags:
   - json
 schema: fold-v1
 fold: bounded-tree
+layout: layout.njk
 ---
 
-# Cognitive Folding
+# cognitive-folding
 
 Fold-engine treats JSON as a bounded cognitive surface rather than an infinite
 tree. The goal is to keep attention in a small, meaningful window while keeping

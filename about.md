@@ -1,4 +1,4 @@
-About fold-engine
+about-fold-engine
 
 Fold-engine is a schema-aware view generator that turns large or unknown JSON
 into small, navigable Markdown folds. It treats JSON as a bounded cognitive
