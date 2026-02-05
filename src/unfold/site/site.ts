@@ -1,6 +1,5 @@
 import lume from "lume/mod.ts";
-import type { Page } from "lume/core/file.ts";
-import { dirname, fromFileUrl, isAbsolute, join, relative } from "@std/path";
+import { dirname, fromFileUrl, isAbsolute, join } from "@std/path";
 import jsonLd from "lume/plugins/json_ld.ts";
 import metas from "lume/plugins/metas.ts";
 import robots from "lume/plugins/robots.ts";
@@ -35,26 +34,13 @@ const getLayoutPath = () =>
 const getVaultPath = (): string => {
   const override = Deno.env.get("VAULT_PATH")?.trim();
   if (!override) {
-    const workspaceRoot = getWorkspaceRoot().replace(/\/$/, "");
-    try {
-      const stat = Deno.statSync(join(workspaceRoot, "vault"));
-      if (stat.isDirectory) {
-        return "vault";
-      }
-    } catch {
-      // Fall through to repo root.
-    }
-    return ".";
+    return "obsidian_vault";
   }
-  if (isAbsolute(override)) {
-    const workspaceRoot = getWorkspaceRoot().replace(/\/$/, "");
-    if (override.startsWith(`${workspaceRoot}/`)) {
-      return relative(workspaceRoot, override);
-    }
-    return override;
-  }
-  return override;
+  return isAbsolute(override) ? override : join(getWorkspaceRoot(), override);
 };
+
+const getSiteDest = (): string =>
+  Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
 
 const getSiteDest = (): string =>
   Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
@@ -64,15 +50,11 @@ export const createSite = (): ReturnType<typeof lume> => {
   const basePath = getSiteBasePath();
   const workspaceRoot = getWorkspaceRoot();
   const vaultPath = getVaultPath();
-  const normalizedWorkspaceRoot = workspaceRoot.replace(/\/$/, "");
-  const srcPath = vaultPath.startsWith(`${normalizedWorkspaceRoot}/`)
-    ? relative(normalizedWorkspaceRoot, vaultPath)
-    : vaultPath;
   const destPath = getSiteDest();
 
   const site = lume({
     cwd: workspaceRoot,
-    src: srcPath,
+    src: vaultPath,
     dest: destPath,
     location: new URL(siteUrl),
     watcher: {

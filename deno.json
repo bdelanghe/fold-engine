@@ -17,8 +17,8 @@
     "test": "deno test -A",
     "check": "deno task fmt:check && deno task lint && deno task test && deno task validate",
     "ci": "deno task check",
-    "check:emit": "deno run -A tools/watch_status.ts",
-    "check:watch": "deno run -A --watch tools/watch_status.ts",
+    "check:emit": "deno run -A src/unfold/tools/watch_status.ts",
+    "check:watch": "deno run -A --watch src/unfold/tools/watch_status.ts",
     "clean": "rm -rf .unfold dist _site site/.lume"
   },
   "imports": {

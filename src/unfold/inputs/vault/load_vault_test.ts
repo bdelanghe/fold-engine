@@ -7,66 +7,27 @@ import {
   validateVault,
 } from "./load_vault.ts";
 
-const writeWarning = (message: string): void => {
-  const encoder = new TextEncoder();
-  void Deno.stderr.write(encoder.encode(`${message}\n`));
-};
-
-const hasPermissions = async (
-  permissions: Deno.PermissionName[],
-): Promise<boolean> => {
-  for (const permission of permissions) {
-    const status = await Deno.permissions.query({ name: permission });
-    if (status.state !== "granted") {
-      return false;
-    }
-  }
-  return true;
-};
-
 const hasVaultFixture = async (): Promise<boolean> => {
-  const allowed = await hasPermissions(["env", "read"]);
-  if (!allowed) {
-    writeWarning("Skipping vault tests (missing permissions).");
-    return false;
-  }
   const manifest = await scanVault();
   if (!manifest.hasConfig || manifest.files.length === 0) {
-    writeWarning("Skipping vault tests (missing vault content).");
+    console.warn("Skipping vault tests (missing vault content).");
     return false;
   }
   return true;
 };
 
-Deno.test("loadVaultRoot returns valid URL", async () => {
-  const allowed = await hasPermissions(["env", "read"]);
-  if (!allowed) {
-    writeWarning("Skipping loadVaultRoot test (missing permissions).");
-    return;
-  }
+Deno.test("loadVaultRoot returns valid URL", () => {
   const root = loadVaultRoot();
   assertEquals(root.protocol, "file:");
   const override = Deno.env.get("VAULT_PATH")?.trim();
   if (override) {
-    const resolved = isAbsolute(override)
-      ? override
-      : join(Deno.cwd(), override);
+    const resolved = isAbsolute(override) ? override : join(Deno.cwd(), override);
     const expected = toFileUrl(
       resolved.endsWith("/") ? resolved : `${resolved}/`,
     );
     assertEquals(root.pathname, expected.pathname);
   } else {
-    const defaultVault = join(Deno.cwd(), "vault");
-    let expectedSuffix = "/";
-    try {
-      const stat = await Deno.stat(defaultVault);
-      if (stat.isDirectory) {
-        expectedSuffix = "/vault/";
-      }
-    } catch {
-      // Fall through to repo root.
-    }
-    assertEquals(root.pathname.endsWith(expectedSuffix), true);
+    assertEquals(root.pathname.endsWith("obsidian_vault/"), true);
   }
 });
 

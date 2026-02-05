@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { buildStatus, type StepResult, truncateTail } from "./watch_status.ts";
+import { buildStatus, truncateTail, type StepResult } from "./watch_status.ts";
 
 Deno.test("truncateTail keeps last lines and chars", () => {
   const text = Array.from({ length: 5 }, (_, i) => `line-${i + 1}`).join("\n");

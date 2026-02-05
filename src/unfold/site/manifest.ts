@@ -1,5 +1,4 @@
 import { DOMParser, type HTMLDocument } from "deno-dom-wasm";
-import { normalizeSiteUrl } from "./site_url.ts";
 
 type ManifestPage = {
   path: string;
@@ -32,7 +31,7 @@ type ManifestOptions = {
 };
 
 const defaultSiteUrl = () =>
-  normalizeSiteUrl(Deno.env.get("SITE_URL") ?? "https://fold.example");
+  (Deno.env.get("SITE_URL") ?? "https://fold.example").replace(/\/$/, "");
 
 const requireBuildMode = (value?: string): string => {
   const raw = value?.trim() ?? Deno.env.get("LUME_ENV") ??

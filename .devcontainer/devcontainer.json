@@ -2,6 +2,7 @@
   "name": "fold-engine",
   "dockerComposeFile": ["../docker-compose.yml"],
   "service": "unfold",
+  "runServices": ["vault", "unfold"],
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "shutdownAction": "stopCompose",
   "forwardPorts": [3000],

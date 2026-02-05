@@ -10,16 +10,7 @@ export const loadVaultRoot = (): URL => {
       : join(Deno.cwd(), override);
     return toFileUrl(resolved.endsWith("/") ? resolved : `${resolved}/`);
   }
-  const cwd = Deno.cwd().replace(/\/$/, "");
-  try {
-    const stat = Deno.statSync(join(cwd, "vault"));
-    if (stat.isDirectory) {
-      return toFileUrl(`${cwd}/vault/`);
-    }
-  } catch {
-    // Fall through to repo root.
-  }
-  return toFileUrl(`${cwd}/`);
+  return new URL("../../../../obsidian_vault/", import.meta.url);
 };
 
 /** Obsidian accepted file extensions by type */
