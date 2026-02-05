@@ -25,6 +25,11 @@ const getSiteBasePath = () => {
   return pathname ? `${pathname}/` : "/";
 };
 
+const getSiteBasePath = () => {
+  const pathname = new URL(getSiteUrl()).pathname.replace(/\/$/, "");
+  return pathname ? `${pathname}/` : "/";
+};
+
 const getWorkspaceRoot = () =>
   fromFileUrl(new URL("../../..", import.meta.url));
 
