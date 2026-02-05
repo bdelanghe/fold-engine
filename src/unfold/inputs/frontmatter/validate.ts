@@ -2,7 +2,7 @@ import { extractYaml } from "@std/front-matter";
 import { basename, relative } from "@std/path";
 import { z } from "zod";
 import { loadVaultRoot } from "../vault/load_vault.ts";
-import { normalizeSiteUrl } from "../../site/site_url.ts";
+import { siteBuildConfig } from "../../site/site_build_config.ts";
 
 const schemaOrgSchema = z
   .object({
@@ -58,8 +58,7 @@ const writeWarning = (message: string): void => {
   const encoder = new TextEncoder();
   void Deno.stderr.write(encoder.encode(`${message}\n`));
 };
-const getSiteUrl = () =>
-  normalizeSiteUrl(Deno.env.get("SITE_URL") ?? "https://fold.example");
+const getSiteUrl = (): string => siteBuildConfig.siteUrl;
 
 const buildVaultIndexJsonLd = (
   title: string,

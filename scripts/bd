@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if git rev-parse --is-bare-repository >/dev/null 2>&1; then
+  if [ "$(git rev-parse --is-bare-repository)" = "true" ]; then
+    current_dir="$(pwd -P)"
+    if command -v rg >/dev/null 2>&1; then
+      worktree_dir="$(git worktree list --porcelain | awk '/^worktree /{print $2}' | rg -F -v -- "${current_dir}" | head -n 1)"
+    else
+      worktree_dir="$(git worktree list --porcelain | awk '/^worktree /{print $2}' | grep -F -v -- "${current_dir}" | head -n 1)"
+    fi
+
+    if [ -z "${worktree_dir}" ]; then
+      echo "bd: no worktrees found; run from a worktree checkout instead of the bare repo." >&2
+      exit 1
+    fi
+
+    cd "${worktree_dir}"
+  fi
+fi
+
+has_db_flag=0
+for arg in "$@"; do
+  case "$arg" in
+    --db|--db=*)
+      has_db_flag=1
+      break
+      ;;
+  esac
+done
+
+if [ "${has_db_flag}" -eq 0 ] && [ -f ".beads/beads.db" ]; then
+  set -- --db ".beads/beads.db" "$@"
+fi
+
+exec bd "$@"

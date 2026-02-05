@@ -1,0 +1,24 @@
+{
+  "shapes": [
+    {
+      "id": "schema:WebSiteShape",
+      "targetClass": "schema:WebSite",
+      "allowedTypes": ["schema:WebSite", "WebSite"],
+      "required": ["@id", "@type", "name"],
+      "properties": [
+        { "path": "url", "maxCount": 1 },
+        { "path": "description", "maxCount": 1 },
+        { "path": "hasPart", "minCount": 1 }
+      ]
+    },
+    {
+      "id": "schema:AboutPageShape",
+      "targetClass": "schema:AboutPage",
+      "allowedTypes": ["schema:AboutPage", "AboutPage"],
+      "required": ["@id", "@type", "name", "isPartOf"],
+      "properties": [
+        { "path": "description", "maxCount": 1 }
+      ]
+    }
+  ]
+}

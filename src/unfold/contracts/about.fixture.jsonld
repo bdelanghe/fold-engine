@@ -1,0 +1,23 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@id": "https://unfold.robertdelanghe.com/#website",
+      "@type": "WebSite",
+      "name": "Unfold",
+      "url": "https://unfold.robertdelanghe.com/",
+      "description": "A schema-first vault published as a minimal, auditable website.",
+      "hasPart": { "@id": "https://unfold.robertdelanghe.com/about/#page" }
+    },
+    {
+      "@id": "https://unfold.robertdelanghe.com/about/#page",
+      "@type": "AboutPage",
+      "name": "About Unfold",
+      "url": "https://unfold.robertdelanghe.com/about/",
+      "description": "Unfold is a deterministic publishing surface for structured notes and folds.",
+      "inLanguage": "en",
+      "dateModified": "2026-01-25T00:00:00Z",
+      "isPartOf": { "@id": "https://unfold.robertdelanghe.com/#website" }
+    }
+  ]
+}

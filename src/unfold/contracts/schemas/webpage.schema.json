@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://unfold.example/schemas/webpage-v1.schema.json",
+  "title": "Unfold WebPage Contract v1",
+  "description": "Canonical JSON shape for WebPage (source-of-truth before JSON-LD projection)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "id", "url", "name"],
+  "properties": {
+    "kind": {
+      "const": "WebPage",
+      "description": "Discriminator for WebPage type"
+    },
+    "id": {
+      "type": "string",
+      "format": "uri",
+      "description": "Unique identifier (@id in JSON-LD)"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Canonical URL of the page"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Title/name of the page"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description/summary of the page"
+    },
+    "inLanguage": {
+      "type": "string",
+      "minLength": 2,
+      "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+      "description": "Language of the page content"
+    },
+    "dateCreated": {
+      "type": "string",
+      "format": "date",
+      "description": "Creation date (YYYY-MM-DD)"
+    },
+    "dateModified": {
+      "type": "string",
+      "format": "date",
+      "description": "Last modification date (YYYY-MM-DD)"
+    },
+    "isPartOf": {
+      "$ref": "#/$defs/websiteRef",
+      "description": "Parent website"
+    },
+    "hasPart": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/webPageElementRef"
+      },
+      "description": "Sections/elements that compose this page"
+    },
+    "content": {
+      "type": "string",
+      "description": "Main text content (plain text or markdown)"
+    }
+  },
+  "$defs": {
+    "websiteRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": {
+          "const": "WebSite"
+        },
+        "id": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "webPageElementRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": {
+          "const": "WebPageElement"
+        },
+        "id": {
+          "type": "string",
+          "format": "uri"
+        },
+        "name": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

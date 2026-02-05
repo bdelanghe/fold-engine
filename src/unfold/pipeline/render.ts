@@ -1,8 +1,10 @@
-import { prepareVault } from "../inputs/vault/prepare_vault.ts";
 import { createSite } from "../site/site.ts";
 
+/**
+ * Render JSON-LD vault to HTML
+ * Lume processes .jsonld files using the jsonld_loader
+ */
 export const runRender = async (): Promise<void> => {
-  await prepareVault();
   const site = createSite();
   await site.build();
 };

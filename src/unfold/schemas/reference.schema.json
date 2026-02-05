@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.org/schemas/reference.schema.json",
+  "title": "Reference",
+  "description": "A citation or reference to an external resource",
+  "type": "object",
+  "required": ["@context", "@type", "@id", "title", "url"],
+  "properties": {
+    "@context": {
+      "description": "JSON-LD context",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" },
+        { "type": "array" }
+      ]
+    },
+    "@type": {
+      "description": "RDF type of the node",
+      "type": "string",
+      "x-jsonld-type": true,
+      "enum": ["basis:Reference", "Reference"]
+    },
+    "@id": {
+      "description": "Unique identifier (IRI) for this reference",
+      "type": "string",
+      "format": "uri",
+      "x-jsonld-id": true,
+      "pattern": "^https://example\\.org/refs/"
+    },
+    "title": {
+      "description": "Reference title",
+      "type": "string",
+      "x-jsonld-term": "schema:name",
+      "minLength": 1
+    },
+    "description": {
+      "description": "Reference description",
+      "type": "string",
+      "x-jsonld-term": "schema:description"
+    },
+    "url": {
+      "description": "External URL for the referenced resource",
+      "type": "string",
+      "format": "uri",
+      "x-jsonld-term": "schema:url",
+      "x-jsonld-datatype": "@id"
+    },
+    "author": {
+      "description": "Author or creator",
+      "type": "string",
+      "x-jsonld-term": "schema:author"
+    },
+    "dateCreated": {
+      "description": "Creation date",
+      "type": "string",
+      "format": "date",
+      "x-jsonld-term": "schema:dateCreated",
+      "x-jsonld-datatype": "xsd:date"
+    },
+    "dateAccessed": {
+      "description": "Date this reference was accessed",
+      "type": "string",
+      "format": "date",
+      "x-jsonld-term": "schema:dateAccessed",
+      "x-jsonld-datatype": "xsd:date"
+    }
+  },
+  "additionalProperties": false
+}

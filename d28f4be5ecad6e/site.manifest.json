@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-01-26T02:36:34.194Z",
+  "pages": [
+    {
+      "url": "/",
+      "title": "",
+      "h1": "",
+      "canonical": "",
+      "links": [],
+      "jsonLd": [],
+      "cid": "sha256:d46e8145ca7e3a0d942490926d43631ab9c80154405c54798cfc6d30400c9bf2",
+      "forbidden": {
+        "lumeLiveReload": false,
+        "lumeBar": false
+      }
+    }
+  ]
+}

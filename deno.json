@@ -17,7 +17,7 @@
     "fmt:check": "deno fmt --check",
     "test": "deno test -A",
     "check": "deno task fmt:check && deno task lint && deno task test && deno task validate",
-    "ci": "deno task check",
+    "ci": "UNFOLD_VALIDATE_MODE=strict deno task check",
     "check:emit": "deno run -A src/unfold/tools/watch_status.ts",
     "check:watch": "deno run -A --watch src/unfold/tools/watch_status.ts",
     "gh:pages": "gh run list --workflow=\"pages.yml\" -b \"$(git rev-parse --abbrev-ref HEAD)\"",
@@ -27,6 +27,7 @@
   "imports": {
     "@std/assert": "jsr:@std/assert@^1.0.17",
     "@std/front-matter": "jsr:@std/front-matter@^1.0.9",
+    "@std/csv": "jsr:@std/csv@^1.0.6",
     "@std/fs": "jsr:@std/fs@^1.0.22",
     "@std/fs/walk": "jsr:@std/fs@^1.0.22/walk",
     "@std/path": "jsr:@std/path@^1.1.4",

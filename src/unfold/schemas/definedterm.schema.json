@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.org/schemas/definedterm.schema.json",
+  "title": "DefinedTerm",
+  "description": "Schema.org DefinedTerm profile for Unfold validation",
+  "type": "object",
+  "required": ["@context", "@type", "@id", "name"],
+  "properties": {
+    "@context": {
+      "description": "JSON-LD context",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" },
+        { "type": "array" }
+      ]
+    },
+    "@type": {
+      "description": "RDF type of the node",
+      "type": "string",
+      "x-jsonld-type": true,
+      "enum": ["schema:DefinedTerm", "DefinedTerm"]
+    },
+    "@id": {
+      "description": "Unique identifier (IRI) for this term",
+      "type": "string",
+      "format": "uri",
+      "x-jsonld-id": true
+    },
+    "name": {
+      "description": "Term name",
+      "type": "string",
+      "x-jsonld-term": "schema:name",
+      "minLength": 1
+    },
+    "description": {
+      "description": "Term description",
+      "type": "string",
+      "x-jsonld-term": "schema:description"
+    },
+    "alternateName": {
+      "description": "Alternate names",
+      "type": "array",
+      "x-jsonld-term": "schema:alternateName",
+      "x-jsonld-container": "@set",
+      "items": { "type": "string" }
+    },
+    "termCode": {
+      "description": "Term code",
+      "type": "string",
+      "x-jsonld-term": "schema:termCode"
+    },
+    "sameAs": {
+      "description": "Same-as URLs",
+      "type": "array",
+      "x-jsonld-term": "schema:sameAs",
+      "x-jsonld-container": "@set",
+      "items": { "type": "string", "format": "uri" }
+    },
+    "inDefinedTermSet": {
+      "description": "Containing term set",
+      "x-jsonld-term": "schema:inDefinedTermSet",
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "$ref": "#/definitions/nodeRef" }
+      ]
+    },
+    "broader": {
+      "description": "Broader terms",
+      "x-jsonld-term": "schema:broader",
+      "x-jsonld-container": "@set",
+      "$ref": "#/definitions/urlOrNodeRefArray"
+    },
+    "narrower": {
+      "description": "Narrower terms",
+      "x-jsonld-term": "schema:narrower",
+      "x-jsonld-container": "@set",
+      "$ref": "#/definitions/urlOrNodeRefArray"
+    },
+    "related": {
+      "description": "Related terms",
+      "x-jsonld-term": "schema:related",
+      "x-jsonld-container": "@set",
+      "$ref": "#/definitions/urlOrNodeRefArray"
+    }
+  },
+  "definitions": {
+    "nodeRef": {
+      "type": "object",
+      "required": ["@id"],
+      "properties": {
+        "@id": {
+          "type": "string",
+          "format": "uri",
+          "x-jsonld-id": true
+        }
+      }
+    },
+    "urlOrNodeRef": {
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "$ref": "#/definitions/nodeRef" }
+      ]
+    },
+    "urlOrNodeRefArray": {
+      "oneOf": [
+        { "$ref": "#/definitions/urlOrNodeRef" },
+        {
+          "type": "array",
+          "items": { "$ref": "#/definitions/urlOrNodeRef" }
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

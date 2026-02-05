@@ -1,0 +1,256 @@
+{
+  "shapes": [
+    {
+      "id": "basis:PageShape",
+      "targetClass": "basis:Page",
+      "closed": true,
+      "ignoredProperties": ["@context"],
+      "properties": [
+        {
+          "path": "@id",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI",
+          "pattern": "^https://.*/pages/"
+        },
+        {
+          "path": "@type",
+          "minCount": 1,
+          "maxCount": 1,
+          "in": ["basis:Page", "Page"]
+        },
+        {
+          "path": "title",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:string"
+        },
+        { "path": "description", "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "dateCreated", "maxCount": 1, "datatype": "xsd:date" },
+        { "path": "dateModified", "maxCount": 1, "datatype": "xsd:date" },
+        { "path": "hasPart" },
+        { "path": "mentions" }
+      ]
+    },
+    {
+      "id": "basis:ReferenceShape",
+      "targetClass": "basis:Reference",
+      "closed": true,
+      "ignoredProperties": ["@context"],
+      "properties": [
+        {
+          "path": "@id",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI",
+          "pattern": "^https://.*/refs/"
+        },
+        {
+          "path": "@type",
+          "minCount": 1,
+          "maxCount": 1,
+          "in": ["basis:Reference", "Reference"]
+        },
+        {
+          "path": "title",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:string"
+        },
+        {
+          "path": "url",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI"
+        },
+        { "path": "description", "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "author", "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "dateCreated", "maxCount": 1, "datatype": "xsd:date" },
+        { "path": "dateAccessed", "maxCount": 1, "datatype": "xsd:date" }
+      ]
+    },
+    {
+      "id": "basis:ConceptShape",
+      "targetClass": "skos:Concept",
+      "closed": true,
+      "ignoredProperties": ["@context"],
+      "properties": [
+        {
+          "path": "@id",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI",
+          "pattern": "^https://.*/vocab/"
+        },
+        {
+          "path": "@type",
+          "minCount": 1,
+          "in": ["rdfs:Class", "skos:Concept"]
+        },
+        {
+          "path": "label",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:string"
+        },
+        { "path": "definition", "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "broader" },
+        { "path": "narrower" },
+        { "path": "related" }
+      ]
+    },
+    {
+      "id": "schema:WebSiteShape",
+      "targetClass": "schema:WebSite",
+      "closed": true,
+      "ignoredProperties": ["@context"],
+      "properties": [
+        {
+          "path": "@id",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI"
+        },
+        {
+          "path": "@type",
+          "minCount": 1,
+          "in": ["schema:WebSite", "WebSite"]
+        },
+        {
+          "path": "name",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:string"
+        },
+        { "path": "description", "maxCount": 1, "datatype": "xsd:string" },
+        {
+          "path": "url",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI"
+        },
+        {
+          "path": "inLanguage",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:string",
+          "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+        },
+        { "path": "sameAs", "datatype": "xsd:anyURI" },
+        { "path": "publisher", "maxCount": 1, "datatype": "xsd:anyURI" },
+        { "path": "hasPart" }
+      ]
+    },
+    {
+      "id": "schema:WebPageShape",
+      "targetClass": "schema:WebPage",
+      "closed": true,
+      "ignoredProperties": ["@context"],
+      "properties": [
+        {
+          "path": "@id",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI"
+        },
+        {
+          "path": "@type",
+          "minCount": 1,
+          "in": ["schema:WebPage", "WebPage"]
+        },
+        {
+          "path": "name",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:string"
+        },
+        {
+          "path": "url",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI"
+        },
+        { "path": "description", "maxCount": 1, "datatype": "xsd:string" },
+        {
+          "path": "inLanguage",
+          "maxCount": 1,
+          "datatype": "xsd:string",
+          "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+        },
+        {
+          "path": "dateCreated",
+          "maxCount": 1,
+          "datatype": "xsd:date"
+        },
+        {
+          "path": "dateModified",
+          "maxCount": 1,
+          "datatype": "xsd:date"
+        },
+        { "path": "isPartOf", "maxCount": 1 },
+        { "path": "hasPart" },
+        { "path": "text", "maxCount": 1, "datatype": "xsd:string" }
+      ]
+    },
+    {
+      "id": "schema:WebPageElementShape",
+      "targetClass": "schema:WebPageElement",
+      "closed": true,
+      "ignoredProperties": ["@context"],
+      "properties": [
+        {
+          "path": "@id",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI"
+        },
+        {
+          "path": "@type",
+          "minCount": 1,
+          "in": ["schema:WebPageElement", "WebPageElement"]
+        },
+        { "path": "name", "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "text", "maxCount": 1, "datatype": "xsd:string" }
+      ]
+    },
+    {
+      "id": "schema:AboutPageShape",
+      "targetClass": "schema:AboutPage",
+      "closed": true,
+      "ignoredProperties": ["@context"],
+      "properties": [
+        {
+          "path": "@id",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI"
+        },
+        {
+          "path": "@type",
+          "minCount": 1,
+          "in": ["schema:AboutPage", "AboutPage"]
+        },
+        {
+          "path": "name",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:string"
+        },
+        {
+          "path": "url",
+          "minCount": 1,
+          "maxCount": 1,
+          "datatype": "xsd:anyURI"
+        },
+        {
+          "path": "isPartOf",
+          "minCount": 1,
+          "maxCount": 1
+        },
+        { "path": "description", "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "inLanguage", "maxCount": 1, "datatype": "xsd:string" },
+        { "path": "dateModified", "maxCount": 1, "datatype": "xsd:dateTime" }
+      ]
+    }
+  ]
+}

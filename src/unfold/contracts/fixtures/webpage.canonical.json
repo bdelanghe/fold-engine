@@ -1,0 +1,29 @@
+{
+  "kind": "WebPage",
+  "id": "https://example.org/pages/hello",
+  "url": "https://example.org/pages/hello",
+  "name": "Hello World",
+  "description": "A minimal page demonstrating the semantic website contract.",
+  "inLanguage": "en",
+  "dateCreated": "2026-01-25",
+  "dateModified": "2026-01-25",
+  "isPartOf": {
+    "kind": "WebSite",
+    "id": "https://example.org"
+  },
+  "hasPart": [
+    {
+      "kind": "WebPageElement",
+      "id": "https://example.org/pages/hello#intro",
+      "name": "Introduction",
+      "text": "This is the introduction section."
+    },
+    {
+      "kind": "WebPageElement",
+      "id": "https://example.org/pages/hello#content",
+      "name": "Main Content",
+      "text": "WebPages can contain multiple sections, each with their own ID and content."
+    }
+  ],
+  "content": "This is a minimal page demonstrating the semantic website contract. It validates with JSON Schema, compiles to JSON-LD, and validates as RDF graph."
+}

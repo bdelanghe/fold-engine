@@ -1,6 +1,6 @@
 import { fromFileUrl, join } from "@std/path";
 import { loadVaultRoot } from "../inputs/vault/load_vault.ts";
-import { normalizeSiteUrl } from "../site/site_url.ts";
+import { siteBuildConfig } from "../site/site_build_config.ts";
 
 type SitemapEntry = {
   url: string;
@@ -10,8 +10,7 @@ type SitemapEntry = {
 const getSiteOutputDir = (): string =>
   Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
 
-const getSiteUrl = (): string =>
-  normalizeSiteUrl(Deno.env.get("SITE_URL") ?? "https://fold.example");
+const getSiteUrl = (): string => siteBuildConfig.siteUrl;
 
 const stripLegacyFoldEnginePrefix = (pathname: string): string =>
   pathname.replace(/^\/fold-engine(?=\/|$)/, "");

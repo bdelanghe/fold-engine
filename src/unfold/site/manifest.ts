@@ -1,5 +1,6 @@
 import { DOMParser, type HTMLDocument } from "deno-dom-wasm";
-import { normalizeSiteUrl } from "./site_url.ts";
+import { loadVault } from "../inputs/jsonld/loader.ts";
+import type { VaultNode } from "../inputs/jsonld/types.ts";
 
 type ManifestPage = {
   path: string;
@@ -9,6 +10,7 @@ type ManifestPage = {
   hasJsonLd: boolean;
   jsonLdErrors: string[];
   canonical: string;
+  cid: string;
   hasCharset: boolean;
   hasViewport: boolean;
   forbiddenMarkersFound: string[];
@@ -26,13 +28,27 @@ type ManifestOptions = {
   siteDir?: string;
   siteUrl?: string;
   buildMode?: string;
+  vaultPath?: string;
+  source?: "siteDir" | "vaultGraph";
 };
 
-const defaultSiteUrl = () =>
-  normalizeSiteUrl(Deno.env.get("SITE_URL") ?? "https://fold.example");
+const requireSiteUrl = (value?: string, fallback?: string): string => {
+  const raw = value?.trim() ?? fallback?.trim() ??
+    Deno.env.get("SITE_URL")?.trim();
+  if (!raw) {
+    throw new Error("SITE_URL is required.");
+  }
+  return raw.replace(/\/$/, "");
+};
 
-const defaultBuildMode = () =>
-  Deno.env.get("LUME_ENV") ?? Deno.env.get("BUILD_MODE") ?? "production";
+const requireBuildMode = (value?: string): string => {
+  const raw = value?.trim() ?? Deno.env.get("LUME_ENV") ??
+    Deno.env.get("BUILD_MODE");
+  if (!raw) {
+    throw new Error("BUILD_MODE or LUME_ENV is required.");
+  }
+  return raw;
+};
 
 const normalizePathname = (pathname: string): string => {
   if (!pathname.startsWith("/")) {
@@ -158,6 +174,17 @@ const extractJsonLd = (doc: HTMLDocument): {
   return { hasJsonLd: true, jsonLdErrors: errors };
 };
 
+const hashSha256Hex = async (value: string): Promise<string> => {
+  const data = new TextEncoder().encode(value);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+};
+
+const buildCid = async (value: string): Promise<string> =>
+  `sha256:${await hashSha256Hex(value)}`;
+
 const detectForbiddenMarkers = (html: string): string[] => {
   const markers: Array<{ id: string; pattern: RegExp }> = [
     { id: "lume-live-reload", pattern: /lume-live-reload/i },
@@ -173,15 +200,168 @@ const detectForbiddenMarkers = (html: string): string[] => {
     .map((marker) => marker.id);
 };
 
-const getSiteDir = (): string =>
-  Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
+const requireSiteDir = (value?: string): string => {
+  const raw = value?.trim() ?? Deno.env.get("SITE_OUTPUT_DIR")?.trim();
+  if (!raw) {
+    throw new Error("SITE_OUTPUT_DIR is required.");
+  }
+  return raw;
+};
+
+const requireVaultPath = (value?: string): string => {
+  const raw = value?.trim() ?? Deno.env.get("VAULT_PATH")?.trim();
+  if (!raw) {
+    throw new Error("VAULT_PATH is required for vault JSON-LD loading.");
+  }
+  return raw;
+};
+
+const hasJsonLdType = (node: VaultNode, type: string): boolean => {
+  const value = node["@type"];
+  if (!value) return false;
+  const types = Array.isArray(value) ? value : [value];
+  return types.some((entry) => entry === type || entry === `schema:${type}`);
+};
+
+const readNodeString = (
+  node: VaultNode,
+  key: string,
+): string | undefined => {
+  const value = node[key];
+  return typeof value === "string" ? value.trim() : undefined;
+};
+
+const getNodeUrl = (node: VaultNode): string | undefined =>
+  readNodeString(node, "url") ?? readNodeString(node, "@id");
+
+const getNodeTitle = (node: VaultNode, fallback: string): string =>
+  readNodeString(node, "name") ?? readNodeString(node, "headline") ??
+    readNodeString(node, "title") ?? fallback;
+
+const extractNodeLinks = (node: VaultNode, siteUrl: string): string[] => {
+  const raw = node["hasPart"];
+  const parts = Array.isArray(raw) ? raw : raw ? [raw] : [];
+  const origin = new URL(siteUrl).origin;
+  const links = new Set<string>();
+
+  for (const part of parts) {
+    if (typeof part === "string") {
+      try {
+        const url = new URL(part, siteUrl);
+        if (url.origin === origin) {
+          links.add(normalizePathname(url.pathname));
+        }
+      } catch {
+        continue;
+      }
+      continue;
+    }
+
+    if (part && typeof part === "object") {
+      const record = part as Record<string, unknown>;
+      const id = typeof record["@id"] === "string" ? record["@id"] : undefined;
+      const url = typeof record["url"] === "string" ? record["url"] : undefined;
+      const target = id ?? url;
+      if (!target) continue;
+      try {
+        const parsed = new URL(target, siteUrl);
+        if (parsed.origin === origin) {
+          links.add(normalizePathname(parsed.pathname));
+        }
+      } catch {
+        continue;
+      }
+    }
+  }
+
+  return Array.from(links).sort();
+};
+
+const buildPageFromNode = async (
+  node: VaultNode,
+  siteUrl: string,
+  linkOverrides?: string[],
+): Promise<ManifestPage> => {
+  const nodeUrl = getNodeUrl(node);
+  if (!nodeUrl) {
+    throw new Error("JSON-LD node is missing url or @id.");
+  }
+  const path = normalizePathname(new URL(nodeUrl, siteUrl).pathname);
+  const title = getNodeTitle(node, path);
+  const links = linkOverrides ?? extractNodeLinks(node, siteUrl);
+  const cid = await buildCid(JSON.stringify(node));
+
+  return {
+    path,
+    title,
+    h1: title,
+    links,
+    hasJsonLd: true,
+    jsonLdErrors: [],
+    canonical: `${siteUrl}${path}`,
+    cid,
+    hasCharset: true,
+    hasViewport: true,
+    forbiddenMarkersFound: [],
+  };
+};
+
+const buildPagesFromVaultGraph = async (
+  nodes: VaultNode[],
+  siteUrl: string,
+): Promise<ManifestPage[]> => {
+  const pageByPath = new Map<string, ManifestPage>();
+  const siteNode = nodes.find((node) => hasJsonLdType(node, "WebSite"));
+
+  if (siteNode) {
+    const siteLinks = extractNodeLinks(siteNode, siteUrl);
+    const sitePage = await buildPageFromNode(siteNode, siteUrl, siteLinks);
+    pageByPath.set(sitePage.path, sitePage);
+  }
+
+  for (const node of nodes) {
+    if (!hasJsonLdType(node, "WebPage")) {
+      continue;
+    }
+    const page = await buildPageFromNode(node, siteUrl);
+    if (!pageByPath.has(page.path)) {
+      pageByPath.set(page.path, page);
+    }
+  }
+
+  return Array.from(pageByPath.values()).sort((a, b) =>
+    a.path.localeCompare(b.path)
+  );
+};
 
 export const generateSiteManifest = async (
   options: ManifestOptions = {},
 ): Promise<SiteManifest> => {
-  const siteDir = options.siteDir ?? getSiteDir();
-  const siteUrl = (options.siteUrl ?? defaultSiteUrl()).replace(/\/$/, "");
-  const buildMode = options.buildMode ?? defaultBuildMode();
+  const buildMode = requireBuildMode(options.buildMode);
+  const useVaultGraph = options.source === "vaultGraph" ||
+    typeof options.vaultPath === "string";
+
+  if (useVaultGraph) {
+    const vaultPath = requireVaultPath(options.vaultPath);
+    const { nodes, errors } = await loadVault(vaultPath);
+    if (errors.length > 0) {
+      const detail = errors.map((error) => error.message).join("; ");
+      throw new Error(`Vault JSON-LD load failed: ${detail}`);
+    }
+    const siteNode = nodes.find((node) => hasJsonLdType(node, "WebSite"));
+    const siteUrl = requireSiteUrl(
+      options.siteUrl,
+      siteNode ? getNodeUrl(siteNode) : undefined,
+    );
+    const pages = await buildPagesFromVaultGraph(nodes, siteUrl);
+    return {
+      site: { url: siteUrl, buildMode },
+      pages,
+    };
+  }
+
+  const siteDir = requireSiteDir(options.siteDir);
+  const siteUrl = requireSiteUrl(options.siteUrl);
   const htmlFiles = await collectHtmlFiles(siteDir);
 
   const pages = await Promise.all(
@@ -202,6 +382,7 @@ export const generateSiteManifest = async (
       );
       const canonical = getCanonicalUrl(doc, siteUrl);
       const { hasJsonLd, jsonLdErrors } = extractJsonLd(doc);
+      const cid = await buildCid(html);
 
       return {
         path,
@@ -211,6 +392,7 @@ export const generateSiteManifest = async (
         hasJsonLd,
         jsonLdErrors,
         canonical,
+        cid,
         hasCharset,
         hasViewport,
         forbiddenMarkersFound: detectForbiddenMarkers(html),
