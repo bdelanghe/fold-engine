@@ -1,6 +1,5 @@
 import lume from "lume/mod.ts";
-import type { Page } from "lume/core/file.ts";
-import { dirname, join, relative } from "@std/path";
+import { dirname, fromFileUrl, isAbsolute, join } from "@std/path";
 import jsonLd from "lume/plugins/json_ld.ts";
 import metas from "lume/plugins/metas.ts";
 import robots from "lume/plugins/robots.ts";
@@ -35,74 +34,26 @@ const getWorkspaceRoot = (): string => {
 };
 
 const getVaultPath = (): string => {
-  const workspaceRoot = getWorkspaceRoot().replace(/\/$/, "");
-  const vaultPath = vaultConfig.vaultPath;
-  if (vaultPath.startsWith(`${workspaceRoot}/`)) {
-    return relative(workspaceRoot, vaultPath);
+  const override = Deno.env.get("VAULT_PATH")?.trim();
+  if (!override) {
+    return "obsidian_vault";
   }
-  return vaultPath;
+  return isAbsolute(override) ? override : join(getWorkspaceRoot(), override);
 };
 
-const getSiteDest = (): string => {
-  const raw = Deno.env.get("SITE_OUTPUT_DIR")?.trim();
-  if (!raw) {
-    throw new Error("SITE_OUTPUT_DIR is required.");
-  }
-  return raw;
-};
-
-type SiteDest = {
-  dest: (path: string) => string;
-};
-
-const normalizePages = (pages: Page[] | Iterable<Page>): Page[] => {
-  if (Array.isArray(pages)) {
-    return pages;
-  }
-  try {
-    return Array.from(pages);
-  } catch (error) {
-    throw new Error("Pages are not iterable.", { cause: error });
-  }
-};
-
-const writeJsonldPages = async (
-  site: SiteDest,
-  pages: Page[],
-): Promise<void> => {
-  const writes = pages.map((page) => {
-    const pageUrl = typeof page.data.url === "string" ? page.data.url : "/";
-    const jsonldUrl = pageUrl.replace(/\/$/, "") + ".jsonld";
-    const jsonldPath = site.dest(jsonldUrl);
-    const jsonld = page.data.jsonld;
-    if (!jsonld) {
-      throw new Error(`Missing jsonld data for page: ${pageUrl}`);
-    }
-    return (async () => {
-      await Deno.mkdir(dirname(jsonldPath), { recursive: true });
-      await Deno.writeTextFile(
-        jsonldPath,
-        JSON.stringify(jsonld, null, 2),
-      );
-    })();
-  });
-  await Promise.all(writes);
-};
+const getSiteDest = (): string =>
+  Deno.env.get("SITE_OUTPUT_DIR")?.trim() || ".unfold/site";
 
 export const createSite = (): ReturnType<typeof lume> => {
   const siteUrl = getSiteUrl();
   const basePath = getSiteBasePath();
   const workspaceRoot = getWorkspaceRoot();
   const vaultPath = getVaultPath();
-  const normalizedWorkspaceRoot = workspaceRoot.replace(/\/$/, "");
-  const srcPath = vaultPath.startsWith(`${normalizedWorkspaceRoot}/`)
-    ? relative(normalizedWorkspaceRoot, vaultPath)
-    : vaultPath;
   const destPath = getSiteDest();
 
   const site = lume({
     cwd: workspaceRoot,
-    src: srcPath,
+    src: vaultPath,
     dest: destPath,
     location: new URL(siteUrl),
     watcher: {

@@ -173,9 +173,9 @@ const buildJsonLd = (
 
     const graph = [webpage, article, website].map((node) =>
       Object.fromEntries(
-        Object.entries(node).filter(([, value]) =>
-          value !== "" && value !== null && value !== undefined
-        ),
+      Object.entries(node).filter(([, value]) =>
+        value !== "" && value !== null && value !== undefined
+      ),
       )
     );
 

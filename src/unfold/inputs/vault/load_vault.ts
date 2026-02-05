@@ -3,7 +3,14 @@ import { relative } from "@std/path";
 import { vaultConfig, DEFAULT_VAULT_DIRS } from "./vault_config.ts";
 
 export const loadVaultRoot = (): URL => {
-  return vaultConfig.vaultUrl;
+  const override = Deno.env.get("VAULT_PATH")?.trim();
+  if (override) {
+    const resolved = isAbsolute(override)
+      ? override
+      : join(Deno.cwd(), override);
+    return toFileUrl(resolved.endsWith("/") ? resolved : `${resolved}/`);
+  }
+  return new URL("../../../../obsidian_vault/", import.meta.url);
 };
 
 /** Obsidian accepted file extensions by type */

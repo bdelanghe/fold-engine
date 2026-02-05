@@ -1,6 +1,4 @@
 import { DOMParser, type HTMLDocument } from "deno-dom-wasm";
-import { loadVault } from "../inputs/jsonld/loader.ts";
-import type { VaultNode } from "../inputs/jsonld/types.ts";
 
 type ManifestPage = {
   path: string;
@@ -32,14 +30,8 @@ type ManifestOptions = {
   source?: "siteDir" | "vaultGraph";
 };
 
-const requireSiteUrl = (value?: string, fallback?: string): string => {
-  const raw = value?.trim() ?? fallback?.trim() ??
-    Deno.env.get("SITE_URL")?.trim();
-  if (!raw) {
-    throw new Error("SITE_URL is required.");
-  }
-  return raw.replace(/\/$/, "");
-};
+const defaultSiteUrl = () =>
+  (Deno.env.get("SITE_URL") ?? "https://fold.example").replace(/\/$/, "");
 
 const requireBuildMode = (value?: string): string => {
   const raw = value?.trim() ?? Deno.env.get("LUME_ENV") ??
