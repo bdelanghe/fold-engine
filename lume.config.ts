@@ -17,7 +17,7 @@ const siteRoot = new URL(".", import.meta.url).pathname;
 const site = lume({
   cwd: siteRoot,
   src: "obsidian_vault",
-  dest: "./_site",
+  dest: "dist/site",
   includes: "src/includes",
   location: new URL(siteUrl),
 });

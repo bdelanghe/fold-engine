@@ -1,4 +1,4 @@
-todo
+# Unfold TODO
 
-- First project: set up this static site
+- First project: set up the Unfold static site
 - Build pipeline: jaq-based JSON folding

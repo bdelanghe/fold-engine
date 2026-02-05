@@ -86,9 +86,7 @@ export default (data: LayoutData) => {
   const jsonld = buildJsonLd(data);
   const content = data.content ?? "";
   const hasContentH1 = /<h1[\s>]/i.test(content);
-  const headerMarkup = hasContentH1
-    ? ""
-    : `<header>
+  const headerMarkup = hasContentH1 ? "" : `<header>
           <h1 id="page-title" itemprop="headline">${title}</h1>
         </header>`;
   const articleLabel = hasContentH1 ? "" : ' aria-labelledby="page-title"';
