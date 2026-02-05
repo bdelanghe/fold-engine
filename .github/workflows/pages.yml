@@ -65,7 +65,7 @@ jobs:
           VAULT_PATH: vault
 
       - name: Validate AI exports
-        run: deno test -A src/unfold/tests/exporters_ai_test.ts
+        run: deno test -A src/unfold/exporters/exporters_ai_test.ts
         env:
           SITE_URL: ${{ steps.site.outputs.site_url }}
           SITE_OUTPUT_DIR: .unfold/site
