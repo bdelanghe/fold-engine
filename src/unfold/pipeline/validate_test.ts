@@ -1,14 +1,22 @@
 import { assert, assertRejects } from "@std/assert";
-import { ValidationError } from "../inputs/jsonld/types.ts";
+import { ValidationError, type VaultNode } from "../inputs/jsonld/types.ts";
 import { ORPHAN_REACHABILITY_PREFIX } from "../inputs/jsonld/validator_reachability.ts";
 import { runValidate, type ValidationDeps } from "./validate.ts";
+
+const SAMPLE_NODES: VaultNode[] = [
+  {
+    "@type": "Catalog",
+    "@id": "https://example.org/catalog",
+    _source: { file: "vault/catalog.jsonld", path: "vault/catalog.jsonld" },
+  },
+];
 
 const createBaseDeps = (
   overrides: Partial<ValidationDeps> = {},
 ): Partial<ValidationDeps> => ({
   prepareVault: async () => {},
   getVaultPath: () => "/vault",
-  loadVault: async () => ({ nodes: [], errors: [] }),
+  loadVault: async () => ({ nodes: SAMPLE_NODES, errors: [] }),
   validateNodesJsonSchema: async () => [],
   validateNodes: async () => [],
   loadShapes: async () => ({ shapes: [] }),
@@ -20,6 +28,21 @@ const createBaseDeps = (
   writeError: async () => {},
   writeWarning: async () => {},
   ...overrides,
+});
+
+Deno.test("runValidate - dev mode warns when no JSON-LD nodes found", async () => {
+  const warnings: string[] = [];
+  const deps = createBaseDeps({
+    loadVault: async () => ({ nodes: [], errors: [] }),
+    writeWarning: async (text: string) => {
+      warnings.push(text);
+    },
+  });
+
+  await runValidate({ mode: "dev", deps });
+
+  assert(warnings.length === 1);
+  assert(warnings[0].includes("no JSON-LD nodes found"));
 });
 
 Deno.test("runValidate - dev mode warns on orphan reachability", async () => {

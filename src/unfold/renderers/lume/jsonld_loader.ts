@@ -19,20 +19,20 @@ type LoaderFunction = (path: string) => Promise<PageData>;
  * Extract page data from a JSON-LD node
  * Maps JSON-LD properties to Lume page data
  */
-function extractPageData(node: JsonLdNode): PageData {
+function extractPageData(node: JsonLdNode, sourcePath: string): PageData {
   const extractedDate = extractDate(node);
 
   const data: PageData = {
     // Required Lume fields
-    url: extractUrl(node),
-    title: extractTitle(node),
+    url: extractUrl(node, sourcePath),
+    title: extractTitle(node, sourcePath),
     date: extractedDate || new Date(), // Lume requires Date, not undefined
 
     // Optional fields
     description: extractString(node, "description"),
 
     // Content
-    content: extractContent(node),
+    content: extractContent(node, sourcePath),
 
     // JSON-LD metadata (full node for <script type="application/ld+json">)
     // The layout template will inject this into the page head
@@ -40,7 +40,7 @@ function extractPageData(node: JsonLdNode): PageData {
 
     // Metas for SEO
     metas: {
-      title: extractTitle(node),
+      title: extractTitle(node, sourcePath),
       description: extractString(node, "description"),
       type: "article",
     },
@@ -58,7 +58,7 @@ function extractPageData(node: JsonLdNode): PageData {
  * Extract URL from @id
  * Convert @id IRI to Lume-friendly URL path
  */
-function extractUrl(node: JsonLdNode): string {
+function extractUrl(node: JsonLdNode, sourcePath: string): string {
   const id = node["@id"];
   if (!id) {
     throw new Error(`Node missing @id: ${JSON.stringify(node)}`);
@@ -67,17 +67,17 @@ function extractUrl(node: JsonLdNode): string {
   try {
     const url = new URL(id);
     // Return pathname (e.g., /pages/hello from https://example.org/pages/hello)
-    return url.pathname + url.hash;
+    const path = url.pathname + url.hash;
+    return path.startsWith("/") ? path : urlFromPath(sourcePath);
   } catch {
-    // If not a valid URL, use as-is
-    return id;
+    return urlFromPath(sourcePath);
   }
 }
 
 /**
  * Extract title from various JSON-LD properties
  */
-function extractTitle(node: JsonLdNode): string {
+function extractTitle(node: JsonLdNode, sourcePath: string): string {
   // Try common title properties
   const candidates = [
     node.title,
@@ -95,7 +95,7 @@ function extractTitle(node: JsonLdNode): string {
   }
 
   // Fallback to @id
-  return extractUrl(node);
+  return extractUrl(node, sourcePath);
 }
 
 /**
@@ -142,7 +142,7 @@ function extractDate(node: JsonLdNode): Date | undefined {
 /**
  * Extract content from the node
  */
-function extractContent(node: JsonLdNode): string {
+function extractContent(node: JsonLdNode, sourcePath: string): string {
   // Check for explicit content properties
   const content = extractString(
     node,
@@ -168,8 +168,8 @@ function extractContent(node: JsonLdNode): string {
           if (keys.length === 0) {
             return ""; // Just a reference, skip it
           }
-          const sectionTitle = extractTitle(partNode);
-          const sectionContent = extractContent(partNode);
+          const sectionTitle = extractTitle(partNode, sourcePath);
+          const sectionContent = extractContent(partNode, sourcePath);
           if (sectionContent) {
             return `<section>\n<h2>${sectionTitle}</h2>\n${sectionContent}\n</section>`;
           }
@@ -191,6 +191,14 @@ function extractContent(node: JsonLdNode): string {
 
   return "";
 }
+
+const urlFromPath = (path: string): string => {
+  const normalized = path.replaceAll("\\", "/");
+  const withoutExt = normalized.endsWith(".jsonld")
+    ? normalized.slice(0, -7)
+    : normalized;
+  return withoutExt.startsWith("/") ? withoutExt : `/${withoutExt}`;
+};
 
 /**
  * Lume loader for .jsonld files
@@ -224,7 +232,7 @@ export default function (): LoaderFunction {
       return {} as PageData; // Return empty page data to skip this file
     }
 
-    const data = extractPageData(mainNode);
+    const data = extractPageData(mainNode, path);
 
     // Store all nodes for potential use
     data.allNodes = nodes;

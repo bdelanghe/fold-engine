@@ -79,6 +79,8 @@ export const buildLlmsTxt = async (
       const url = resolveCanonical(page, siteUrl);
       const title = normalizeText(
         page.document?.querySelector("title")?.textContent,
+      ) || normalizeText(
+        typeof page.data?.title === "string" ? page.data.title : "",
       );
       if (!url) {
         return null;

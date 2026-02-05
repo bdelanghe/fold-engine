@@ -1,5 +1,5 @@
 import { walk } from "@std/fs";
-import { relative } from "@std/path";
+import { isAbsolute, join, relative, toFileUrl } from "@std/path";
 import { vaultConfig, DEFAULT_VAULT_DIRS } from "./vault_config.ts";
 
 export const loadVaultRoot = (): URL => {
