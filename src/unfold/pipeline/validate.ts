@@ -111,6 +111,19 @@ export const runValidate = async (
     await deps.writeError(errorLines.join("\n"));
     throw new Error("JSON-LD load failed");
   }
+  if (nodes.length === 0) {
+    const lines = [
+      `JSON-LD validation skipped (mode: ${mode}):`,
+      `  - no JSON-LD nodes found in ${vaultPath}`,
+      "Hint: export JSON-LD into the vault or set VAULT_BASE_URL.",
+    ];
+    if (mode === "strict") {
+      await deps.writeError(lines.join("\n"));
+      throw new Error("JSON-LD validation failed");
+    }
+    await deps.writeWarning(lines.join("\n"));
+    return;
+  }
 
   if (mode === "strict") {
     const jsonSchemaErrors = await deps.validateNodesJsonSchema(nodes);
