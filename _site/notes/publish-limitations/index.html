@@ -1,0 +1,122 @@
+<h1>publish-limitations</h1>
+<p>This vault should stay compatible with Obsidian Publish. Keep content within
+supported formats and avoid patterns that Publish does not accept.</p>
+<h2>Compatibility checklist</h2>
+<ul>
+<li>Use supported file formats only (Markdown + approved attachments).</li>
+<li>Keep attachment sizes within Publish limits.</li>
+<li>Avoid unsupported plugins or features in published notes.</li>
+<li>Keep vault structure simple and portable (no special filesystem tricks).</li>
+</ul>
+<p>Reference: Obsidian Publish limitations.</p>
+<h2>URLs and identifiers</h2>
+<p>When naming publishable URLs or identifiers, prefer stable namespaces over
+ad-hoc slugs. A URI-style pattern keeps names globally unique and avoids
+semantic drift as titles change.</p>
+<ul>
+<li><strong>Namespace + local name</strong>: <code>https://example.org/ontology#Person</code></li>
+<li><strong>Opaque IDs + labels</strong>: store labels separately from the identifier</li>
+<li><strong>Controlled vocabularies</strong>: track preferred labels + synonyms in metadata</li>
+</ul>
+<h2>IPFS and content addressing</h2>
+<p>IPFS replaces slug-like identifiers with <strong>content identifiers (CIDs)</strong>, which
+are cryptographic hashes of the content itself. Links are CIDs, and naming is
+treated as metadata layered on top.</p>
+<ul>
+<li><strong>CID = canonical identifier</strong>: identical content yields identical CIDs</li>
+<li><strong>IPLD graphs</strong>: links are hash pointers, not human-readable slugs</li>
+<li><strong>Naming overlays</strong>: IPNS, DNSLink, or DIDs provide mutable labels</li>
+</ul>
+<h2>IPLD note decomposition</h2>
+<p>In IPLD terms, a single note often mixes multiple conceptual layers. Prefer
+splitting stable meaning, mutable structure, and indexes into separate nodes
+linked by CIDs so that each part can evolve independently.</p>
+<h3>Structural atoms</h3>
+<p>Anything that can be reused, referenced elsewhere, or indexed globally should
+be a candidate for its own CID-backed object.</p>
+<h3>Front-matter fields as links</h3>
+<p>Some fields stay inline (like a current title), but structural metadata should
+be links.</p>
+<ul>
+<li><strong>Tags</strong>: treat tags as linked nodes, not strings.</li>
+<li><strong>Schema</strong>: point to a schema contract node.</li>
+<li><strong>Fold type</strong>: link to a fold-type definition.</li>
+<li><strong>Semantic overlays</strong>: JSON-LD belongs in a separate overlay node.</li>
+</ul>
+<h3>Markdown body as a content node</h3>
+<p>The prose content should be a dedicated markdown node so metadata can change
+without rewriting the body. This also enables clean diffing and deduplication.</p>
+<h3>Optional conceptual anchors</h3>
+<p>Keep bullet lists in the markdown body unless the concepts recur across many
+notes; then elevate them into reusable concept nodes.</p>
+<h3>Example skeleton</h3>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;note&quot;,
+  &quot;title&quot;: &quot;cognitive-folding&quot;,
+  &quot;schema&quot;: { &quot;/&quot;: &quot;bafy...fold-v1&quot; },
+  &quot;foldType&quot;: { &quot;/&quot;: &quot;bafy...bounded-tree&quot; },
+  &quot;tags&quot;: [
+    { &quot;/&quot;: &quot;bafy...tag/cognitive&quot; },
+    { &quot;/&quot;: &quot;bafy...tag/adhd&quot; }
+  ],
+  &quot;body&quot;: { &quot;/&quot;: &quot;bafy...markdown&quot; },
+  &quot;semanticOverlays&quot;: [
+    { &quot;/&quot;: &quot;bafy...schemaorg-webpage&quot; }
+  ],
+  &quot;created&quot;: &quot;2026-01-24T15:10:00Z&quot;,
+  &quot;previous&quot;: { &quot;/&quot;: &quot;bafy...oldversion&quot; }
+}
+</code></pre>
+<h2>JSON-LD typing for notes</h2>
+<p><code>WebPage</code> is common because Obsidian Publish emits web pages and schema.org is
+optimized for search engines. It is safe and widely indexed, but semantically
+underpowered for technical notes.</p>
+<h3>Better schema.org defaults</h3>
+<p>If staying inside schema.org, prefer note-shaped types.</p>
+<ul>
+<li><strong>DigitalDocument</strong>: simple, accurate for technical docs.</li>
+<li><strong>TechArticle</strong>: better for documentation and specs.</li>
+<li><strong>CreativeWork</strong>: flexible but minimal.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-json">{
+  &quot;@context&quot;: &quot;https://schema.org&quot;,
+  &quot;@type&quot;: &quot;DigitalDocument&quot;,
+  &quot;name&quot;: &quot;publish-limitations&quot;,
+  &quot;about&quot;: [&quot;obsidian publish&quot;, &quot;ipfs&quot;, &quot;naming&quot;],
+  &quot;genre&quot;: &quot;technical-spec&quot;
+}
+</code></pre>
+<h3>Custom class + schema.org overlay</h3>
+<p>If you stop optimizing for search engines, declare a first-class class and use
+schema.org as a secondary vocabulary.</p>
+<pre><code class="language-json">{
+  &quot;@context&quot;: {
+    &quot;@vocab&quot;: &quot;https://example.org/fold#&quot;,
+    &quot;schema&quot;: &quot;https://schema.org/&quot;
+  },
+  &quot;@type&quot;: &quot;Note&quot;,
+  &quot;title&quot;: &quot;publish-limitations&quot;,
+  &quot;noteKind&quot;: &quot;policy&quot;,
+  &quot;system&quot;: &quot;obsidian-publish&quot;,
+  &quot;schema:about&quot;: [&quot;ipfs&quot;, &quot;slugging&quot;, &quot;naming&quot;]
+}
+</code></pre>
+<h3>IPLD view</h3>
+<p>In content-addressed graphs, the JSON-LD overlay is just one lens. The
+structural role matters more than SEO types.</p>
+<ul>
+<li><code>type: note</code></li>
+<li><code>noteClass: publish-policy</code></li>
+<li><code>appliesTo: obsidian-publish</code></li>
+<li><code>references: [CID...]</code></li>
+</ul>
+<h2>Human slug conventions</h2>
+<p>There is no single global standard for human-readable slugs, but there are
+common conventions driven by web and SEO practice.</p>
+<ul>
+<li><strong>Lowercase + hyphens</strong>: replace spaces with <code>-</code>, avoid underscores</li>
+<li><strong>Short + descriptive</strong>: favor concise, meaningful words</li>
+<li><strong>Avoid noise</strong>: skip redundant numbers/dates unless meaningful</li>
+<li><strong>Stability</strong>: keep published slugs immutable when possible</li>
+</ul>
