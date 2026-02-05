@@ -1,3 +1,5 @@
+import { DOMParser, type HTMLDocument } from "deno-dom-wasm";
+
 type ManifestPage = {
   path: string;
   title: string;
@@ -74,7 +76,7 @@ const collectHtmlFiles = async (dir: string): Promise<string[]> => {
   return htmlFiles;
 };
 
-const getCanonicalUrl = (doc: Document, siteUrl: string): string => {
+const getCanonicalUrl = (doc: HTMLDocument, siteUrl: string): string => {
   const canonical = doc.querySelector('link[rel="canonical"]')?.getAttribute(
     "href",
   ) ?? "";
@@ -91,7 +93,7 @@ const getCanonicalUrl = (doc: Document, siteUrl: string): string => {
 };
 
 const extractLinks = (
-  doc: Document,
+  doc: HTMLDocument,
   pageUrl: string,
   siteUrl: string,
 ): string[] => {
@@ -126,7 +128,7 @@ const extractLinks = (
   return Array.from(links).sort();
 };
 
-const extractJsonLd = (doc: Document): {
+const extractJsonLd = (doc: HTMLDocument): {
   hasJsonLd: boolean;
   jsonLdErrors: string[];
 } => {
