@@ -23,8 +23,8 @@ const normalizePages = (pages: Page[] | Iterable<Page>): Page[] =>
   Array.isArray(pages) ? pages : Array.from(pages);
 
 const normalizeJsonldPath = (url: string): string => {
-  const noFragment = url.split("#")[0] ?? url;
-  const noQuery = noFragment.split("?")[0] ?? noFragment;
+  const noFragment = url.split("#")[0];
+  const noQuery = noFragment.split("?")[0];
   const trimmed = noQuery.replace(/^\/+/, "").replace(/\/$/, "");
   if (!trimmed) {
     return "index";
@@ -105,7 +105,13 @@ export const createSite = (): ReturnType<typeof lume> => {
     Deno.statSync(layoutTarget);
   } catch {
     Deno.mkdirSync(includesDir, { recursive: true });
-    Deno.copyFileSync(layoutPath, layoutTarget);
+    try {
+      Deno.copyFileSync(layoutPath, layoutTarget);
+    } catch (error) {
+      if (!(error instanceof Deno.errors.AlreadyExists)) {
+        throw error;
+      }
+    }
   }
 
   const site = lume({
